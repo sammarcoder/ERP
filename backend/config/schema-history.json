@@ -1,0 +1,106 @@
+{
+  "JournalDetails": {
+    "id": "INTEGER",
+    "jmId": "INTEGER",
+    "lineId": "INTEGER",
+    "coaId": "INTEGER",
+    "description": "VARCHAR(100)",
+    "chqNo": "VARCHAR(50)",
+    "recieptNo": "VARCHAR(50)",
+    "ownDb": "DOUBLE PRECISION",
+    "ownCr": "DOUBLE PRECISION",
+    "rate": "DOUBLE PRECISION",
+    "amountDb": "DOUBLE PRECISION",
+    "amountCr": "DOUBLE PRECISION",
+    "isCost": "TINYINT(1)",
+    "currencyId": "INTEGER",
+    "status": "TINYINT(1)",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  },
+  "Users": {
+    "id": "INTEGER",
+    "name": "VARCHAR(255)",
+    "email": "VARCHAR(255)",
+    "password": "VARCHAR(255)",
+    "role": "VARCHAR(255)",
+    "resetToken": "VARCHAR(255)",
+    "resetTokenExpires": "DATETIME",
+    "isVerified": "TINYINT(1)",
+    "verificationToken": "VARCHAR(255)",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  },
+  "ZControlHead1s": {
+    "id": "INTEGER",
+    "zHead1": "VARCHAR(255)",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  },
+  "ZControlHead2s": {
+    "id": "INTEGER",
+    "zHead2": "VARCHAR(255)",
+    "zHead1Id": "INTEGER",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  },
+  "ZCOATypes": {
+    "id": "INTEGER",
+    "zType": "VARCHAR(255)",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  },
+  "ZsalesMans": {
+    "id": "INTEGER",
+    "name": "VARCHAR(45)",
+    "city": "VARCHAR(45)",
+    "adress": "VARCHAR(255)",
+    "telephone": "VARCHAR(15)",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  },
+  "ZvoucherTypes": {
+    "id": "INTEGER",
+    "vType": "VARCHAR(10)",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  },
+  "ZCoas": {
+    "id": "INTEGER",
+    "acName": "VARCHAR(255)",
+    "ch1Id": "INTEGER",
+    "ch2Id": "INTEGER",
+    "coaTypeId": "INTEGER",
+    "setupName": "VARCHAR(255)",
+    "adress": "VARCHAR(255)",
+    "city": "VARCHAR(255)",
+    "personName": "VARCHAR(255)",
+    "mobileNo": "VARCHAR(255)",
+    "taxStatus": "VARCHAR(255)",
+    "ntn": "VARCHAR(255)",
+    "cnic": "VARCHAR(255)",
+    "salesLimit": "VARCHAR(255)",
+    "credit": "VARCHAR(255)",
+    "creditDoys": "VARCHAR(255)",
+    "salesMan": "VARCHAR(255)",
+    "isJvBalance": "TINYINT(1)",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  },
+  "JournalMasters": {
+    "id": "INTEGER",
+    "date": "DATETIME",
+    "voucherTypeId": "INTEGER",
+    "voucherNo": "VARCHAR(50)",
+    "balacingId": "INTEGER",
+    "status": "TINYINT(1)",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  },
+  "Zcurrencies": {
+    "id": "INTEGER",
+    "currencyName": "VARCHAR(10)",
+    "createdAt": "DATETIME",
+    "updatedAt": "DATETIME"
+  }
+}
