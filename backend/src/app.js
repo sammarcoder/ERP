@@ -26,7 +26,7 @@ app.use('/api', require('./routes/index.js'))
 sequelize.authenticate()
   .then(() => {
     console.log('✅ Database connected');
-    return sequelize.sync();
+    return sequelize.sync({});
   })
   .then(() => {
     console.log('✅ Models synced');

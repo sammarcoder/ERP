@@ -1,5 +1,5 @@
 // controllers/zItems.controller.js
-const { ZItems, ZClassType } = require('../models');
+const { ZItems, ZClassType,Uom } = require('../models');
 const { Op } = require('sequelize');
 
 // Create a new item
@@ -188,7 +188,10 @@ const getItemById = async (req, res) => {
                 { model: ZClassType, as: 'class1', attributes: ['classId'] },
                 { model: ZClassType, as: 'class2', attributes: ['classId'] },
                 { model: ZClassType, as: 'class3', attributes: ['classId'] },
-                { model: ZClassType, as: 'class4', attributes: ['classId'] }
+                { model: ZClassType, as: 'class4', attributes: ['classId'] },
+                {model: Uom , as:'uom1',attributes:['uom'] },
+                {model: Uom , as:'uomTwo', attributes:['uom']},
+                {model: Uom , as:'uomThree' ,attributes:['uom']}
             ]
         });
 
@@ -213,6 +216,107 @@ const getItemById = async (req, res) => {
         });
     }
 };
+
+
+
+// // Get items by multiple class filters
+// const getItemsByClassFilters = async (req, res) => {
+//     try {
+//         const { class1, class2, class3, class4 } = req.query;
+        
+//         const whereClause = {};
+        
+//         // Add filters only if values are provided and not 0
+//         if (class1 && class1 !== '0') {
+//             whereClause.itemClass1 = class1;
+//         }
+//         if (class2 && class2 !== '0') {
+//             whereClause.itemClass2 = class2;
+//         }
+//         if (class3 && class3 !== '0') {
+//             whereClause.itemClass3 = class3;
+//         }
+//         if (class4 && class4 !== '0') {
+//             whereClause.itemClass4 = class4;
+//         }
+
+//         const items = await ZItems.findAll({
+//             where: whereClause,
+//             include: [
+//                 { model: ZClassType, as: 'class1', attributes: ['id', 'className'] },
+//                 { model: ZClassType, as: 'class2', attributes: ['id', 'className'] },
+//                 { model: ZClassType, as: 'class3', attributes: ['id', 'className'] },
+//                 { model: ZClassType, as: 'class4', attributes: ['id', 'className'] }
+//             ]
+//         });
+
+//         return res.status(200).json({
+//             success: true,
+//             data: items,
+//             count: items.length,
+//             filters: { class1, class2, class3, class4 }
+//         });
+
+//     } catch (error) {
+//         console.error('Error fetching items by class filters:', error);
+//         return res.status(500).json({
+//             success: false,
+//             message: 'Error fetching items by class filters',
+//             error: error.message
+//         });
+//     }
+// };
+
+
+
+
+
+
+
+
+
+
+
+// In your zItems.controller.js, add this method:
+const getItemsByClassFilters = async (req, res) => {
+    try {
+        const { class1, class2, class3, class4 } = req.query;
+        
+        const whereClause = {};
+        
+        // Only add filters if values are provided
+        if (class1 && class1 !== '0') whereClause.itemClass1 = class1;
+        if (class2 && class2 !== '0') whereClause.itemClass2 = class2;
+        if (class3 && class3 !== '0') whereClause.itemClass3 = class3;
+        if (class4 && class4 !== '0') whereClause.itemClass4 = class4;
+
+        const items = await ZItems.findAll({
+            where: whereClause,
+           
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: items
+        });
+
+    } catch (error) {
+        console.error('Error fetching filtered items:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error fetching filtered items'
+        });
+    }
+};
+
+
+
+
+
+
+
+
+
 
 // Update item
 const updateItem = async (req, res) => {
@@ -388,5 +492,6 @@ module.exports = {
     updateItem,
     deleteItem,
     getItemsByClass,
-    searchItems
+    searchItems,
+    getItemsByClassFilters
 };

@@ -1,12 +1,50 @@
-import OrderList from '@/components/OrderList'
-import React from 'react'
+// import OrderList from '@/components/OrderList'
+// import React from 'react'
 
-const page = () => {
+// const page = () => {
+//   return (
+//     <div>
+//         <OrderList />
+//     </div>
+//   )
+// }
+
+// export default page
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// app/order/purchase/page.tsx
+import OrderList from '@/components/OrderList'
+
+export default function Page() {
   return (
     <div>
-        <OrderList />
+      <OrderList />
     </div>
   )
 }
-
-export default page

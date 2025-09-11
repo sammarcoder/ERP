@@ -1,12 +1,10 @@
+// app/order/purchase/create/page.tsx
 import UnifiedOrderForm from '@/components/UnifiedOrderForm'
-import React from 'react'
 
-const page = () => {
+export default function Page() {
   return (
     <div>
-        <UnifiedOrderForm orderType="purchase"/>
+      <UnifiedOrderForm orderType="purchase" />
     </div>
   )
 }
-
-export default page

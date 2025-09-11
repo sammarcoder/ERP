@@ -193,69 +193,132 @@
 
 
 
-'use client';
-import { useState } from 'react';
+// 'use client';
+// import { useState } from 'react';
 
-export default function ProfessionalForm() {
-  const [errors, setErrors] = useState({});
+// export default function ProfessionalForm() {
+//   const [errors, setErrors] = useState({});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Get all data at once using FormData
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData.entries());
-    
-    // Validation
-    const newErrors = {};
-    if (!data.username) newErrors.username = 'Required';
-    if (!data.email) newErrors.email = 'Required';
-    
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    
-    console.log('Valid data:', data);
-    
-    // Send to API
-    fetch('/api/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  };
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <input 
-          name="username"
-          placeholder="Username"
-          className="border p-2 rounded"
-        />
-        {errors.username && <span className="text-red-500">{errors.username}</span>}
-      </div>
-      
-      <div>
-        <input 
-          name="email"
-          type="email"
-          placeholder="Email"
-          className="border p-2 rounded"
-        />
-        {errors.email && <span className="text-red-500">{errors.email}</span>}
-      </div>
-      
-      <select name="country" className="border p-2 rounded">
-        <option value="">Select Country</option>
-        <option value="usa">USA</option>
-        <option value="uk">UK</option>
-      </select>
-      
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-        Submit
-      </button>
-    </form>
-  );
+//     // Get all data at once using FormData
+//     const formData = new FormData(e.target);
+//     const data = Object.fromEntries(formData.entries());
+
+//     // Validation
+//     const newErrors = {};
+//     if (!data.username) newErrors.username = 'Required';
+//     if (!data.email) newErrors.email = 'Required';
+
+//     if (Object.keys(newErrors).length > 0) {
+//       setErrors(newErrors);
+//       return;
+//     }
+
+//     console.log('Valid data:', data);
+
+//     // Send to API
+//     fetch('/api/submit', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify(data)
+//     });
+//   };
+
+//   return (
+//     <form onSubmit={handleSubmit} className="space-y-4">
+//       <div>
+//         <input 
+//           name="username"
+//           placeholder="Username"
+//           className="border p-2 rounded"
+//         />
+//         {errors.username && <span className="text-red-500">{errors.username}</span>}
+//       </div>
+
+//       <div>
+//         <input 
+//           name="email"
+//           type="email"
+//           placeholder="Email"
+//           className="border p-2 rounded"
+//         />
+//         {errors.email && <span className="text-red-500">{errors.email}</span>}
+//       </div>
+
+//       <select name="country" className="border p-2 rounded">
+//         <option value="">Select Country</option>
+//         <option value="usa">USA</option>
+//         <option value="uk">UK</option>
+//       </select>
+
+//       <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+//         Submit
+//       </button>
+//     </form>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React from 'react'
+// import ClassFilter from '../../components/ClassFilter'
+// const page = () => {
+//   return (
+//     <div>
+//       <ClassFilter/>
+//     </div>
+//   )
+// }
+
+// export default page
+
+
+
+
+
+'use client'
+
+import React, { useState } from 'react'
+
+// let count = 2
+
+const page = () => {
+  const [count, setCount] = useState(1);
+  const increment = () => {
+  setCount(count+1)
 }
+  return (
+    <>
+    <select >
+      <option value={1}>1</option>
+    </select>
+      <div>this is pratice page</div>
+      <p>{count}</p>
+      <button onClick={increment}>click</button>
+    </>
+  )
+}
+
+export default page

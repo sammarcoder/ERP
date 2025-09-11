@@ -8,7 +8,8 @@ const {
     updateItem,
     deleteItem,
     getItemsByClass,
-    searchItems
+    searchItems,
+    getItemsByClassFilters
 } = require('../controllers/zItems.controller');
 
 // Basic CRUD routes
@@ -21,5 +22,6 @@ router.delete('/items/:id', deleteItem);
 
 // Special routes
 router.get('/items/class/:classId/level/:classLevel', getItemsByClass);
+router.get('/items/by-class-filters', getItemsByClassFilters);
 
 module.exports = router;

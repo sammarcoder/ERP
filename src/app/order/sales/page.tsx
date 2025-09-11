@@ -1,12 +1,10 @@
+// app/order/sales/page.tsx
 import OrderList from '@/components/OrderList'
-import React from 'react'
 
-const page = () => {
+export default function Page() {
   return (
     <div>
-        <OrderList/>
+      <OrderList />
     </div>
   )
 }
-
-export default page

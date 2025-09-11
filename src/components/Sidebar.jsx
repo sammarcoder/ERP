@@ -342,8 +342,8 @@ const Sidebar = () => {
             icon: '🛒',
             path: null,
             subItems: [
-                { id: 'sales-order', title: 'Sales Order', path: '/orders/sales' },
-                { id: 'purchase-order', title: 'Purchase Order', path: '/orders/purchase' }
+                { id: 'sales-order', title: 'Sales Order', path: '/order/sales' },
+                { id: 'purchase-order', title: 'Purchase Order', path: '/order/purchase' }
             ]
         },
         {
@@ -352,7 +352,7 @@ const Sidebar = () => {
             icon: '⚙️',
             path: null,
             subItems: [
-                { id: 'coa', title: 'COA', path: '/definition-ac/coa' },
+                { id: 'coa', title: 'COA', path: '/coa' },
                 { id: 'purchase-order-def', title: 'Purchase Order', path: '/definition-ac/purchase-order' }
             ]
         },

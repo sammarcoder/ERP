@@ -285,19 +285,19 @@ class ZItems extends Model {
             constraints: true,
             onDelete: 'SET NULL'
         });
-         
-        this.hasMany(models.Order_Detail,{
+
+        this.hasMany(models.Order_Detail, {
             foreignKey: 'Item_ID',
-            as : "item"
+            as: "item"
         })
-        
-        this.hasMany(models.StockDetail,{
+
+        this.hasMany(models.StockDetail, {
             foreignKey: 'itemId',
-            as : "stock_item"
+            as: "stock_item"
         })
-        
+
         // this.hasMany('')
-        
+
         // Supplier association (if you have a Supplier model)
         // this.belongsTo(models.Supplier, {
         //     foreignKey: 'supplier',
@@ -326,32 +326,32 @@ ZItems.init(
         },
 
         // Foreign Keys for Item Classes
-        itemClass1: { 
-            type: DataTypes.INTEGER, 
+        itemClass1: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'ZClassTypes',
                 key: 'id'
             }
         },
-        itemClass2: { 
-            type: DataTypes.INTEGER, 
+        itemClass2: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'ZClassTypes',
                 key: 'id'
             }
         },
-        itemClass3: { 
-            type: DataTypes.INTEGER, 
+        itemClass3: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'ZClassTypes',
                 key: 'id'
             }
         },
-        itemClass4: { 
-            type: DataTypes.INTEGER, 
+        itemClass4: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'ZClassTypes',
@@ -360,40 +360,44 @@ ZItems.init(
         },
 
         // UOM Fields - FIXED: No duplicates
-        skuUOM: { 
-            type: DataTypes.INTEGER, 
+        skuUOM: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'uoms',
                 key: 'id'
             }
         },
-        uom2: { 
-            type: DataTypes.INTEGER, 
+        uom1_qyt: {
+            type: DataTypes.INTEGER,
+            defaultValue: 1
+        },
+        uom2: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'uoms',
                 key: 'id'
             }
         },
-        uom2_qty: { 
-            type: DataTypes.DECIMAL(10, 2), 
-            allowNull: true 
+        uom2_qty: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: true
         },
-        uom3: { 
-            type: DataTypes.INTEGER, 
+        uom3: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'uoms',
                 key: 'id'
             }
         },
-        uom3_qty: { 
-            type: DataTypes.DECIMAL(10, 2), 
-            allowNull: true 
+        uom3_qty: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: true
         },
-        assessmentUOM: { 
-            type: DataTypes.INTEGER, 
+        assessmentUOM: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'uoms',
@@ -402,96 +406,96 @@ ZItems.init(
         },
 
         // Product Details
-        weight_per_pcs: { 
-            type: DataTypes.DECIMAL(10, 4), 
-            allowNull: true 
+        weight_per_pcs: {
+            type: DataTypes.DECIMAL(10, 4),
+            allowNull: true
         },
-        barCode: { 
-            type: DataTypes.BIGINT, 
-            allowNull: true 
+        barCode: {
+            type: DataTypes.BIGINT,
+            allowNull: true
         },
 
         // Pricing Fields
-        sellingPrice: { 
-            type: DataTypes.DECIMAL(10, 2), 
-            allowNull: true 
+        sellingPrice: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: true
         },
-        purchasePricePKR: { 
-            type: DataTypes.DECIMAL(10, 2), 
-            allowNull: true 
+        purchasePricePKR: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: true
         },
-        purchasePriceFC: { 
-            type: DataTypes.DECIMAL(12, 6), 
-            allowNull: true 
+        purchasePriceFC: {
+            type: DataTypes.DECIMAL(12, 6),
+            allowNull: true
         },
-        assessedPrice: { 
-            type: DataTypes.DECIMAL(12, 6), 
-            allowNull: true 
+        assessedPrice: {
+            type: DataTypes.DECIMAL(12, 6),
+            allowNull: true
         },
 
         // Duty Structure
-        hsCode: { 
-            type: DataTypes.STRING, 
-            allowNull: true 
+        hsCode: {
+            type: DataTypes.STRING,
+            allowNull: true
         },
-        cd: { 
-            type: DataTypes.DECIMAL(5, 2), 
-            allowNull: true 
+        cd: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: true
         },
-        ftaCd: { 
-            type: DataTypes.DECIMAL(5, 2), 
-            allowNull: true 
+        ftaCd: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: true
         },
-        acd: { 
-            type: DataTypes.DECIMAL(5, 2), 
-            allowNull: true 
+        acd: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: true
         },
-        rd: { 
-            type: DataTypes.DECIMAL(5, 2), 
-            allowNull: true 
+        rd: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: true
         },
-        salesTax: { 
-            type: DataTypes.DECIMAL(5, 2), 
-            allowNull: true 
+        salesTax: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: true
         },
-        addSalesTax: { 
-            type: DataTypes.DECIMAL(5, 2), 
-            allowNull: true 
+        addSalesTax: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: true
         },
-        itaxImport: { 
-            type: DataTypes.DECIMAL(5, 2), 
-            allowNull: true 
+        itaxImport: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: true
         },
-        furtherTax: { 
-            type: DataTypes.DECIMAL(5, 2), 
-            allowNull: true 
+        furtherTax: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: true
         },
 
         // Supplier Foreign Key
-        supplier: { 
-            type: DataTypes.INTEGER, 
-            allowNull: true 
+        supplier: {
+            type: DataTypes.INTEGER,
+            allowNull: true
         },
 
         // Account Foreign Keys - FIXED: No duplicates, typo corrected
-        purchaseAccount: { 
-            type: DataTypes.INTEGER, 
+        purchaseAccount: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'ZCoas',
                 key: 'id'
             }
         },
-        salesAccount: { 
-            type: DataTypes.INTEGER, 
+        salesAccount: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'ZCoas',
                 key: 'id'
             }
         },
-        salesTaxAccount: { 
-            type: DataTypes.INTEGER, 
+        salesTaxAccount: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'ZCoas',
@@ -500,15 +504,15 @@ ZItems.init(
         },
 
         // Boolean Fields
-        wastageItem: { 
-            type: DataTypes.BOOLEAN, 
-            allowNull: true, 
-            defaultValue: false 
+        wastageItem: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: false
         },
-        isNonInventory: { 
-            type: DataTypes.BOOLEAN, 
-            allowNull: true, 
-            defaultValue: false 
+        isNonInventory: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: false
         },
     },
     {
