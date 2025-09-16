@@ -2675,7 +2675,7 @@ export default function CoaForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      
+     
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || `Request failed with status ${response.status}`);

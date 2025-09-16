@@ -2,44 +2,148 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 
-// const coaController = require('./controllers/coa.controller.js')
 const {JournalDetail} = require('./models/JournalDetail.model.js')
-
 const app = express()
-
 const sequelize = require ('../config/database')
-app.use(morgan('dev')) // Logging middleware
-app.use(express.json()) // Body parser for JSON
+
+app.use(morgan('dev'))
+app.use(express.json()) 
 app.use(cors())
+
 app.get('/api', (req, res) => {
   res.json({ name: "saamr" })
 })
 
-// app.post('/post2',coaController.createCoa)
-// app.get('/post2',coaController.getCoa)
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).json({ error: 'Something went wrong!' })
-})
+// MOVE ROUTES BEFORE ERROR MIDDLEWARE
 app.use('/api', require('./routes/index.js'))
-sequelize.authenticate()
-  .then(() => {
-    console.log('✅ Database connected');
-    return sequelize.sync({});
-  })
-  .then(() => {
-    console.log('✅ Models synced');
-  })
-  .catch(err => {
-    console.error('❌ DB connection error:', err);
+
+// ENHANCED ERROR LOGGING MIDDLEWARE (Place AFTER routes)
+app.use((err, req, res, next) => {
+  console.error('=== ERROR DETAILS ===');
+  console.error('URL:', req.method, req.originalUrl);
+  console.error('Body:', req.body);
+  console.error('Error Name:', err.name);
+  console.error('Error Message:', err.message);
+  console.error('Full Error:', err);
+  console.error('Stack Trace:', err.stack);
+  console.error('===================');
+  
+  // Send detailed error in development
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+  
+  res.status(err.status || 500).json({
+    success: false,
+    error: isDevelopment ? err.message : 'Something went wrong!',
+    details: isDevelopment ? {
+      name: err.name,
+      message: err.message,
+      stack: err.stack
+    } : undefined
   });
+});
+
+// BETTER DATABASE INITIALIZATION
+const initDatabase = async () => {
+  try {
+    console.log('🔄 Starting database initialization...');
+    
+    await sequelize.authenticate();
+    console.log('✅ Database connected');
+    
+    // Disable foreign key checks during sync
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+    console.log('⚠️ Foreign key checks disabled');
+    
+    await sequelize.sync({ alter: true });
+    console.log('✅ Models synced');
+    
+    // Re-enable foreign key checks
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+    console.log('✅ Foreign key checks re-enabled');
+    
+  } catch (err) {
+    console.error('❌ Database initialization error:');
+    console.error('Error Name:', err.name);
+    console.error('Error Message:', err.message);
+    console.error('Full Error:', err);
+    
+    // Try to re-enable foreign key checks even on error
+    try {
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+    } catch (e) {
+      console.error('Failed to re-enable foreign key checks');
+    }
+    
+    process.exit(1);
+  }
+};
+
+const PORT = process.env.PORT || 4000;
+
+// START SERVER WITH PROPER ERROR HANDLING
+initDatabase().then(() => {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📍 COA API: http://localhost:${PORT}/api/z-coa/create`);
+  });
+}).catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
 
 
-const PORT = process.env.PORT || 4000
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`)
-})
+
+
+
+
+
+
+
+
+
+
+// const express = require('express')
+// const morgan = require('morgan')
+// const cors = require('cors')
+
+// // const coaController = require('./controllers/coa.controller.js')
+// const {JournalDetail} = require('./models/JournalDetail.model.js')
+
+// const app = express()
+
+// const sequelize = require ('../config/database')
+// app.use(morgan('dev')) // Logging middleware
+// app.use(express.json()) // Body parser for JSON
+// app.use(cors())
+// app.get('/api', (req, res) => {
+//   res.json({ name: "saamr" })
+// })
+
+// // app.post('/post2',coaController.createCoa)
+// // app.get('/post2',coaController.getCoa)
+// // Error handling middleware
+// app.use((err, req, res, next) => {
+//   console.error(err.stack)
+//   res.status(500).json({ error: 'Something went wrong!' })
+// })
+// app.use('/api', require('./routes/index.js'))
+// sequelize.authenticate()
+//   .then(() => {
+//     console.log('✅ Database connected');
+//     return sequelize.sync({alter:true});
+//   })
+//   .then(() => {
+//     console.log('✅ Models synced');
+//   })
+//   .catch(err => {
+//     console.error('❌ DB connection error:', err);
+//   });
+
+
+// const PORT = process.env.PORT || 4000
+// app.listen(PORT, '0.0.0.0', () => {
+//   console.log(`Server running on port ${PORT}`)
+// })
 
 
 
