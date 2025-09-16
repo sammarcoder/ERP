@@ -20,7 +20,7 @@
 //   useEffect(() => {
 //     const fetchCOAData = async () => {
 //       try {
-//         const response = await fetch(`http://${window.location.hostname}:5000/api/z-coa/get`)
+//         const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/get`)
 //         const data = await response.json()
 //         setCoaData(data || [])
 //       } catch (error) {
@@ -181,22 +181,22 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ values, onChange }) =
   useEffect(() => {
     const fetchCOAData = async () => {
       try {
-        const response = await fetch(`http://${window.location.hostname}:5000/api/z-coa/get`)
+        const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/get`)
         const result = await response.json()
         
         console.log('COA API Response:', result)
-        
+        setCoaData(result.zCoaRecords)
         // Handle the response structure {sucess: true, zCoaRecords: [...]}
-        if (result.sucess && Array.isArray(result.zCoaRecords)) {
-          setCoaData(result.zCoaRecords)
-        } else if (result.success && Array.isArray(result.data)) {
-          setCoaData(result.data)
-        } else if (Array.isArray(result)) {
-          setCoaData(result)
-        } else {
-          console.error('Unexpected COA data structure:', result)
-          setCoaData([])
-        }
+        // if (result.sucess && Array.isArray(result.zCoaRecords)) {
+        //   setCoaData(result.zCoaRecords)
+        // } else if (result.success && Array.isArray(result.data)) {
+        //   setCoaData(result.data)
+        // } else if (Array.isArray(result)) {
+        //   setCoaData(result)
+        // } else {
+        //   console.error('Unexpected COA data structure:', result)
+        //   setCoaData([])
+        // }
       } catch (error) {
         console.error('Error fetching COA data:', error)
         setCoaData([])

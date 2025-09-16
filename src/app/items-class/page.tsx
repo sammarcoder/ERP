@@ -5,7 +5,7 @@ const Page = () => {
   return (
     <div>
         <ItemsClass/>
-        sdsds
+        
     </div>
   )
 }

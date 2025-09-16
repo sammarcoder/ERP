@@ -20,7 +20,7 @@
 //   useEffect(() => {
 //     const fetchUOMData = async () => {
 //       try {
-//         const response = await fetch(`http://${window.location.hostname}:5000/api/z-uom/get`)
+//         const response = await fetch(`http://${window.location.hostname}:4000/api/z-uom/get`)
 //         const data = await response.json()
 //         setUomData(data || [])
 //       } catch (error) {
@@ -149,7 +149,7 @@ const UOMDropdown: React.FC<UOMDropdownProps> = ({ values, onChange }) => {
   useEffect(() => {
     const fetchUOMData = async () => {
       try {
-        const response = await fetch(`http://${window.location.hostname}:5000/api/z-uom/get`)
+        const response = await fetch(`http://${window.location.hostname}:4000/api/z-uom/get`)
         const data = await response.json()
         // Ensure data is an array
         setUomData(Array.isArray(data) ? data : [])

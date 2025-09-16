@@ -82,12 +82,12 @@ export default function SheetTransactionVoucher() {
     try {
       setLoading(prev => ({ ...prev, voucherTypes: true }));
 
-      let response = await fetch(`http://${window.location.hostname}:5000/api/z-control/voucher-type/`);
+      let response = await fetch(`http://${window.location.hostname}:4000/api/z-control/voucher-type/`);
       console.log(response);
 
       if (!response.ok) {
         console.log('First voucher type endpoint failed, trying alternative...');
-        response = await fetch(`http://${window.location.hostname}:5000/api/z-control/voucher-type/`);
+        response = await fetch(`http://${window.location.hostname}:4000/api/z-control/voucher-type/`);
       }
 
       if (!response.ok) {
@@ -133,7 +133,7 @@ export default function SheetTransactionVoucher() {
   const fetchAccounts = async () => {
     try {
       setLoading(prev => ({ ...prev, accounts: true }));
-      const response = await fetch(`http://${window.location.hostname}:5000/api/z-coa/get`);
+      const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/get`);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch accounts: ${response.status}`);
@@ -351,7 +351,7 @@ export default function SheetTransactionVoucher() {
 
       console.log("Sending journal data:", journalData);
 
-      const response = await fetch(`http://${window.location.hostname}:5000/api/journal-master/create-complete`, {
+      const response = await fetch(`http://${window.location.hostname}:4000/api/journal-master/create-complete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

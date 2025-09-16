@@ -459,7 +459,7 @@ const EnhancedSelectableTable: React.FC<EnhancedSelectableTableProps> = ({
     const fetchClassData = async () => {
       try {
         const promises = [1, 2, 3, 4].map(id =>
-          fetch(`http://${window.location.hostname}:5000/api/z-classes/get-by-class-id/${id}`)
+          fetch(`http://${window.location.hostname}:4000/api/z-classes/get-by-class-id/${id}`)
             .then(res => res.json())
         )
         const results = await Promise.all(promises)

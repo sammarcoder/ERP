@@ -11,7 +11,7 @@
 //   useEffect(() => {
 //     async function fetchData() {
 //       try {
-//         const response = await fetch(`http://${window.location.hostname}:5000/api/z-items/items/2`);
+//         const response = await fetch(`http://${window.location.hostname}:4000/api/z-items/items/2`);
 //         const post = await response.json();
 //         setData(post.data);
 //       } catch (error) {
@@ -228,8 +228,8 @@
 //         async function fetchData() {
 //             setLoading(true);
 //             try {
-//                 // const response = await fetch(`http://${window.location.hostname}:5000/api/z-items/items/${itemId}`);
-//                 const response = await fetch(`http://${window.location.hostname}:5000/api/z-items/items/${itemId}`);
+//                 // const response = await fetch(`http://${window.location.hostname}:4000/api/z-items/items/${itemId}`);
+//                 const response = await fetch(`http://${window.location.hostname}:4000/api/z-items/items/${itemId}`);
 //                 const result = await response.json();
 
 //                 if (result.success && result.data) {
@@ -495,7 +495,7 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
         async function fetchData() {
             setLoading(true);
             try {
-                const response = await fetch(`http://${window.location.hostname}:5000/api/z-items/items/${itemId}`);
+                const response = await fetch(`http://${window.location.hostname}:4000/api/z-items/items/${itemId}`);
                 const result = await response.json();
                 if (result.success && result.data) {
                     setData({

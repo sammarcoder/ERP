@@ -139,7 +139,7 @@
 // //       setApiErrors(prev => ({ ...prev, coaData: '' }));
       
 // //       console.log('Fetching COA data for editing, ID:', id);
-// //       const response = await fetch(`http://${window.location.hostname}:5000/api/z-coa/get/${id}`);
+// //       const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/get/${id}`);
       
 // //       if (!response.ok) {
 // //         throw new Error(`Failed to fetch COA data: ${response.status}`);
@@ -2344,7 +2344,7 @@ export default function CoaForm() {
       setApiErrors(prev => ({ ...prev, coaData: '' }));
       
       console.log('Fetching COA data for editing, ID:', id);
-      const response = await fetch(`http://${window.location.hostname}:5000/api/z-coa/get/${id}`);
+      const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/get/${id}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch COA data: ${response.status}`);
@@ -2401,7 +2401,7 @@ export default function CoaForm() {
       setApiErrors(prev => ({ ...prev, ch1: '' }));
       
       console.log('Fetching Control Head 1 data...');
-      const response = await fetch(`http://${window.location.hostname}:5000/api/z-control-head1`);
+      const response = await fetch(`http://${window.location.hostname}:4000/api/z-control-head1`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch Control Head 1 data: ${response.status}`);
@@ -2430,7 +2430,7 @@ export default function CoaForm() {
       setApiErrors(prev => ({ ...prev, ch2: '' }));
       
       console.log('Fetching Control Head 2 data...');
-      const response = await fetch(`http://${window.location.hostname}:5000/api/z-control-head2/get`);
+      const response = await fetch(`http://${window.location.hostname}:4000/api/z-control-head2/get`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch Control Head 2 data: ${response.status}`);
@@ -2482,7 +2482,7 @@ export default function CoaForm() {
       setApiErrors(prev => ({ ...prev, coaType: '' }));
       
       console.log('Fetching COA Types data...');
-      const response = await fetch(`http://${window.location.hostname}:5000/api/z-coa-type`);
+      const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa-type`);
       
       console.log('COA Types response status:', response.status);
       
@@ -2542,7 +2542,7 @@ export default function CoaForm() {
       setApiErrors(prev => ({ ...prev, salesMan: '' }));
       
       console.log('Fetching Salesmen data...');
-      const response = await fetch(`http://${window.location.hostname}:5000/api/z-control/salesman`);
+      const response = await fetch(`http://${window.location.hostname}:4000/api/z-control/salesman`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch Salesmen data: ${response.status}`);
@@ -2665,8 +2665,8 @@ export default function CoaForm() {
       console.log(`${isEditMode ? 'Updating' : 'Creating'} COA:`, formData);
       
       const url = isEditMode 
-        ? `http://${window.location.hostname}:5000/api/z-coa/update/${coaId}`
-        : `http://${window.location.hostname}:5000/api/z-coa/create`;
+        ? `http://${window.location.hostname}:4000/api/z-coa/update/${coaId}`
+        : `http://${window.location.hostname}:4000/api/z-coa/create`;
         
       const method = isEditMode ? 'PUT' : 'POST';
       
@@ -2744,7 +2744,7 @@ export default function CoaForm() {
       
       console.log('Deleting COA with ID:', coaId);
       
-      const response = await fetch(`http://${window.location.hostname}:5000/api/z-coa/delete/${coaId}`, {
+      const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/delete/${coaId}`, {
         method: 'DELETE',
       });
       

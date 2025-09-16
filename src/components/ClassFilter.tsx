@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react'
 
 const ClassFilter = () => {
-    const BaseUrl = `http://${window.location.hostname}:5000/api/z-classes/get-by-class-id/${id}`
+    const BaseUrl = `http://${window.location.hostname}:4000/api/z-classes/get-by-class-id/${id}`
     useEffect(() => {
         async function getByCassId() {
             const response = await fetch(BaseUrl)

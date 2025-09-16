@@ -34,31 +34,61 @@ export default function Ch2() {
     const [message, setMessage] = useState<MessageState>({ type: '', text: '' });
 
     // Fetch Control Head 1 values on component mount
-    useEffect(() => {
-        const fetchControlHead1 = async () => {
-            try {
-                setLoading(true);
-                const response = await fetch('http://localhost:5000/api/z-control-head1/');
+    // useEffect(() => {
+    //     const fetchControlHead1 = async () => {
+    //         try {
+    //             setLoading(true);
+    //             const response = await fetch(`http://${window.location.hostname}:4000/api/z-control-head1/`);
 
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch data: ${response.status}`);
-                }
+    //             if (!response.ok) {
+    //                 throw new Error(`Failed to fetch data: ${response.status}`);
+    //             }
 
-                const data = await response.json();
-                setControlHead1List(data);
-            } catch (error) {
-                console.error('Error fetching control head 1:', error);
-                setMessage({
-                    type: 'error',
-                    text: 'Failed to load Control Head 1 data. Please try again.'
-                });
-            } finally {
-                setLoading(false);
+    //             const data = await response.json();
+    //             setControlHead1List(data);
+    //         } catch (error) {
+    //             console.error('Error fetching control head 1:', error);
+    //             setMessage({
+    //                 type: 'error',
+    //                 text: 'Failed to load Control Head 1 data. Please try again.'
+    //             });
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     fetchControlHead1();
+    // }, []);
+
+
+useEffect(() => {
+    const fetchControlHead1 = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`http://${window.location.hostname}:4000/api/z-control-head1/`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data: ${response.status}`);
             }
-        };
 
-        fetchControlHead1();
-    }, []);
+            const data = await response.json();
+            setControlHead1List(data);
+            
+            // Auto-select first item if exists
+            if (data.length > 0) {
+                setSelectedHead1Id(data[0].id.toString());
+            }
+        } catch (error) {
+            // ... error handling
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchControlHead1();
+}, []);
+
+
 
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -83,7 +113,7 @@ export default function Ch2() {
         alert({fk:selectedHead1Id.valueOf(), text: head2Value})
         try {
             setSubmitting(true);
-            const response = await fetch('http://localhost:5000/api/z-control-head2/', {
+            const response = await fetch('http://localhost:4000/api/z-control-head2/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
