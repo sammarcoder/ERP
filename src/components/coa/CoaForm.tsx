@@ -102,7 +102,7 @@
 // //   const [message, setMessage] = useState({ type: '', text: '' });
 // //   const [apiErrors, setApiErrors] = useState<{[key: string]: string}>({});
 
-// //   // Fetch all required data on component mount
+// //   // Fetch all data on component mount
 // //   useEffect(() => {
 // //     fetchControlHead1();
 // //     fetchControlHead2();
@@ -3022,7 +3022,7 @@ export default function CoaForm() {
                   value={formData.setupName}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter setup name"
                 />
               </div>
@@ -3039,7 +3039,7 @@ export default function CoaForm() {
                   value={formData.adress}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter full address"
                 />
               </div>
@@ -3056,7 +3056,7 @@ export default function CoaForm() {
                   value={formData.city}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter city"
                 />
               </div>
@@ -3073,7 +3073,7 @@ export default function CoaForm() {
                   value={formData.personName}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter person name"
                 />
               </div>
@@ -3090,7 +3090,7 @@ export default function CoaForm() {
                   value={formData.mobileNo}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter mobile number"
                 />
               </div>
@@ -3107,7 +3107,7 @@ export default function CoaForm() {
                   value={formData.ntn}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter NTN"
                 />
               </div>
@@ -3124,7 +3124,7 @@ export default function CoaForm() {
                   value={formData.cnic}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter CNIC"
                 />
               </div>
@@ -3141,7 +3141,7 @@ export default function CoaForm() {
                   value={formData.salesLimit}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter sales limit"
                 />
               </div>
@@ -3158,7 +3158,7 @@ export default function CoaForm() {
                   value={formData.credit}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter credit amount"
                 />
               </div>
@@ -3175,7 +3175,7 @@ export default function CoaForm() {
                   value={formData.creditDoys}
                   onChange={handleInputChange}
                   disabled={submitting}
-                  required
+                 
                   placeholder="Enter credit days"
                 />
               </div>
@@ -3191,7 +3191,7 @@ export default function CoaForm() {
                   value={formData.salesMan}
                   onChange={handleInputChange}
                   disabled={submitting || !Array.isArray(salesManList) || salesManList.length === 0}
-                  required
+                 
                 >
                   <option value="">Select Sales Man</option>
                   {Array.isArray(salesManList) && salesManList.length > 0 ? 
