@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation';
 import ClassDropdown from './ClassDropdown'
 import UOMDropdown from './UOMDropdown'
 import AccountDropdown from './AccountDropdown'
@@ -41,6 +42,11 @@ interface ItemFormData {
 }
 
 const ZItemsForm = () => {
+
+
+const router = useRouter();
+
+
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [errorDetails, setErrorDetails] = useState('')
@@ -54,9 +60,9 @@ const ZItemsForm = () => {
     itemClass4: null,
     skuUOM: null,
     uom2: null,
-    uom2_qty: 12,
+    uom2_qty: null,
     uom3: null,
-    uom3_qty: 144,
+    uom3_qty: null,
     assessmentUOM: null,
     weight_per_pcs: null,
     // weight_per_pcs: 0.5,
@@ -158,6 +164,8 @@ const ZItemsForm = () => {
       // Optionally reset form after success
       setTimeout(() => {
         setMessage('')
+        router.push('item-form')
+      
       }, 4000)
       
     } catch (err) {
@@ -552,5 +560,4 @@ const ZItemsForm = () => {
     </div>
   )
 }
-
 export default ZItemsForm

@@ -1,215 +1,326 @@
+
+// // components/OrderList.jsx
 // 'use client'
+// import React, { useState, useEffect } from 'react';
+// import { useRouter } from 'next/navigation';
+// import PrintModal from './PrintModal';
 
-// import React, { useState, useEffect } from 'react'
-// import Link from 'next/link'
-// import { usePathname } from 'next/navigation'
+// const OrderList = ({ orderType }) => {
+//   const [orders, setOrders] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [selectedOrder, setSelectedOrder] = useState(null);
+//   const [showPrintModal, setShowPrintModal] = useState(false);
+//   const [expandedOrders, setExpandedOrders] = useState(new Set());
+//   const router = useRouter();
+//   const isPurchase = orderType === 'purchase';
 
-// const OrderList = () => {
-//   const [orders, setOrders] = useState([])
-//   const [loading, setLoading] = useState(true)
-//   const [page, setPage] = useState(1)
-//   const [totalPages, setTotalPages] = useState(1)
-//   const [message, setMessage] = useState({ type: '', text: '' })
-
-//   const pathname = usePathname()
-//   const orderType = pathname.includes('purchase') ? 'purchase' : 'sales'
-//   const stockTypeId = orderType === 'purchase' ? 1 : 2
-// console.log()
 //   useEffect(() => {
-//     fetchOrders()
-//   }, [page, stockTypeId])
-// console.log(`http://${window.location.hostname}:4000/api`,'this is current url')
+//     fetchOrders();
+//   }, [orderType]);
+
 //   const fetchOrders = async () => {
 //     try {
-//       setLoading(true)
-//       const baseUrl = typeof window !== 'undefined'
-//         ? `http://${window.location.hostname}:5000/api`
-//         : 'http://localhost:5000/api/'
-
-//       const response = await fetch(
-//         `${baseUrl}/order`
-//       )
-//       const result = await response.json()
-
+//       setLoading(true);
+//       const response = await fetch(`http://${window.location.hostname}:4000/api/order?stockTypeId=${isPurchase ? 1 : 2}`);
+//       const result = await response.json();
 //       if (result.success) {
-//         setOrders(result.data)
-//         setTotalPages(result.pagination.totalPages)
-//       } else {
-//         setMessage({ type: 'error', text: 'Failed to load orders' })
+//         setOrders(result.data);
 //       }
+//       console.log(result)
 //     } catch (error) {
-//       console.error('Error fetching orders:', error)
-//       setMessage({ type: 'error', text: 'Error fetching orders' })
+//       console.error('Error fetching orders:', error);
 //     } finally {
-//       setLoading(false)
+//       setLoading(false);
 //     }
-//   }
+//   };
 
-//   const handleDelete = async (id) => {
-//     if (!confirm('Are you sure you want to delete this order?')) return
-
-//     try {
-//       setLoading(true)
-//       const baseUrl = typeof window !== 'undefined'
-//         ? `http://${window.location.hostname}:5000/api`
-//         : 'http://localhost:5000/api'
-
-//       const response = await fetch(`${baseUrl}/orders/${id}`, {
-//         method: 'DELETE'
-//       })
-//       const result = await response.json()
-
-//       if (result.success) {
-//         setMessage({ type: 'success', text: 'Order deleted successfully' })
-//         fetchOrders()
+//   const toggleOrderExpanded = (orderId) => {
+//     setExpandedOrders(prev => {
+//       const newSet = new Set(prev);
+//       if (newSet.has(orderId)) {
+//         newSet.delete(orderId);
 //       } else {
-//         setMessage({ type: 'error', text: result.message || 'Failed to delete order' })
+//         newSet.add(orderId);
 //       }
-//     } catch (error) {
-//       console.error('Error deleting order:', error)
-//       setMessage({ type: 'error', text: 'Error deleting order' })
-//     } finally {
-//       setLoading(false)
-//     }
-//   }
+//       return newSet;
+//     });
+//   };
 
-//   const formatDate = (dateString) => {
-//     const date = new Date(dateString)
-//     return date.toLocaleDateString('en-US', {
-//       year: 'numeric',
-//       month: 'short',
-//       day: 'numeric'
-//     })
+//   // FIXED: Function to get correct quantity and UOM based on sale_unit
+//   const getDisplayQuantity = (detail) => {
+//     if (isPurchase) {
+//       const qty = detail.Stock_In_UOM_Qty || 0;
+//       const uom = detail.item?.uom1?.uom || 'Pcs';
+//       return `${parseFloat(qty).toFixed(0)} ${uom}`;
+//     } else {
+//       let qty = 0;
+//       let uom = '';
+      
+//       if (detail.sale_unit === 'uom1') {
+//         qty = detail.uom1_qty || detail.Stock_out_UOM_Qty || 0;
+//         uom = detail.item?.uom1?.uom || 'Pcs';
+//       } else if (detail.sale_unit === 'uomTwo') {
+//         qty = detail.uom2_qty || detail.Stock_out_SKU_UOM_Qty || 0;
+//         uom = detail.item?.uomTwo?.uom || 'Doz';
+//       } else if (detail.sale_unit === 'uomThree') {
+//         qty = detail.uom3_qty || detail.Stock_out_UOM3_Qty || 0;
+//         uom = detail.item?.uomThree?.uom || 'Box';
+//       } else {
+//         qty = detail.uom1_qty || detail.Stock_out_UOM_Qty || 0;
+//         uom = detail.item?.uom1?.uom || 'Pcs';
+//       }
+      
+//       return `${parseFloat(qty).toFixed(0)} ${uom}`;
+//     }
+//   };
+
+//   const handlePrint = (order) => {
+//     setSelectedOrder(order);
+//     setShowPrintModal(true);
+//   };
+
+//   // FIXED: Edit navigation
+//   const handleEdit = (order) => {
+//     console.log('Editing order:', order.ID); // Debug log
+//     router.push(`/order/${orderType}/edit?id=${order.ID}`);
+//   };
+
+//   const handleDelete = async (orderId) => {
+//     if (window.confirm('Are you sure you want to delete this order?')) {
+//       try {
+//         const response = await fetch(`http://${window.location.hostname}:4000/api/order/${orderId}`, {
+//           method: 'DELETE'
+//         });
+//         if (response.ok) {
+//           fetchOrders();
+//         }
+//       } catch (error) {
+//         console.error('Error deleting order:', error);
+//       }
+//     }
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="flex justify-center items-center h-32">
+//         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+//         <span className="ml-2 text-gray-600">Loading...</span>
+//       </div>
+//     );
 //   }
 
 //   return (
-//     <div className="p-6 bg-gray-50 min-h-screen">
-//       <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-lg">
-//         <div className={`${orderType === 'purchase' ? 'bg-blue-600' : 'bg-green-600'} text-white p-5 rounded-t-lg`}>
-//           <div className="flex justify-between items-center">
-//             <h1 className="text-2xl font-bold">{orderType === 'purchase' ? 'Purchase Orders' : 'Sales Orders'}</h1>
-//             <Link
-//               href={`/order/${orderType}/create`}
-//               className="px-4 py-2 bg-white text-gray-800 rounded hover:bg-gray-100 shadow-sm"
-//             >
-//               + Create New
-//             </Link>
-//           </div>
-//         </div>
+//     <div className="p-4">
+//       {/* Header */}
+//       <div className={`${isPurchase ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-green-600 to-green-700'} text-white p-4 rounded-t flex justify-between items-center shadow-lg`}>
+//         <h1 className="text-xl font-bold">{isPurchase ? 'Purchase' : 'Sales'} Orders</h1>
+//         <button
+//           onClick={() => router.push(`/order/${orderType}/create`)}
+//           className="bg-white bg-opacity-20 px-4 py-2 rounded hover:bg-opacity-30 transition-all duration-200 hover:scale-105 transform text-black"
+//         >
+//           + Create New
+//         </button>
+//       </div>
 
-//         {message.text && (
-//           <div className={`m-4 p-3 rounded ${
-//             message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-//           }`}>
-//             {message.text}
-//           </div>
-//         )}
+//       {/* Enhanced Table with Hover Effects */}
+//       <div className="bg-white rounded-b shadow-lg overflow-hidden">
+//         <table className="w-full text-sm">
+//           <thead className="bg-gray-100">
+//             <tr>
+//               <th className="px-3 py-2 text-left font-medium text-gray-700">Order #</th>
+//               <th className="px-3 py-2 text-left font-medium text-gray-700">Order ID</th>
+//               <th className="px-3 py-2 text-left font-medium text-gray-700">Date</th>
+//               <th className="px-3 py-2 text-left font-medium text-gray-700">Status</th>
+//               <th className="px-3 py-2 text-left font-medium text-gray-700">{isPurchase ? 'Supplier' : 'Customer'}</th>
+//               <th className="px-3 py-2 text-center font-medium text-gray-700">Items</th>
+//               <th className="px-3 py-2 text-center font-medium text-gray-700">Actions</th>
+//             </tr>
+//           </thead>
+//           <tbody className="divide-y divide-gray-200">
+//             {orders.map((order) => (
+//               <React.Fragment key={order.ID}>
+//                 {/* Main Order Row with Enhanced Hover Effects */}
+//                 <tr className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-green-50 transition-all duration-300 hover:shadow-md cursor-pointer group">
+//                   <td className="px-3 py-3 font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+//                     {order.Number}
+//                   </td>
+//                   <td className="px-3 py-3 text-gray-600 group-hover:text-gray-800 transition-colors">
+//                     #{order.ID}
+//                   </td>
+//                   <td className="px-3 py-3 text-gray-600 group-hover:text-gray-800 transition-colors">
+//                     {new Date(order.Date).toLocaleDateString()}
+//                   </td>
+//                   <td className="px-3 py-3">
+//                     <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full transition-all duration-200 ${
+//                       order.Next_Status === 'Complete' 
+//                         ? 'bg-green-100 text-green-800 group-hover:bg-green-200' 
+//                         : 'bg-orange-100 text-orange-800 group-hover:bg-orange-200'
+//                     }`}>
+//                        {order.Next_Status}
+//                     </span>
+//                   </td>
+//                   <td className="px-3 py-3 text-gray-600 group-hover:text-gray-800 transition-colors font-medium">
+//                     {order.account?.acName || 'N/A'}
+//                     {order.account?.city && (
+//                       <div className="text-xs text-gray-400 group-hover:text-gray-500 transition-colors">
+//                        {order.account.city}
+//                       </div>
+//                     )}
+//                   </td>
+//                   <td className="px-3 py-3 text-center">
+//                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+//                       isPurchase ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+//                     } group-hover:scale-110 transition-transform duration-200`}>
+//                        {order.details.length} items
+//                     </span>
+//                   </td>
+//                   <td className="px-3 py-3">
+//                     <div className="flex justify-center space-x-1">
+//                       {/* Print Button with Hover Effect */}
+//                       <button
+//                         onClick={(e) => {
+//                           e.stopPropagation();
+//                           handlePrint(order);
+//                         }}
+//                         className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:scale-110 transform"
+//                         title="Print Order"
+//                       >
+//                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+//                         </svg>
+//                       </button>
 
-//         {loading ? (
-//           <div className="flex justify-center items-center h-64">
-//             <div className="text-center">
-//               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-//               <p className="text-gray-600">Loading orders...</p>
-//             </div>
-//           </div>
-//         ) : orders.length > 0 ? (
-//           <div className="overflow-x-auto">
-//             <table className="w-full border-collapse">
-//               <thead className="bg-gray-100">
-//                 <tr>
-//                   <th className="px-4 py-2 border border-gray-300 text-left">Order #</th>
-//                   <th className="px-4 py-2 border border-gray-300 text-left">Date</th>
-//                   <th className="px-4 py-2 border border-gray-300 text-left">
-//                     {orderType === 'purchase' ? 'Supplier' : 'Customer'}
-//                   </th>
-//                   <th className="px-4 py-2 border border-gray-300 text-left">Status</th>
-//                   <th className="px-4 py-2 border border-gray-300 text-center">Actions</th>
+//                       {/* Edit Button with Enhanced Hover */}
+//                       <button
+//                         onClick={(e) => {
+//                           e.stopPropagation();
+//                           handleEdit(order);
+//                         }}
+//                         className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-100 rounded-lg transition-all duration-200 hover:scale-110 transform hover:rotate-12"
+//                         title="Edit Order"
+//                       >
+//                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+//                         </svg>
+//                       </button>
+
+//                       {/* Delete Button with Shake Effect */}
+//                       <button
+//                         onClick={(e) => {
+//                           e.stopPropagation();
+//                           handleDelete(order.ID);
+//                         }}
+//                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200 hover:scale-110 transform hover:animate-pulse"
+//                         title="Delete Order"
+//                       >
+//                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+//                         </svg>
+//                       </button>
+
+//                       {/* Expand/Collapse with Rotation Effect */}
+//                       <button
+//                         onClick={(e) => {
+//                           e.stopPropagation();
+//                           toggleOrderExpanded(order.ID);
+//                         }}
+//                         className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 transform ${
+//                           expandedOrders.has(order.ID)
+//                             ? 'text-blue-600 bg-blue-100 rotate-180'
+//                             : 'text-gray-400 hover:text-blue-600 hover:bg-blue-100'
+//                         }`}
+//                         title={expandedOrders.has(order.ID) ? 'Hide Items' : 'Show Items'}
+//                       >
+//                         <svg className="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+//                         </svg>
+//                       </button>
+//                     </div>
+//                   </td>
 //                 </tr>
-//               </thead>
-//               <tbody>
-//                 {orders.map((order) => (
-//                   <tr key={order.ID} className="hover:bg-gray-50">
-//                     <td className="px-4 py-2 border border-gray-300">{order.Number}</td>
-//                     <td className="px-4 py-2 border border-gray-300">{formatDate(order.Date)}</td>
-//                     <td className="px-4 py-2 border border-gray-300">{order.account?.acName}</td>
-//                     <td className="px-4 py-2 border border-gray-300">
-//                       <span className={`px-2 py-1 text-xs rounded-full ${
-//                         order.Next_Status === 'Complete' 
-//                           ? 'bg-green-100 text-green-800' 
-//                           : 'bg-yellow-100 text-yellow-800'
-//                       }`}>
-//                         {order.Next_Status}
-//                       </span>
-//                     </td>
-//                     <td className="px-4 py-2 border border-gray-300 text-center">
-//                       <div className="flex justify-center space-x-2">
-//                         <Link
-//                           href={`/order/${orderType}/edit?id=${order.ID}`}
-//                           className="text-blue-600 hover:text-blue-800"
-//                         >
-//                           Edit
-//                         </Link>
-//                         <button
-//                           onClick={() => handleDelete(order.ID)}
-//                           className="text-red-600 hover:text-red-800"
-//                         >
-//                           Delete
-//                         </button>
+
+//                 {/* Expanded Items - Smooth Animation */}
+//                 {expandedOrders.has(order.ID) && (
+//                   <tr className="animate-fadeIn">
+//                     <td colSpan="7" className="px-3 py-2 bg-gradient-to-r from-gray-50 to-blue-50 border-l-4 border-blue-400">
+//                       <div className="text-xs">
+//                         {/* <div className="font-semibold text-gray-700 mb-2 flex items-center">
+//                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+//                           </svg>
+//                           Order Items ({order.details.length})
+//                         </div> */}
+//                         <div className="grid grid-cols-1 gap-1">
+//                           {order.details.map((detail, index) => (
+//                             <div key={index} className="bg-white rounded p-2 hover:bg-blue-50 transition-all duration-200 hover:shadow-sm border-l-2 hover:border-l-blue-400">
+//                               <div className="grid grid-cols-4 gap-3 items-center">
+//                                 <div className="flex items-center">
+//                                   <span className={`w-5 h-5 rounded-full ${isPurchase ? 'bg-blue-500' : 'bg-green-500'} text-white text-xs flex items-center justify-center font-bold mr-2`}>
+//                                     {index + 1}
+//                                   </span>
+//                                   <span className="font-medium text-gray-900">
+//                                     {detail.item?.itemName || 'Unknown Item'}
+//                                   </span>
+//                                 </div>
+//                                 <div className="text-center">
+//                                   <span className="font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded">
+//                                     {getDisplayQuantity(detail)}
+//                                   </span>
+//                                 </div>
+//                                 <div className="text-center text-gray-600">
+//                                   {parseFloat(detail.Price || 0).toFixed(2)}
+//                                 </div>
+//                                 <div className="text-gray-500 text-xs">
+//                                   {detail.Remarks || '-'}
+//                                 </div>
+//                               </div>
+//                             </div>
+//                           ))}
+//                         </div>
 //                       </div>
 //                     </td>
 //                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           </div>
-//         ) : (
-//           <div className="flex justify-center items-center h-64">
-//             <p className="text-gray-500">No orders found. Create your first order.</p>
-//           </div>
-//         )}
-
-//         {/* Pagination */}
-//         {totalPages > 1 && (
-//           <div className="p-4 border-t border-gray-200 flex justify-center">
-//             <div className="flex space-x-2">
-//               <button
-//                 onClick={() => setPage(p => Math.max(1, p - 1))}
-//                 disabled={page === 1}
-//                 className="px-3 py-1 border rounded disabled:opacity-50"
-//               >
-//                 Previous
-//               </button>
-
-//               {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-//                 <button
-//                   key={p}
-//                   onClick={() => setPage(p)}
-//                   className={`px-3 py-1 border rounded ${
-//                     p === page ? 'bg-blue-500 text-white' : ''
-//                   }`}
-//                 >
-//                   {p}
-//                 </button>
-//               ))}
-
-//               <button
-//                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-//                 disabled={page === totalPages}
-//                 className="px-3 py-1 border rounded disabled:opacity-50"
-//               >
-//                 Next
-//               </button>
-//             </div>
-//           </div>
-//         )}
+//                 )}
+//               </React.Fragment>
+//             ))}
+//           </tbody>
+//         </table>
 //       </div>
+
+//       {/* Print Modal */}
+//       {showPrintModal && selectedOrder && (
+//         <PrintModal 
+//           order={selectedOrder} 
+//           isPurchase={isPurchase}
+//           onClose={() => setShowPrintModal(false)}
+//           getDisplayQuantity={getDisplayQuantity}
+//         />
+//       )}
+
+//       {/* Add Custom Animations */}
+//       <style jsx>{`
+//         @keyframes fadeIn {
+//           from { opacity: 0; transform: translateY(-10px); }
+//           to { opacity: 1; transform: translateY(0); }
+//         }
+        
+//         .animate-fadeIn {
+//           animation: fadeIn 0.3s ease-in-out;
+//         }
+        
+//         .hover-glow:hover {
+//           box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+//         }
+        
+//         .hover-lift:hover {
+//           transform: translateY(-2px);
+//         }
+//       `}</style>
 //     </div>
-//   )
-// }
+//   );
+// };
 
-// export default OrderList
-
-
+// export default OrderList;
 
 
 
@@ -230,428 +341,452 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// components/OrderList.jsx
 'use client'
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import PrintModal from './PrintModal';
+import GRNModal from './inventory/GRNModal'; // NEW
+import DispatchModal from './inventory/DispatchModal'; // NEW
 
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-
-const OrderList = () => {
-  const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [message, setMessage] = useState({ type: '', text: '' })
-  const [printingOrderId, setPrintingOrderId] = useState(null)
-
-  const pathname = usePathname()
-  const router = useRouter()
-  const orderType = pathname.includes('purchase') ? 'purchase' : 'sales'
-  const stockTypeId = orderType === 'purchase' ? 1 : 2
+const OrderList = ({ orderType }) => {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [showGRNModal, setShowGRNModal] = useState(false); // NEW
+  const [showDispatchModal, setShowDispatchModal] = useState(false); // NEW
+  const [expandedOrders, setExpandedOrders] = useState(new Set());
+  const router = useRouter();
+  const isPurchase = orderType === 'purchase';
 
   useEffect(() => {
-    fetchOrders()
-  }, [page, stockTypeId])
+    fetchOrders();
+  }, [orderType]);
 
   const fetchOrders = async () => {
     try {
-      setLoading(true)
-      const baseUrl = `http://${window.location.hostname}:4000/api`
-
-      const response = await fetch(`${baseUrl}/order?stockTypeId=${stockTypeId}&page=${page}&limit=10`)
-      const result = await response.json()
-
+      setLoading(true);
+      const response = await fetch(`http://${window.location.hostname}:4000/api/order?stockTypeId=${isPurchase ? 1 : 2}`);
+      const result = await response.json();
       if (result.success) {
-        setOrders(result.data || [])
-        setTotalPages(result.pagination?.totalPages || 1)
-      } else {
-        setMessage({ type: 'error', text: 'Failed to load orders' })
+        setOrders(result.data);
       }
     } catch (error) {
-      console.error('Error fetching orders:', error)
-      setMessage({ type: 'error', text: 'Error fetching orders' })
+      console.error('Error fetching orders:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this order? This action cannot be undone.')) return
-
-    try {
-      setLoading(true)
-      const baseUrl = `http://${window.location.hostname}:4000/api`
-
-      // Fixed delete endpoint URL
-      const response = await fetch(`${baseUrl}/order/${id}`, {
-        method: 'DELETE'
-      })
-      const result = await response.json()
-
-      if (response.ok && result.success) {
-        setMessage({ type: 'success', text: 'Order deleted successfully' })
-        fetchOrders() // Refresh the list
+  const toggleOrderExpanded = (orderId) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
       } else {
-        setMessage({ type: 'error', text: result.message || 'Failed to delete order' })
+        newSet.add(orderId);
       }
-    } catch (error) {
-      console.error('Error deleting order:', error)
-      setMessage({ type: 'error', text: 'Error deleting order' })
-    } finally {
-      setLoading(false)
-    }
-  }
+      return newSet;
+    });
+  };
 
-  const handlePrint = async (orderId) => {
-    try {
-      setPrintingOrderId(orderId)
-      const baseUrl = `http://${window.location.hostname}:4000/api`
-
-      // Fetch the complete order data
-      const response = await fetch(`${baseUrl}/order/${orderId}`)
-      const result = await response.json()
-
-      if (result.success && result.data) {
-        // Open print window
-        const printWindow = window.open('', '_blank', 'width=800,height=600')
-        printWindow.document.write(generatePrintHTML(result.data, orderType))
-        printWindow.document.close()
-        printWindow.focus()
-        printWindow.print()
-      } else {
-        setMessage({ type: 'error', text: 'Failed to load order details for printing' })
-      }
-    } catch (error) {
-      console.error('Error printing order:', error)
-      setMessage({ type: 'error', text: 'Error printing order' })
-    } finally {
-      setPrintingOrderId(null)
-    }
-  }
-
-  const generatePrintHTML = (orderData, type) => {
-    const isPurchase = type === 'purchase'
-    const details = orderData.details || []
-
-    // Calculate totals
-    const totals = details.reduce((acc, detail) => ({
-      grossTotal: acc.grossTotal + (detail.grossTotal || 0),
-      netTotal: acc.netTotal + (detail.netTotal || 0)
-    }), { grossTotal: 0, netTotal: 0 })
-
-    return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>${isPurchase ? 'Purchase' : 'Sales'} Order #${orderData.Number}</title>
-      <style>
-        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-        .container { max-width: 350px; margin: auto; padding:10px;  border:1px solid }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
-        .company-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-        .order-title { font-size: 18px; color: ${isPurchase ? '#2563eb' : '#16a34a'}; margin-bottom: 10px; }
-        .order-info { display: flex; justify-content: space-between; margin-bottom: 30px; }
-        .info-section { flex: 1; }
-        .info-title { font-weight: bold; margin-bottom: 10px; padding: 8px; background: #f3f4f6; }
-        .info-content { padding: 8px; }
-        .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .table th { background-color: #f8f9fa; font-weight: bold; }
-        .table .number-cell { text-align: right; }
-        .totals { margin-top: 20px; float: right; }
-        .total-row { display: flex; justify-content: space-between; padding: 5px 0; min-width: 200px; }
-        .grand-total { font-weight: bold; border-top: 2px solid #333; padding-top: 10px; }
-        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #666; }
-        @media print {
-          body { margin: 0; }
-          .no-print { display: none; }
-        }
-      </style>
-    </head>
-    <body >
-
-<div class="container">
-<div class="header">
-        <div class="company-name">Your Company Name</div>
-        <div class="order-title">${isPurchase ? 'Purchase Order' : 'Sales Order'}</div>
-        <div>Order #: ${orderData.Number || 'N/A'}</div>
-      </div>
-
-      <div class="order-info">
-        <div class="info-section">
-          <div class="info-title">Order Information</div>
-          <div class="info-content">
-            <strong>Date:</strong> ${new Date(orderData.Date).toLocaleDateString()}<br>
-            <strong>Order ID:</strong> ${orderData.ID}<br>
-            <strong>Status:</strong> ${orderData.Next_Status || 'Pending'}
-          </div>
-        </div>
-        <div class="info-section">
-          <div class="info-title">${isPurchase ? 'Supplier' : 'Customer'} Information</div>
-          <div class="info-content">
-            <strong>Name:</strong> ${orderData.account?.acName || 'N/A'}<br>
-            <strong>City:</strong> ${orderData.account?.city || 'N/A'}<br>
-            <strong>Contact:</strong> ${orderData.account?.personName || 'N/A'}
-          </div>
-        </div>
-      </div>
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th style="width: 5% ">#</th>
-            <th style="width: 25%; font-weight:300; font-size:13px">Item Name</th>
-            <th style="width: 10%; font-weight:300; font-size:13px " >Unit Price</th>
-            <th style="width: 10%; font-weight:300; font-size:13px">Quantity</th>
-           
-           
-          </tr>
-        </thead>
-        <tbody>
-          ${details.map((detail, index) => `
-            <tr>
-              <td>${index + 1}</td>
-              <td class="">${detail.item?.itemName || 'N/A'}</td>
-              <td class="number-cell">${parseFloat(detail.Price || 0).toFixed(2)}</td>
-              <td class="number-cell">${isPurchase ?
-        (parseFloat(detail.Stock_In_UOM_Qty || 0).toFixed(0)) :
-        (parseFloat(detail.Stock_out_UOM_Qty || 0).toFixed(0))}</td>
-              
-            
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-
-      <div class="totals">
-        <div class="total-row">
-          <span>Gross Total:</span>
-          <span>${totals.grossTotal.toFixed(2)}</span>
-        </div>
-        <div class="total-row grand-total">
-          <span>Net Total:</span>
-          <span>${totals.netTotal.toFixed(2)}</span>
-        </div>
-      </div>
-
-      <div class="footer">
-        <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
-        <p>This is a computer-generated document.</p>
-      </div>
-</div>
+  // FIXED: Function to get correct quantity and UOM based on sale_unit
+  const getDisplayQuantity = (detail) => {
+    if (isPurchase) {
+      const qty = detail.Stock_In_UOM_Qty || 0;
+      const uom = detail.item?.uom1?.uom || 'Pcs';
+      return `${parseFloat(qty).toFixed(0)} ${uom}`;
+    } else {
+      let qty = 0;
+      let uom = '';
       
-      <script>
-        // Auto print when page loads
-        window.onload = function() {
-          setTimeout(function() {
-            window.print();
-          }, 500);
+      if (detail.sale_unit === 'uom1') {
+        qty = detail.uom1_qty || detail.Stock_out_UOM_Qty || 0;
+        uom = detail.item?.uom1?.uom || 'Pcs';
+      } else if (detail.sale_unit === 'uomTwo') {
+        qty = detail.uom2_qty || detail.Stock_out_SKU_UOM_Qty || 0;
+        uom = detail.item?.uomTwo?.uom || 'Doz';
+      } else if (detail.sale_unit === 'uomThree') {
+        qty = detail.uom3_qty || detail.Stock_out_UOM3_Qty || 0;
+        uom = detail.item?.uomThree?.uom || 'Box';
+      } else {
+        qty = detail.uom1_qty || detail.Stock_out_UOM_Qty || 0;
+        uom = detail.item?.uom1?.uom || 'Pcs';
+      }
+      
+      return `${parseFloat(qty).toFixed(0)} ${uom}`;
+    }
+  };
+
+  const handlePrint = (order) => {
+    setSelectedOrder(order);
+    setShowPrintModal(true);
+  };
+
+  // NEW: Handle GRN creation
+  const handleCreateGRN = (order) => {
+    setSelectedOrder(order);
+    setShowGRNModal(true);
+  };
+
+  // NEW: Handle Dispatch creation
+  const handleCreateDispatch = (order) => {
+    setSelectedOrder(order);
+    setShowDispatchModal(true);
+  };
+
+  const handleEdit = (order) => {
+    router.push(`/order/${orderType}/edit?id=${order.ID}`);
+  };
+
+  const handleDelete = async (orderId) => {
+    if (window.confirm('Are you sure you want to delete this order?')) {
+      try {
+        const response = await fetch(`http://${window.location.hostname}:4000/api/order/${orderId}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          fetchOrders();
         }
-      </script>
+      } catch (error) {
+        console.error('Error deleting order:', error);
+      }
+    }
+  };
 
-
-    </body>
-    </html>
-    `
-  }
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-32">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <span className="ml-2 text-gray-600">Loading...</span>
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-lg">
-        <div className={`${orderType === 'purchase' ? 'bg-blue-600' : 'bg-green-600'} text-white p-5 rounded-t-lg`}>
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">{orderType === 'purchase' ? 'Purchase Orders' : 'Sales Orders'}</h1>
-            <Link
-              href={`/order/${orderType}/create`}
-              className="px-4 py-2 bg-white text-gray-800 rounded hover:bg-gray-100 shadow-sm transition-colors"
-            >
-              + Create New Order
-            </Link>
-          </div>
-        </div>
+    <div className="p-4">
+      {/* Header */}
+      <div className={`${isPurchase ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-green-600 to-green-700'} text-white p-4 rounded-t flex justify-between items-center shadow-lg`}>
+        <h1 className="text-xl font-bold">{isPurchase ? 'Purchase' : 'Sales'} Orders</h1>
+        <button
+          onClick={() => router.push(`/order/${orderType}/create`)}
+          className="bg-white bg-opacity-20 px-4 py-2 rounded hover:bg-opacity-30 transition-all duration-200 hover:scale-105 transform"
+        >
+          + Create New
+        </button>
+      </div>
 
-        {message.text && (
-          <div className={`m-4 p-4 rounded-lg border ${message.type === 'success'
-            ? 'bg-green-50 border-green-300 text-green-800'
-            : 'bg-red-50 border-red-300 text-red-800'
-            }`}>
-            <div className="flex items-center">
-              <div className={`w-5 h-5 mr-3 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                {message.type === 'success' ? (
-                  <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                ) : (
-                  <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </div>
-              {message.text}
-            </div>
-          </div>
-        )}
+      {/* Enhanced Table */}
+      <div className="bg-white rounded-b shadow-lg overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-3 py-2 text-left font-medium text-gray-700">Order #</th>
+              <th className="px-3 py-2 text-left font-medium text-gray-700">ID</th>
+              <th className="px-3 py-2 text-left font-medium text-gray-700">Date</th>
+              <th className="px-3 py-2 text-left font-medium text-gray-700">Status</th>
+              <th className="px-3 py-2 text-left font-medium text-gray-700">{isPurchase ? 'Supplier' : 'Customer'}</th>
+              <th className="px-3 py-2 text-center font-medium text-gray-700">Items</th>
+              <th className="px-3 py-2 text-center font-medium text-gray-700">Process</th> {/* NEW COLUMN */}
+              <th className="px-3 py-2 text-center font-medium text-gray-700">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {orders.map((order) => (
+              <React.Fragment key={order.ID}>
+                {/* Main Order Row */}
+                <tr className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-green-50 transition-all duration-300 hover:shadow-sm group">
+                  <td className="px-3 py-3 font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    {order.Number}
+                  </td>
+                  <td className="px-3 py-3 text-gray-600 group-hover:text-gray-800 transition-colors">
+                    #{order.ID}
+                  </td>
+                  <td className="px-3 py-3 text-gray-600 group-hover:text-gray-800 transition-colors">
+                    {new Date(order.Date).toLocaleDateString()}
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-all duration-200 ${
+                      order.Next_Status === 'Complete' 
+                        ? 'bg-green-100 text-green-800 group-hover:bg-green-200' 
+                        : 'bg-orange-100 text-orange-800 group-hover:bg-orange-200'
+                    }`}>
+                      {order.Next_Status === 'Complete' ? '✅' : '⏳'} {order.Next_Status}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-gray-600 group-hover:text-gray-800 transition-colors font-medium">
+                    {order.account?.acName || 'N/A'}
+                    {order.account?.city && (
+                      <div className="text-xs text-gray-400 group-hover:text-gray-500 transition-colors">
+                        📍 {order.account.city}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-3 py-3 text-center">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                      isPurchase ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                    } group-hover:scale-110 transition-transform duration-200`}>
+                      📦 {order.details.length} items
+                    </span>
+                  </td>
 
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading orders...</p>
-            </div>
-          </div>
-        ) : orders.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-4 py-3 border border-gray-300 text-left font-semibold">Order #</th>
-                  <th className="px-4 py-3 border border-gray-300 text-left font-semibold">Date</th>
-                  <th className="px-4 py-3 border border-gray-300 text-left font-semibold">
-                    {orderType === 'purchase' ? 'Supplier' : 'Customer'}
-                  </th>
-                  <th className="px-4 py-3 border border-gray-300 text-left font-semibold">Status</th>
-                  <th className="px-4 py-3 border border-gray-300 text-center font-semibold">Actions</th>
+                  {/* NEW: Process Column - GRN/Dispatch Button */}
+                  <td className="px-3 py-3 text-center">
+                    {isPurchase ? (
+                      /* GRN Button for Purchase Orders */
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCreateGRN(order);
+                        }}
+                        className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-full hover:from-blue-600 hover:to-blue-700 transition-all duration-200 hover:scale-105 transform shadow-md"
+                        title="Create Goods Receiving Note"
+                      >
+                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        📦 GRN
+                      </button>
+                    ) : (
+                      /* Dispatch Button for Sales Orders */
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCreateDispatch(order);
+                        }}
+                        className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-medium rounded-full hover:from-green-600 hover:to-green-700 transition-all duration-200 hover:scale-105 transform shadow-md"
+                        title="Create Sales Dispatch"
+                      >
+                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        🚚 Dispatch
+                      </button>
+                    )}
+                  </td>
+
+                  <td className="px-3 py-3">
+                    <div className="flex justify-center space-x-1">
+                      {/* Print Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePrint(order);
+                        }}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:scale-110 transform"
+                        title="Print Order"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                      </button>
+
+                      {/* Edit Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(order);
+                        }}
+                        className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-100 rounded-lg transition-all duration-200 hover:scale-110 transform hover:rotate-12"
+                        title="Edit Order"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+
+                      {/* Delete Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(order.ID);
+                        }}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200 hover:scale-110 transform hover:animate-pulse"
+                        title="Delete Order"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+
+                      {/* Expand/Collapse */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleOrderExpanded(order.ID);
+                        }}
+                        className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 transform ${
+                          expandedOrders.has(order.ID)
+                            ? 'text-blue-600 bg-blue-100 rotate-180'
+                            : 'text-gray-400 hover:text-blue-600 hover:bg-blue-100'
+                        }`}
+                        title={expandedOrders.has(order.ID) ? 'Hide Items' : 'Show Items'}
+                      >
+                        <svg className="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {orders.map((order) => (
-                  <tr key={order.ID} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 border border-gray-300 font-medium">{order.Number || order.ID}</td>
-                    <td className="px-4 py-3 border border-gray-300">{formatDate(order.Date)}</td>
-                    <td className="px-4 py-3 border border-gray-300">{order.account?.acName || 'N/A'}</td>
-                    <td className="px-4 py-3 border border-gray-300">
-                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${order.Next_Status === 'Complete'
-                        ? 'bg-green-100 text-green-800'
-                        : order.Next_Status === 'Pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-blue-100 text-blue-800'
-                        }`}>
-                        {order.Next_Status || 'Pending'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 border border-gray-300">
-                      <div className="flex justify-center items-center space-x-2">
-                        {/* Print Button */}
-                        <button
-                          onClick={() => handlePrint(order.ID)}
-                          disabled={printingOrderId === order.ID}
-                          className="text-gray-600 hover:text-gray-800 p-1 rounded hover:bg-gray-100 transition-colors disabled:opacity-50"
-                          title="Print Order"
-                        >
-                          {printingOrderId === order.ID ? (
-                            <div className="animate-spin w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                          ) : (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                            </svg>
-                          )}
-                        </button>
 
-                        {/* Edit Button */}
-                        <Link
-                          href={`/order/${orderType}/edit/${order.ID}`}
-                          className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50 transition-colors"
-                          title="Edit Order"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                {/* Expanded Items */}
+                {expandedOrders.has(order.ID) && (
+                  <tr className="animate-fadeIn">
+                    <td colSpan="8" className="px-3 py-2 bg-gradient-to-r from-gray-50 to-blue-50 border-l-4 border-blue-400">
+                      <div className="text-xs">
+                        <div className="font-semibold text-gray-700 mb-2 flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                           </svg>
-                        </Link>
-
-                        {/* Delete Button */}
-                        <button
-                          onClick={() => handleDelete(order.ID)}
-                          className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors"
-                          title="Delete Order"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                          Order Items ({order.details.length})
+                        </div>
+                        <div className="grid grid-cols-1 gap-1">
+                          {order.details.map((detail, index) => (
+                            <div key={index} className="bg-white rounded p-2 hover:bg-blue-50 transition-all duration-200 hover:shadow-sm border-l-2 hover:border-l-blue-400">
+                              <div className="grid grid-cols-4 gap-3 items-center">
+                                <div className="flex items-center">
+                                  <span className={`w-5 h-5 rounded-full ${isPurchase ? 'bg-blue-500' : 'bg-green-500'} text-white text-xs flex items-center justify-center font-bold mr-2`}>
+                                    {index + 1}
+                                  </span>
+                                  <span className="font-medium text-gray-900">
+                                    {detail.item?.itemName || 'Unknown Item'}
+                                  </span>
+                                </div>
+                                <div className="text-center">
+                                  <span className="font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                                    {getDisplayQuantity(detail)}
+                                  </span>
+                                </div>
+                                <div className="text-center text-gray-600">
+                                  ₹{parseFloat(detail.Price || 0).toFixed(2)}
+                                </div>
+                                <div className="text-gray-500 text-xs">
+                                  {detail.Remarks || '-'}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="flex flex-col justify-center items-center h-64">
-            <svg className="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p className="text-gray-500 text-lg mb-2">No orders found</p>
-            <p className="text-gray-400 text-sm mb-4">Create your first {orderType} order to get started</p>
-            <Link
-              href={`/order/${orderType}/create`}
-              className={`px-6 py-2 text-white rounded-lg hover:opacity-90 transition-opacity ${orderType === 'purchase' ? 'bg-blue-600' : 'bg-green-600'
-                }`}
-            >
-              Create New Order
-            </Link>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="p-4 border-t border-gray-200 flex justify-center">
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-3 py-2 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-              >
-                Previous
-              </button>
-
-              {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-                let pageNum
-                if (totalPages <= 7) {
-                  pageNum = i + 1
-                } else if (page <= 4) {
-                  pageNum = i + 1
-                } else if (page >= totalPages - 3) {
-                  pageNum = totalPages - 6 + i
-                } else {
-                  pageNum = page - 3 + i
-                }
-
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setPage(pageNum)}
-                    className={`px-3 py-2 text-sm border rounded-md transition-colors ${pageNum === page
-                      ? `${orderType === 'purchase' ? 'bg-blue-500 text-white border-blue-500' : 'bg-green-500 text-white border-green-500'}`
-                      : 'hover:bg-gray-50'
-                      }`}
-                  >
-                    {pageNum}
-                  </button>
-                )
-              })}
-
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="px-3 py-2 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
       </div>
-    </div>
-  )
-}
 
-export default OrderList
+      {/* Print Modal */}
+      {showPrintModal && selectedOrder && (
+        <PrintModal 
+          order={selectedOrder} 
+          isPurchase={isPurchase}
+          onClose={() => setShowPrintModal(false)}
+          getDisplayQuantity={getDisplayQuantity}
+        />
+      )}
+
+      {/* NEW: GRN Modal */}
+      {showGRNModal && selectedOrder && (
+        <GRNModal
+          purchaseOrder={selectedOrder}
+          onClose={() => setShowGRNModal(false)}
+          onSuccess={() => {
+            setShowGRNModal(false);
+            fetchOrders(); // Refresh orders
+          }}
+        />
+      )}
+
+      {/* NEW: Dispatch Modal */}
+      {showDispatchModal && selectedOrder && (
+        <DispatchModal
+          salesOrder={selectedOrder}
+          onClose={() => setShowDispatchModal(false)}
+          onSuccess={() => {
+            setShowDispatchModal(false);
+            fetchOrders(); // Refresh orders
+          }}
+        />
+      )}
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-in-out;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default OrderList;

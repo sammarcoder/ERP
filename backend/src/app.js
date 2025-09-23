@@ -51,10 +51,10 @@ const initDatabase = async () => {
     console.log('✅ Database connected');
     
     // Disable foreign key checks during sync
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
-    console.log('⚠️ Foreign key checks disabled');
+    // await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+    // console.log('⚠️ Foreign key checks disabled');
     
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log('✅ Models synced');
     
     // Re-enable foreign key checks
@@ -130,7 +130,7 @@ initDatabase().then(() => {
 // sequelize.authenticate()
 //   .then(() => {
 //     console.log('✅ Database connected');
-//     return sequelize.sync({alter:true});
+//     return sequelize.sync({});
 //   })
 //   .then(() => {
 //     console.log('✅ Models synced');

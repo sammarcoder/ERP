@@ -45,12 +45,22 @@ const createCompleteOrder = async (req, res) => {
     }, { transaction });
     
     // Add master ID to details and ensure Line_Id is sequential
+    // Old code (before sale_unit):
+    // const orderDetails = details.map((detail, index) => ({
+    //   ...detail,
+    //   Order_Main_Id: orderMaster.ID,
+    //   Line_Id: index + 1
+    // }));
+    // New code: include all UOM quantities and sale_unit from frontend
     const orderDetails = details.map((detail, index) => ({
       ...detail,
       Order_Main_Id: orderMaster.ID,
-      Line_Id: index + 1
+      Line_Id: index + 1,
+      uom1_qty: detail.uom1_qty || 0,
+      uom2_qty: detail.uom2_qty || 0,
+      uom3_qty: detail.uom3_qty || 0,
+      sale_unit: detail.sale_unit || null
     }));
-    
     // Create details
     const createdDetails = await Order_Detail.bulkCreate(orderDetails, { 
       transaction,
@@ -97,26 +107,82 @@ const createCompleteOrder = async (req, res) => {
   }
 };
 
+// const getAllOrders = async (req, res) => {
+//   try {
+//     const { stockTypeId, page = 1, limit = 10 } = req.query;
+//     const offset = (page - 1) * limit;
+    
+//     const whereClause = {};
+//     if (stockTypeId) whereClause.Stock_Type_ID = stockTypeId;
+    
+//     const { count, rows } = await Order_Main.findAndCountAll({
+//       where: whereClause,
+//       include: [
+//         { model: ZCoa, as: 'account', attributes: ['id', 'acName','city'] },
+//         {model:Order_Detail,as:'details', },
+//         { model: ZItems, as: 'item', attributes: ['id', 'Item_Name'] }
+//       ],
+//       limit: parseInt(limit),
+//       offset: parseInt(offset),
+//       order: [['createdAt', 'DESC']]
+//     });
+    
+//     return res.status(200).json({
+//       success: true,
+//       data: rows,
+//       pagination: {
+//         total: count,
+//         page: parseInt(page),
+//         limit: parseInt(limit),
+//         totalPages: Math.ceil(count / limit)
+//       }
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Failed to fetch orders',
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
+
 const getAllOrders = async (req, res) => {
   try {
     const { stockTypeId, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
-    
+
     const whereClause = {};
     if (stockTypeId) whereClause.Stock_Type_ID = stockTypeId;
-    
+
     const { count, rows } = await Order_Main.findAndCountAll({
       where: whereClause,
       include: [
-        { model: ZCoa, as: 'account', attributes: ['id', 'acName'] },
-        {model:Order_Detail,as:'details', }
-        // include: [{ model: ZItems, as: 'item', attributes: ['id', 'Item_Name'] }]
+        { model: ZCoa, as: 'account', attributes: ['id', 'acName','city'] },
+        // Corrected: Nested include for ZItems within Order_Detail
+        {
+          model: Order_Detail,
+          as: 'details',
+          include: [{
+            model: ZItems,
+            as: 'item',
+            include: [{ model: Uom, as: 'uom1' }, { model: Uom, as: 'uomTwo' }, { model: Uom, as: 'uomThree' }],
+            attributes: ['id', 'itemName']
+          }]
+        },
       ],
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['createdAt', 'DESC']]
     });
-    
+
     return res.status(200).json({
       success: true,
       data: rows,
@@ -128,6 +194,7 @@ const getAllOrders = async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Failed to fetch orders:', error); // Log the full error for debugging
     return res.status(500).json({
       success: false,
       message: 'Failed to fetch orders',
@@ -135,6 +202,9 @@ const getAllOrders = async (req, res) => {
     });
   }
 };
+
+
+
 
 const getOrderById = async (req, res) => {
   const { id } = req.params;
@@ -146,7 +216,7 @@ const getOrderById = async (req, res) => {
           model: Order_Detail,
           as: 'details',
           include: [
-            { model: ZItems, as: 'item' }
+            { model: ZItems, as: 'item', include: [{ model: Uom, as: 'uom1' }, { model: Uom, as: 'uomTwo' }, { model: Uom, as: 'uomThree' }]}
           ]
         },
         { model: ZCoa, as: 'account' }
@@ -203,12 +273,22 @@ const updateCompleteOrder = async (req, res) => {
     });
     
     // Create new details
+    // Old code (before sale_unit):
+    // const orderDetails = details.map((detail, index) => ({
+    //   ...detail,
+    //   Order_Main_Id: id,
+    //   Line_Id: index + 1
+    // }));
+    // New code: include all UOM quantities and sale_unit from frontend
     const orderDetails = details.map((detail, index) => ({
       ...detail,
       Order_Main_Id: id,
-      Line_Id: index + 1
+      Line_Id: index + 1,
+      uom1_qty: detail.uom1_qty || 0,
+      uom2_qty: detail.uom2_qty || 0,
+      uom3_qty: detail.uom3_qty || 0,
+      sale_unit: detail.sale_unit || null
     }));
-    
     await Order_Detail.bulkCreate(orderDetails, { 
       transaction,
       validate: true 

@@ -1,5 +1,5 @@
 // controllers/zItems.controller.js
-const { ZItems, ZClassType,Uom } = require('../models');
+const { ZItems, ZClassType, Uom } = require('../models');
 const { Op } = require('sequelize');
 
 // Create a new item
@@ -103,7 +103,7 @@ const createItem = async (req, res) => {
                 { model: ZClassType, as: 'class2' },
                 { model: ZClassType, as: 'class3' },
                 { model: ZClassType, as: 'class4' },
-                
+
             ]
         });
 
@@ -145,13 +145,17 @@ const getAllItems = async (req, res) => {
             { model: ZClassType, as: 'class1', attributes: ['id', 'classId', 'className'] },
             { model: ZClassType, as: 'class2', attributes: ['id', 'classId', 'className'] },
             { model: ZClassType, as: 'class3', attributes: ['id', 'classId', 'className'] },
-            { model: ZClassType, as: 'class4', attributes: ['id', 'classId', 'className'] }
+            { model: ZClassType, as: 'class4', attributes: ['id', 'classId', 'className'] },
+
         ] : [];
 
+        const uoms = [{ model: Uom, as: 'uom1', attributes: ['uom'] },
+        { model: Uom, as: 'uomTwo', attributes: ['uom'] },
+        { model: Uom, as: 'uomThree', attributes: ['uom'] }]
         // Get items with pagination
         const { count, rows: items } = await ZItems.findAndCountAll({
             where: whereClause,
-            include: includeArray,
+            include: [...includeArray, ...uoms],
             limit: parseInt(limit),
             offset: parseInt(offset),
             order: [['createdAt', 'DESC']]
@@ -189,9 +193,9 @@ const getItemById = async (req, res) => {
                 { model: ZClassType, as: 'class2', attributes: ['classId'] },
                 { model: ZClassType, as: 'class3', attributes: ['classId'] },
                 { model: ZClassType, as: 'class4', attributes: ['classId'] },
-                {model: Uom , as:'uom1',attributes:['uom'] },
-                {model: Uom , as:'uomTwo', attributes:['uom']},
-                {model: Uom , as:'uomThree' ,attributes:['uom']}
+                { model: Uom, as: 'uom1', attributes: ['uom'] },
+                { model: Uom, as: 'uomTwo', attributes: ['uom'] },
+                { model: Uom, as: 'uomThree', attributes: ['uom'] }
             ]
         });
 
@@ -223,9 +227,9 @@ const getItemById = async (req, res) => {
 // const getItemsByClassFilters = async (req, res) => {
 //     try {
 //         const { class1, class2, class3, class4 } = req.query;
-        
+
 //         const whereClause = {};
-        
+
 //         // Add filters only if values are provided and not 0
 //         if (class1 && class1 !== '0') {
 //             whereClause.itemClass1 = class1;
@@ -281,9 +285,9 @@ const getItemById = async (req, res) => {
 const getItemsByClassFilters = async (req, res) => {
     try {
         const { class1, class2, class3, class4 } = req.query;
-        
+
         const whereClause = {};
-        
+
         // Only add filters if values are provided
         if (class1 && class1 !== '0') whereClause.itemClass1 = class1;
         if (class2 && class2 !== '0') whereClause.itemClass2 = class2;
@@ -292,7 +296,7 @@ const getItemsByClassFilters = async (req, res) => {
 
         const items = await ZItems.findAll({
             where: whereClause,
-           
+
         });
 
         return res.status(200).json({

@@ -92,6 +92,26 @@ Order_Detail.init(
       allowNull: true,
       defaultValue: 0
     },
+    uom1_qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    uom2_qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    uom3_qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    sale_unit: {
+      type: DataTypes.STRING(16),
+      allowNull: true,
+      comment: 'Selected UOM for sale: uom1, uomTwo, uomThree'
+    },
     Discount_A: {
       type: DataTypes.DECIMAL(5, 2),
       allowNull: true,

@@ -291,8 +291,8 @@ class ZItems extends Model {
             as: "item"
         })
 
-        this.hasMany(models.StockDetail, {
-            foreignKey: 'itemId',
+        this.hasMany(models.Stk_Detail, {
+            foreignKey: 'Item_Id',
             as: "stock_item"
         })
 

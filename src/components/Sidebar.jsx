@@ -362,7 +362,7 @@ const Sidebar = () => {
             icon: '🔧',
             path: null,
             subItems: [
-                { id: 'items', title: 'Items', path: '/item-form' },
+                { id: 'items', title: 'Items', path: '/items' },
                 { id: 'item-class', title: 'Item Class', path: '/items-class' },
                 { id: 'uom', title: 'UOM', path: '/definition-inventory/uom' }
             ]

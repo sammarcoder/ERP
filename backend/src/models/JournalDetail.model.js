@@ -119,3 +119,8 @@ JournalDetail.associate = function(models) {
 };
 
 module.exports = JournalDetail;
+
+
+
+
+

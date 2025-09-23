@@ -446,7 +446,7 @@ const getAllStock = async (req, res) => {
     const { count, rows } = await StockMain.findAndCountAll({
       where: whereClause,
       include: [
-        { model: ZCoa, as: 'mainAccount', attributes: ['id', 'acName'] }
+        { model: ZCoa, as: 'account', attributes: ['id', 'acName'] }
       ],
       limit: parseInt(limit),
       offset: parseInt(offset),

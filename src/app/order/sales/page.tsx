@@ -6,7 +6,7 @@ export default function Page() {
   return (
     <div>
       
-      <OrderList />
+      <OrderList orderType='sales' />
     </div>
   )
 }

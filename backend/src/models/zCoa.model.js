@@ -188,6 +188,34 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const sequelize = require('../../config/database');
 const { DataTypes } = require('sequelize');
 
@@ -343,12 +371,18 @@ ZCoa.associate = function (models) {
             as: 'orders'
         });
     }
-    if (models && models.StockMain) {
-        ZCoa.hasMany(models.StockMain, {
-            foreignKey: 'coaId',
-            as: 'mainAccount'
+    if (models && models.Stk_main) {
+        ZCoa.hasMany(models.Stk_main, {
+            foreignKey: 'COA_ID',
+            as: 'account'
         });
     }
+    // if (models && models.StockMain) {
+    //     ZCoa.hasMany(models.StockMain, {
+    //         foreignKey: 'coaId',
+    //         as: 'mainAccount'
+    //     });
+    // }
 };
 
 module.exports = ZCoa;
