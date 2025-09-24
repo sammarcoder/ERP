@@ -8,7 +8,7 @@ const Ztransporter = sequelize.define('Ztransporter', {
     primaryKey: true,
     autoIncrement: true
   },
-  transporterName: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false
   },

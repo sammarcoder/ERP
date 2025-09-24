@@ -1,23 +1,159 @@
-const express = require('express')
-const morgan = require('morgan')
-const cors = require('cors')
+// const express = require('express')
+// const morgan = require('morgan')
+// const cors = require('cors')
 
-const {JournalDetail} = require('./models/JournalDetail.model.js')
-const app = express()
-const sequelize = require ('../config/database')
 
-app.use(morgan('dev'))
-app.use(express.json()) 
-app.use(cors())
+// const app = express()
+// const sequelize = require ('../config/database')
+
+// app.use(morgan('dev'))
+// app.use(express.json()) 
+// app.use(cors())
+
+// app.get('/api', (req, res) => {
+//   res.json({ name: "saamr" })
+// })
+
+// // MOVE ROUTES BEFORE ERROR MIDDLEWARE
+// app.use('/api', require('./routes/index.js'))
+
+// // ENHANCED ERROR LOGGING MIDDLEWARE (Place AFTER routes)
+// app.use((err, req, res, next) => {
+//   console.error('=== ERROR DETAILS ===');
+//   console.error('URL:', req.method, req.originalUrl);
+//   console.error('Body:', req.body);
+//   console.error('Error Name:', err.name);
+//   console.error('Error Message:', err.message);
+//   console.error('Full Error:', err);
+//   console.error('Stack Trace:', err.stack);
+//   console.error('===================');
+  
+//   // Send detailed error in development
+//   const isDevelopment = process.env.NODE_ENV !== 'production';
+  
+//   res.status(err.status || 500).json({
+//     success: false,
+//     error: isDevelopment ? err.message : 'Something went wrong!',
+//     details: isDevelopment ? {
+//       name: err.name,
+//       message: err.message,
+//       stack: err.stack
+//     } : undefined
+//   });
+// });
+
+// // BETTER DATABASE INITIALIZATION
+// const initDatabase = async () => {
+//   try {
+//     console.log('🔄 Starting database initialization...');
+    
+//     await sequelize.authenticate();
+//     console.log('✅ Database connected');
+    
+//     // Disable foreign key checks during sync
+//     // await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+//     // console.log('⚠️ Foreign key checks disabled');
+    
+//     await sequelize.sync();
+//     console.log('✅ Models synced');
+    
+//     // Re-enable foreign key checks
+//     await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+//     console.log('✅ Foreign key checks re-enabled');
+    
+//   } catch (err) {
+//     console.error('❌ Database initialization error:');
+//     console.error('Error Name:', err.name);
+//     console.error('Error Message:', err.message);
+//     console.error('Full Error:', err);
+    
+//     // Try to re-enable foreign key checks even on error
+//     try {
+//       await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+//     } catch (e) {
+//       console.error('Failed to re-enable foreign key checks');
+//     }
+    
+//     process.exit(1);
+//   }
+// };
+
+// const PORT = process.env.PORT || 4000;
+
+// // START SERVER WITH PROPER ERROR HANDLING
+// initDatabase().then(() => {
+//   app.listen(PORT, '0.0.0.0', () => {
+//     console.log(`🚀 Server running on http://localhost:${PORT}`);
+//     console.log(`📍 COA API: http://localhost:${PORT}/api/z-coa/create`);
+//   });
+// }).catch(err => {
+//   console.error('Failed to start server:', err);
+//   process.exit(1);
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const express = require('express');
+const morgan = require('morgan');
+const cors = require('cors');
+const sequelize = require('../config/database');
+
+const app = express();
+
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(cors());
 
 app.get('/api', (req, res) => {
-  res.json({ name: "saamr" })
-})
+  res.json({ name: "saamr" });
+});
 
-// MOVE ROUTES BEFORE ERROR MIDDLEWARE
-app.use('/api', require('./routes/index.js'))
+app.use('/api', require('./routes/index.js'));
 
-// ENHANCED ERROR LOGGING MIDDLEWARE (Place AFTER routes)
 app.use((err, req, res, next) => {
   console.error('=== ERROR DETAILS ===');
   console.error('URL:', req.method, req.originalUrl);
@@ -27,10 +163,9 @@ app.use((err, req, res, next) => {
   console.error('Full Error:', err);
   console.error('Stack Trace:', err.stack);
   console.error('===================');
-  
-  // Send detailed error in development
+
   const isDevelopment = process.env.NODE_ENV !== 'production';
-  
+
   res.status(err.status || 500).json({
     success: false,
     error: isDevelopment ? err.message : 'Something went wrong!',
@@ -42,54 +177,83 @@ app.use((err, req, res, next) => {
   });
 });
 
-// BETTER DATABASE INITIALIZATION
-const initDatabase = async () => {
+const PORT = process.env.PORT || 4000;
+
+// Replaced initDatabase with initServer
+const initServer = async () => {
   try {
-    console.log('🔄 Starting database initialization...');
-    
+    console.log('🔄 Starting server initialization...');
     await sequelize.authenticate();
-    console.log('✅ Database connected');
-    
-    // Disable foreign key checks during sync
-    // await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
-    // console.log('⚠️ Foreign key checks disabled');
-    
-    await sequelize.sync();
-    console.log('✅ Models synced');
-    
-    // Re-enable foreign key checks
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
-    console.log('✅ Foreign key checks re-enabled');
-    
+    console.log('✅ Database connection successful. Ready to start the server.');
+
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`📍 COA API: http://localhost:${PORT}/api/z-coa/create`);
+    });
   } catch (err) {
-    console.error('❌ Database initialization error:');
+    console.error('❌ Failed to connect to the database or start the server.');
     console.error('Error Name:', err.name);
     console.error('Error Message:', err.message);
-    console.error('Full Error:', err);
-    
-    // Try to re-enable foreign key checks even on error
-    try {
-      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
-    } catch (e) {
-      console.error('Failed to re-enable foreign key checks');
-    }
-    
     process.exit(1);
   }
 };
 
-const PORT = process.env.PORT || 4000;
+initServer();
 
-// START SERVER WITH PROPER ERROR HANDLING
-initDatabase().then(() => {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📍 COA API: http://localhost:${PORT}/api/z-coa/create`);
-  });
-}).catch(err => {
-  console.error('Failed to start server:', err);
-  process.exit(1);
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
