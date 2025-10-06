@@ -19,23 +19,8 @@ const ZClassType = sequelize.define('ZClassType', {
         unique: true
 
     }
-});
-
-// ZClassType.associate = function (models){
-//     if(models && models.ZItems){
-//         ZClassType.hasMany(models.ZItems)
-//     }
-// }
-
-
-
-
-
-
-
-
-
-
+}
+);
 
 
 

@@ -156,8 +156,8 @@ const getAllItems = async (req, res) => {
         const { count, rows: items } = await ZItems.findAndCountAll({
             where: whereClause,
             include: [...includeArray, ...uoms],
-            limit: parseInt(limit),
-            offset: parseInt(offset),
+            // limit: parseInt(limit),
+            // offset: parseInt(offset),
             order: [['createdAt', 'DESC']]
         });
 

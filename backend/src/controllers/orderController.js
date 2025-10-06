@@ -3,47 +3,82 @@ const { Order_Main, Order_Detail, ZItems, Uom, ZCoa } = db;
 const sequelize = db.sequelize;
 
 // Generate Order Number
+// const generateOrderNumber = async (stockTypeId) => {
+//   const prefix = stockTypeId === 1 ? 'PO' : 'SO';
+//   const year = new Date().getFullYear();
+//   const month = String(new Date().getMonth() + 1).padStart(2, '0');
+
+//   const lastOrder = await Order_Main.findOne({
+//     where: { Stock_Type_ID: stockTypeId },
+//     order: [['createdAt', 'DESC']]
+//   });
+
+//   let sequence = 1;
+//   if (lastOrder && lastOrder.Number) {
+//     const lastSequence = parseInt(lastOrder.Number.split('-').pop());
+//     sequence = lastSequence + 1;
+//   }
+
+//   return `${prefix}-${year}${month}-${String(sequence).padStart(4, '0')}`;
+// };
+
+
+
+
+
+
+
+
+
+// FIXED: Use correct Stock_Type_ID values (11 = PO, 12 = SO)
 const generateOrderNumber = async (stockTypeId) => {
-  const prefix = stockTypeId === 1 ? 'PO' : 'SO';
+  const prefix = stockTypeId === 11 ? 'PO' : 'SO'; // FIXED: 11 for PO, 12 for SO
   const year = new Date().getFullYear();
   const month = String(new Date().getMonth() + 1).padStart(2, '0');
-  
+
   const lastOrder = await Order_Main.findOne({
     where: { Stock_Type_ID: stockTypeId },
     order: [['createdAt', 'DESC']]
   });
-  
+
   let sequence = 1;
   if (lastOrder && lastOrder.Number) {
     const lastSequence = parseInt(lastOrder.Number.split('-').pop());
     sequence = lastSequence + 1;
   }
-  
+
   return `${prefix}-${year}${month}-${String(sequence).padStart(4, '0')}`;
 };
 
+
+
+
+
+
+
+
 const createCompleteOrder = async (req, res) => {
   const { master, details } = req.body;
-  
+
   if (!master || !details || details.length === 0) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Master and details are required' 
+    return res.status(400).json({
+      success: false,
+      message: 'Master and details are required'
     });
   }
-  
+
   const transaction = await sequelize.transaction();
-  
+
   try {
     // Generate order number
     const orderNumber = await generateOrderNumber(master.Stock_Type_ID);
-    
+
     // Create master with generated number
     const orderMaster = await Order_Main.create({
       ...master,
       Number: orderNumber
     }, { transaction });
-    
+
     // Add master ID to details and ensure Line_Id is sequential
     // Old code (before sale_unit):
     // const orderDetails = details.map((detail, index) => ({
@@ -62,13 +97,13 @@ const createCompleteOrder = async (req, res) => {
       sale_unit: detail.sale_unit || null
     }));
     // Create details
-    const createdDetails = await Order_Detail.bulkCreate(orderDetails, { 
+    const createdDetails = await Order_Detail.bulkCreate(orderDetails, {
       transaction,
-      validate: true 
+      validate: true
     });
-    
+
     await transaction.commit();
-    
+
     // Fetch complete order with associations
     const completeOrder = await Order_Main.findByPk(orderMaster.ID, {
       include: [
@@ -82,23 +117,23 @@ const createCompleteOrder = async (req, res) => {
         { model: ZCoa, as: 'account' }
       ]
     });
-    
+
     return res.status(201).json({
       success: true,
       message: 'Order created successfully',
       data: completeOrder
     });
-    
+
   } catch (error) {
     await transaction.rollback();
-    
+
     if (error.name === 'SequelizeForeignKeyConstraintError') {
       return res.status(400).json({
         success: false,
         message: `Invalid reference: ${error.message}`
       });
     }
-    
+
     return res.status(500).json({
       success: false,
       message: 'Failed to create order',
@@ -107,29 +142,126 @@ const createCompleteOrder = async (req, res) => {
   }
 };
 
+
+
+// const getAllOrders = async (req, res) => {
+//   try {
+//     const { stockTypeId, page = 1, limit = 10 } = req.query;
+//     const offset = (page - 1) * limit;
+
+//     const whereClause = {};
+//     if (stockTypeId) whereClause.Stock_Type_ID = stockTypeId;
+
+//     const { count, rows } = await Order_Main.findAndCountAll({
+//       where: whereClause,
+//       include: [
+//         { model: ZCoa, as: 'account', attributes: ['id', 'acName', 'city'] },
+//         // Corrected: Nested include for ZItems within Order_Detail
+//         {
+//           model: Order_Detail,
+//           as: 'details',
+//           include: [{
+//             model: ZItems,
+//             as: 'item',
+//             attributes: ['id', 'itemName'],
+//             include: [{ model: Uom, as: 'uom1', attributes: ['uom'] },
+//             { model: Uom, as: 'uomTwo', attributes: ['uom'] },
+//             { model: Uom, as: 'uomThree', attributes: ['uom'] }]
+
+//           },
+//           ],
+//         }
+//         ]
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       data: rows,
+//       pagination: {
+//         total: count,
+//         page: parseInt(page),
+//         limit: parseInt(limit),
+//         totalPages: Math.ceil(count / limit)
+//       }
+//     });
+//   } catch (error) {
+//     console.error('Failed to fetch orders:', error); // Log the full error for debugging
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Failed to fetch orders',
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const getAllOrders = async (req, res) => {
   try {
-    const { stockTypeId, page = 1, limit = 10 } = req.query;
+    const { stockTypeId, status, dateFrom, dateTo, page = 1, limit = 50 } = req.query;
     const offset = (page - 1) * limit;
-    
+
+    // Build where clause
     const whereClause = {};
-    if (stockTypeId) whereClause.Stock_Type_ID = stockTypeId;
-    
+    if (stockTypeId) {
+      whereClause.Stock_Type_ID = parseInt(stockTypeId); // Parse to integer
+    }
+    if (status && status !== 'all') {
+      whereClause.Next_Status = status;
+    }
+    if (dateFrom && dateTo) {
+      whereClause.Date = {
+        [sequelize.Op.between]: [dateFrom, dateTo]
+      };
+    }
+
     const { count, rows } = await Order_Main.findAndCountAll({
       where: whereClause,
       include: [
-        { model: ZCoa, as: 'account', attributes: ['id', 'acName'] },
-        {model:Order_Detail,as:'details', }
-        // include: [{ model: ZItems, as: 'item', attributes: ['id', 'Item_Name'] }]
+        { 
+          model: ZCoa, 
+          as: 'account', 
+          // attributes: ['id', 'acName', 'city', 'mobileNo'] 
+        },
+        {
+          model: Order_Detail,
+          as: 'details',
+          include: [{
+            model: ZItems,
+            as: 'item',
+            attributes: ['id', 'itemName', 'sellingPrice'],
+            include: [
+              { model: Uom, as: 'uom1', attributes: ['id', 'uom'] },
+              { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
+              { model: Uom, as: 'uomThree', attributes: ['id', 'uom'] }
+            ]
+          }]
+        }
       ],
+      order: [['createdAt', 'DESC']],
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['createdAt', 'DESC']]
+      distinct: true // Important for accurate count with includes
     });
-    
+
     return res.status(200).json({
       success: true,
       data: rows,
+      count: rows.length,
       pagination: {
         total: count,
         page: parseInt(page),
@@ -138,6 +270,7 @@ const getAllOrders = async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Failed to fetch orders:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to fetch orders',
@@ -146,9 +279,25 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const getOrderById = async (req, res) => {
   const { id } = req.params;
-  
+
   try {
     const order = await Order_Main.findByPk(id, {
       include: [
@@ -156,20 +305,25 @@ const getOrderById = async (req, res) => {
           model: Order_Detail,
           as: 'details',
           include: [
-            { model: ZItems, as: 'item' }
+            {
+              model: ZItems, as: 'item', include: [{ model: Uom, as: 'uom1', attributes: ['id','uom'] },
+              // model: ZItems, as: 'item', include: [{ model: Uom, as: 'uom1', attributes: ['uom'] },
+              { model: Uom, as: 'uomTwo', attributes: ['id','uom'] },
+              { model: Uom, as: 'uomThree', attributes: ['id','uom'] }]
+            }
           ]
         },
         { model: ZCoa, as: 'account' }
       ]
     });
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
-    
+
     return res.status(200).json({
       success: true,
       data: order
@@ -186,9 +340,9 @@ const getOrderById = async (req, res) => {
 const updateCompleteOrder = async (req, res) => {
   const { id } = req.params;
   const { master, details } = req.body;
-  
+
   const transaction = await sequelize.transaction();
-  
+
   try {
     // Check if order exists
     const existingOrder = await Order_Main.findByPk(id);
@@ -199,19 +353,19 @@ const updateCompleteOrder = async (req, res) => {
         message: 'Order not found'
       });
     }
-    
+
     // Update master
     await Order_Main.update(master, {
       where: { ID: id },
       transaction
     });
-    
+
     // Delete old details
     await Order_Detail.destroy({
       where: { Order_Main_Id: id },
       transaction
     });
-    
+
     // Create new details
     // Old code (before sale_unit):
     // const orderDetails = details.map((detail, index) => ({
@@ -229,13 +383,13 @@ const updateCompleteOrder = async (req, res) => {
       uom3_qty: detail.uom3_qty || 0,
       sale_unit: detail.sale_unit || null
     }));
-    await Order_Detail.bulkCreate(orderDetails, { 
+    await Order_Detail.bulkCreate(orderDetails, {
       transaction,
-      validate: true 
+      validate: true
     });
-    
+
     await transaction.commit();
-    
+
     return res.status(200).json({
       success: true,
       message: 'Order updated successfully'
@@ -252,9 +406,9 @@ const updateCompleteOrder = async (req, res) => {
 
 const deleteCompleteOrder = async (req, res) => {
   const { id } = req.params;
-  
+
   const transaction = await sequelize.transaction();
-  
+
   try {
     // Check if order exists
     const existingOrder = await Order_Main.findByPk(id);
@@ -265,21 +419,21 @@ const deleteCompleteOrder = async (req, res) => {
         message: 'Order not found'
       });
     }
-    
+
     // Delete details first (due to foreign key)
     await Order_Detail.destroy({
       where: { Order_Main_Id: id },
       transaction
     });
-    
+
     // Delete master
     await Order_Main.destroy({
       where: { ID: id },
       transaction
     });
-    
+
     await transaction.commit();
-    
+
     return res.status(200).json({
       success: true,
       message: 'Order deleted successfully'
@@ -294,10 +448,87 @@ const deleteCompleteOrder = async (req, res) => {
   }
 };
 
+
+
+// ADD THIS: Update order status function
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate status
+    if (!['Incomplete', 'Complete', 'Partial'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status. Use: Incomplete, Complete, or Partial'
+      });
+    }
+
+    // Check if order exists
+    const order = await Order_Main.findByPk(id);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // Update status
+    const [updatedRows] = await Order_Main.update(
+      { Next_Status: status },
+      { where: { ID: id } }
+    );
+
+    if (updatedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Failed to update order status'
+      });
+    }
+
+    // Return updated order
+    const updatedOrder = await Order_Main.findByPk(id, {
+      include: [
+        { model: ZCoa, as: 'account', attributes: ['id', 'acName'] }
+      ]
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Order status updated to ${status}`,
+      data: updatedOrder
+    });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update order status',
+      error: error.message
+    });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
   createCompleteOrder,
   getAllOrders,
   getOrderById,
   updateCompleteOrder,
-  deleteCompleteOrder
+  deleteCompleteOrder,
+  updateOrderStatus,
 };

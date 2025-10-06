@@ -1,38 +1,3 @@
-// // 
-
-// const {
-//     createJournalMaster,
-//     getAllJournalMasters,
-//     getJournalMasterById,
-//     updateJournalMaster,
-//     deleteJournalMaster,
-
-// } = require('../controllers/JournalMaster.controller');
-
-
-// const express = require('express');
-// const router = express.Router();
-
-// router.post('/create', createJournalMaster);
-// router.get('/get',getAllJournalMasters);
-// router.get('/get/:id',getJournalMasterById);
-// router.put('/update/:id',updateJournalMaster);
-// router.delete('/delete/:id',deleteJournalMaster)
-
-// module.exports = router
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -63,7 +28,9 @@ const {
   getAllJournals,
   getJournalById,
   updateCompleteJournal,
-  deleteCompleteJournal
+  deleteCompleteJournal,
+   postVoucherToJournal,
+    checkJournalStatus
 } = require('../controllers/journalMaster.controller');
 
 // Combined endpoints
@@ -72,5 +39,7 @@ router.get('/get-all', getAllJournals);
 router.get('/get/:id', getJournalById);
 router.put('/update/:id', updateCompleteJournal);
 router.delete('/delete/:id', deleteCompleteJournal);
+router.post('/post-voucher/:stockMainId', postVoucherToJournal);
+router.get('/check-status/:stockMainId', checkJournalStatus); // ADD THIS
 
 module.exports = router;

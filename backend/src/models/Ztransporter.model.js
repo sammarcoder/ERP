@@ -31,11 +31,11 @@ const Ztransporter = sequelize.define('Ztransporter', {
 });
 
 // Define associations following your pattern
-Ztransporter.associate = function (models) {
-  Ztransporter.hasMany(models.Stk_main, {
-    foreignKey: 'Transporter',
-    as: 'stockTransactions'
-  });
-};
+// Ztransporter.associate = function (models) {
+//   Ztransporter.hasMany(models.Stk_main, {
+//     foreignKey: 'Transporter',
+//     as: 'stockTransactions'
+//   });
+// };
 
 module.exports = Ztransporter;

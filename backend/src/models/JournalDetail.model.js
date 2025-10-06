@@ -99,7 +99,13 @@ const JournalDetail = sequelize.define('JournalDetail', {
             notEmpty: true,
         }
     }
-});
+}
+,
+
+{
+  tableName: 'JournalDetail', // 👈 match your existing migration table name
+  freezeTableName: true, }
+);
 
 // Define associations in a separate function
 JournalDetail.associate = function(models) {

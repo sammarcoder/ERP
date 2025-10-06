@@ -124,4 +124,7 @@ router.put('/:id', orderController.updateCompleteOrder);
  */
 router.delete('/:id', orderController.deleteCompleteOrder);
 
+router.put('/update-status/:id', orderController.updateOrderStatus);
+
+
 module.exports = router;

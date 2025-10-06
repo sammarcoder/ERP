@@ -5,7 +5,9 @@ const {
     ZCoaGetAll,
     ZCoaGetById,
     ZCoaUpdate,
-    ZCoaDelete
+    ZCoaDelete,
+    ZCoaGetByCoaTypes,
+    ZCoaGetByCoaTypesCarriage
 } = require('../controllers/zCoa.controller');
 
 // Create route
@@ -22,5 +24,8 @@ router.put('/update/:id', ZCoaUpdate);
 
 // Delete route
 router.delete('/delete/:id', ZCoaDelete);
+// Get by Coa Types route
+router.get('/by-coa-types', ZCoaGetByCoaTypes);
 
+router.get('/by-coa-type-carriage',ZCoaGetByCoaTypesCarriage)
 module.exports = router;

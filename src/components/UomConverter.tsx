@@ -770,8 +770,8 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
     // FIXED: Check for null, undefined, and 0 properly
     if (!itemId || itemId === null || itemId === undefined) {
       // Reset state when no item selected
-      setUom1Val(''); 
-      setUom2Val(''); 
+      setUom1Val('');
+      setUom2Val('');
       setUom3Val('');
       setSaleUnit('');
       setData({ uom1: null, uom2_qty: 12, uom3_qty: 144, uomTwo: null, uomThree: null });
@@ -894,31 +894,30 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
         </div>
       )}
 
-      {/* UOM 1 (Pieces) */}
+      {/* UOM 3 (Boxes) */}
       <div className="flex flex-col items-center">
         <label className="text-xs text-gray-600 mb-0.5 font-medium">
-          {data.uom1?.uom || 'PCS'}
+          {data.uomThree?.uom || 'BOX'}
         </label>
         <input
           type="number"
           step="0.01"
-          value={uom1Val}
-          onChange={handleUom1Change}
+          value={uom3Val}
+          onChange={handleUom3Change}
           placeholder="0"
-          className={`border rounded-md px-1 py-0.5 w-16 h-7 text-xs focus:ring-1 transition-all ${
-            saleUnit === 'uom1' && !isPurchase 
-              ? 'border-green-400 bg-green-50 focus:ring-green-500' 
-              : 'border-gray-300 focus:ring-blue-500'
-          }`}
+          className={`border rounded-md px-1 py-0.5 w-16 h-7 text-xs focus:ring-1 transition-all ${saleUnit === 'uomThree' && !isPurchase
+              ? 'border-green-400 bg-green-50 focus:ring-green-500'
+              : 'border-gray-300 focus:ring-purple-500'
+            }`}
         />
         {!isPurchase && (
           <label className="flex items-center mt-1 text-[10px] text-gray-600">
             <input
               type="radio"
               name={`sale_unit_${itemId}`}
-              value="uom1"
-              checked={saleUnit === 'uom1'}
-              onChange={() => handleSaleUnitChange('uom1')}
+              value="uomThree"
+              checked={saleUnit === 'uomThree'}
+              onChange={() => handleSaleUnitChange('uomThree')}
               className="mr-1 w-3 h-3"
             />
             Sale Unit
@@ -937,11 +936,10 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
           value={uom2Val}
           onChange={handleUom2Change}
           placeholder="0"
-          className={`border rounded-md px-1 py-0.5 w-16 h-7 text-xs focus:ring-1 transition-all ${
-            saleUnit === 'uomTwo' && !isPurchase 
-              ? 'border-green-400 bg-green-50 focus:ring-green-500' 
+          className={`border rounded-md px-1 py-0.5 w-16 h-7 text-xs focus:ring-1 transition-all ${saleUnit === 'uomTwo' && !isPurchase
+              ? 'border-green-400 bg-green-50 focus:ring-green-500'
               : 'border-gray-300 focus:ring-blue-500'
-          }`}
+            }`}
         />
         {!isPurchase && (
           <label className="flex items-center mt-1 text-[10px] text-gray-600">
@@ -958,31 +956,30 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
         )}
       </div>
 
-      {/* UOM 3 (Boxes) */}
+      {/* UOM 1 (Pieces) */}
       <div className="flex flex-col items-center">
         <label className="text-xs text-gray-600 mb-0.5 font-medium">
-          {data.uomThree?.uom || 'BOX'}
+          {data.uom1?.uom || 'PCS'}
         </label>
         <input
           type="number"
           step="0.01"
-          value={uom3Val}
-          onChange={handleUom3Change}
+          value={uom1Val}
+          onChange={handleUom1Change}
           placeholder="0"
-          className={`border rounded-md px-1 py-0.5 w-16 h-7 text-xs focus:ring-1 transition-all ${
-            saleUnit === 'uomThree' && !isPurchase 
-              ? 'border-green-400 bg-green-50 focus:ring-green-500' 
-              : 'border-gray-300 focus:ring-purple-500'
-          }`}
+          className={`border rounded-md px-1 py-0.5 w-16 h-7 text-xs focus:ring-1 transition-all ${saleUnit === 'uom1' && !isPurchase
+              ? 'border-green-400 bg-green-50 focus:ring-green-500'
+              : 'border-gray-300 focus:ring-blue-500'
+            }`}
         />
         {!isPurchase && (
           <label className="flex items-center mt-1 text-[10px] text-gray-600">
             <input
               type="radio"
               name={`sale_unit_${itemId}`}
-              value="uomThree"
-              checked={saleUnit === 'uomThree'}
-              onChange={() => handleSaleUnitChange('uomThree')}
+              value="uom1"
+              checked={saleUnit === 'uom1'}
+              onChange={() => handleSaleUnitChange('uom1')}
               className="mr-1 w-3 h-3"
             />
             Sale Unit
@@ -991,19 +988,19 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
       </div>
 
       {/* Conversion Info */}
-      <div className="text-xs text-gray-500 ml-2">
+      {/* <div className="text-xs text-gray-500 ml-2">
         <div className="bg-gray-50 p-1 rounded text-[10px]">
           <div>1 {data.uomTwo?.uom} = {data.uom2_qty} {data.uom1?.uom}</div>
           <div>1 {data.uomThree?.uom} = {data.uom3_qty} {data.uom1?.uom}</div>
           {!isPurchase && saleUnit && (
             <div className="text-green-600 font-medium mt-1">
-              Sale: {saleUnit === 'uom1' ? data.uom1?.uom : 
-                    saleUnit === 'uomTwo' ? data.uomTwo?.uom : 
-                    data.uomThree?.uom}
+              Sale: {saleUnit === 'uom1' ? data.uom1?.uom :
+                saleUnit === 'uomTwo' ? data.uomTwo?.uom :
+                  data.uomThree?.uom}
             </div>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

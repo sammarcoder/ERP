@@ -6,15 +6,15 @@ class Order_Detail extends Model {
     // Relationship with Order_Main
     this.belongsTo(models.Order_Main, {
       foreignKey: 'Order_Main_Id',
-      as: 'orderMain',
-      onDelete: 'CASCADE'
+      as: 'order',
+      // onDelete: 'CASCADE'
     });
     
     // Relationship with ZItems
     this.belongsTo(models.ZItems, {
       foreignKey: 'Item_ID',
       as: 'item',
-      constraints: false  // This prevents auto-adding foreign key column
+      // constraints: false  // This prevents auto-adding foreign key column
     });
   }
 }
@@ -40,7 +40,7 @@ Order_Detail.init(
     },
     Item_ID: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'zitems',
         key: 'id'

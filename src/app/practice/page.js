@@ -298,12 +298,91 @@
 
 
 
+// 'use client'
+// import React, { useState } from 'react'
+// // let count = 2
+// const page = () => {
+//   const [count, setCount] = useState(1);
+//   const increment = () => {
+//   setCount(count+1)
+// }
+//   return (
+//     <>
+//     <select >
+//       <option value={1}>1</option>
+//     </select>
+//       <div>this is pratice page</div>
+//       <p>{count}</p>
+//       <button onClick={increment}>click</button>
+//     </>
+//   )
+// }
+
+// export default page
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 'use client'
-
 import React, { useState } from 'react'
-
 // let count = 2
-
 const page = () => {
   const [count, setCount] = useState(1);
   const increment = () => {

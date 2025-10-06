@@ -1,318 +1,467 @@
-// // routes/dispatch.js
-const express = require('express');
-const router = express.Router();
-const { Stk_main, Stk_Detail, ZItems, ZCoa, Order_Main } = require('../models');
+
+
+// controllers/dispatch.controller.js - COMPLETE FIX
+const { Disc } = require('lucide-react');
+const db = require('../models');
+const { Stk_main, Stk_Detail, ZItems, ZCoa, Order_Main, Uom } = db;
 const { Op } = require('sequelize');
-const sequelize = require('../../config/database');
-const {Uom } = require('../models');
+const sequelize = db.sequelize;
 
-// // Generate Dispatch Number based on type sequence
-// const generateDispatchNumber = async () => {
-//   const today = new Date();
-//   const year = today.getFullYear();
-//   const month = String(today.getMonth() + 1).padStart(2, '0');
-  
-//   const lastDispatch = await Stk_main.findOne({
-//     where: { 
-//       Stock_Type_ID: 2, // Dispatch type
-//       Number: { [Op.like]: `DS-${year}${month}%` }
-//     },
-//     order: [['Number', 'DESC']]
-//   });
 
-//   let sequence = 1;
-//   if (lastDispatch) {
-//     const lastSequence = parseInt(lastDispatch.Number.split('-')[2]);
-//     sequence = lastSequence + 1;
-//   }
-
-//   return `DS-${year}${month}-${String(sequence).padStart(4, '0')}`;
-// };
-
-// // GET /api/dispatch - Get all dispatches
-// router.get('/', async (req, res) => {
-//   try {
-//     const dispatches = await Stk_main.findAll({
-//       where: { Stock_Type_ID: 2 }, // Only dispatch records
-//       include: [
-//         {
-//           model: Stk_Detail,
-//           as: 'stock_details',
-//           include: [
-//             { 
-//               model: ZItems, 
-//               as: 'stock_item',
-//               include: [
-//                 { model: Uom, as: 'uom1' },
-//                 { model: Uom, as: 'uomTwo' },
-//                 { model: Uom, as: 'uomThree' }
-//               ]
-//             }
-//           ]
-//         },
-//         { model: ZCoa, as: 'account' },
-//         { model: Order_Main, as: 'order' },
-       
-//       ],
-//       order: [['createdAt', 'DESC']]
-//     });
-
-//     res.json({
-//       success: true,
-//       data: dispatches
-//     });
-//   } catch (error) {
-//     console.error('Error fetching dispatches:', error);
-//     res.status(500).json({
-//       success: false,
-//       error: error.message
-//     });
-//   }
-// });
-
-// // GET /api/dispatch/available-batches/:itemId - Get available batches for item
-// // router.get('/available-batches/:itemId', async (req, res) => {
-// //   try {
-// //     const { itemId } = req.params;
-
-// //     // ADVANCED: Get available stock by batch for specific item
-// //     const availableBatches = await sequelize.query(`
-// //       SELECT 
-// //         grn.Purchase_Batchno as batch_number,
-// //         grn_detail.Batchno_id as batch_id,
-// //         SUM(grn_detail.Stock_In_UOM_Qty) as received_qty,
-// //         COALESCE(SUM(dispatch_detail.Stock_out_UOM_Qty), 0) as dispatched_qty,
-// //         (SUM(grn_detail.Stock_In_UOM_Qty) - COALESCE(SUM(dispatch_detail.Stock_out_UOM_Qty), 0)) as available_qty
-// //       FROM Stk_main grn
-// //       JOIN Stk_Detail grn_detail ON grn.ID = grn_detail.STK_Main_ID
-// //       LEFT JOIN Stk_Detail dispatch_detail ON grn_detail.Item_ID = dispatch_detail.Item_ID 
-// //         AND grn_detail.Batchno_id = dispatch_detail.Batchno_id
-// //         AND dispatch_detail.STK_Main_ID IN (
-// //           SELECT ID FROM Stk_main WHERE Stock_Type_ID = 2
-// //         )
-// //       WHERE grn.Stock_Type_ID = 1 
-// //         AND grn_detail.Item_ID = :itemId
-// //       GROUP BY grn.Purchase_Batchno, grn_detail.Batchno_id
-// //       HAVING available_qty > 0
-// //       ORDER BY grn.Date ASC
-// //     `, {
-// //       replacements: { itemId },
-// //       type: sequelize.QueryTypes.SELECT
-// //     });
-
-// //     res.json({
-// //       success: true,
-// //       data: availableBatches
-// //     });
-// //   } catch (error) {
-// //     console.error('Error fetching available batches:', error);
-// //     res.status(500).json({
-// //       success: false,
-// //       error: error.message
-// //     });
-// //   }
-// // });
-
-
-
-
-
-// router.get('/available-batches/:itemId', async (req, res) => {
-//   try {
-//     const { itemId } = req.params;
-
-//     // SIMPLIFIED: First check if there are any GRN records for this item
-//     const grnRecords = await sequelize.query(`
-//       SELECT 
-//         sm.Purchase_Batchno as batch_number,
-//         sd.Batchno_id as batch_id,
-//         sm.Date as grn_date,
-//         sd.Stock_In_UOM_Qty as received_qty_uom1,
-//         COALESCE(sd.Stock_In_SKU_UOM_Qty, 0) as received_qty_uom2,
-//         COALESCE(sd.Stock_In_UOM3_Qty, 0) as received_qty_uom3,
-//         sm.ID as grn_id,
-//         sd.ID as grn_detail_id
-//       FROM Stk_main sm
-//       INNER JOIN Stk_Detail sd ON sm.ID = sd.STK_Main_ID
-//       WHERE sm.Stock_Type_ID = 1
-//         AND sd.Item_ID = :itemId
-//       ORDER BY sm.Date ASC
-//     `, {
-//       replacements: { itemId },
-//       type: sequelize.QueryTypes.SELECT
-//     });
-
-//     console.log(`Found ${grnRecords.length} GRN records for item ${itemId}:`, grnRecords);
-
-//     if (grnRecords.length === 0) {
-//       return res.json({
-//         success: true,
-//         data: [],
-//         message: 'No GRN records found for this item'
-//       });
-//     }
-
-//     // For now, return simplified data
-//     const simplifiedBatches = grnRecords.map(record => ({
-//       batch_number: record.batch_number,
-//       batch_id: record.batch_id,
-//       grn_date: record.grn_date,
-//       available_qty: record.received_qty_uom1, // For now, assume no dispatches
-//       available_qty_uom2: record.received_qty_uom2,
-//       available_qty_uom3: record.received_qty_uom3
-//     }));
-
-//     res.json({
-//       success: true,
-//       data: simplifiedBatches
-//     });
-//   } catch (error) {
-//     console.error('Error fetching available batches:', error);
-//     res.status(500).json({
-//       success: false,
-//       error: error.message
-//     });
-//   }
-// });
-
-
-
-
-
-
-
-
-
-// // POST /api/dispatch - Create dispatch with multi-batch logic
-// router.post('/', async (req, res) => {
-//   const transaction = await sequelize.transaction();
-  
-//   try {
-//     const { stockMain, stockDetails } = req.body;
-
-//     // Generate auto dispatch number as per type sequence
-//     const dispatchNumber = await generateDispatchNumber();
-
-//     // Create Stk_main record
-//     const dispatch = await Stk_main.create({
-//       ...stockMain,
-//       Number: dispatchNumber
-//     }, { transaction });
-
-//     // Create Stk_Detail records (can be multiple rows for same item with different batches)
-//     const dispatchDetails = stockDetails.map((detail, index) => ({
-//       ...detail,
-//       STK_Main_ID: dispatch.ID,
-//       Line_Id: index + 1
-//     }));
-
-//     const createdDetails = await Stk_Detail.bulkCreate(dispatchDetails, { 
-//       transaction,
-//       validate: true 
-//     });
-
-//     // ADDED: Update Order_Main Dispatch_Status as per your requirement
-//     if (stockMain.Order_Main_ID) {
-//       await Order_Main.update(
-//         { Dispatch_Status: 'Partial' }, // Can be made dynamic based on quantities
-//         { 
-//           where: { ID: stockMain.Order_Main_ID },
-//           transaction 
-//         }
-//       );
-//     }
-
-//     await transaction.commit();
-
-//     res.status(201).json({
-//       success: true,
-//       message: 'Sales Dispatch created successfully',
-//       data: { 
-//         ...dispatch.toJSON(), 
-//         details: createdDetails,
-//         dispatchNumber: dispatchNumber
-//       }
-//     });
-//   } catch (error) {
-//     await transaction.rollback();
-//     console.error('Error creating dispatch:', error);
-//     res.status(500).json({
-//       success: false,
-//       error: error.message
-//     });
-//   }
-// });
-
-// module.exports = router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// routes/dispatch.js (update your existing file)
-
-// FIXED: Convert to Sequelize built-in methods
-router.get('/available-batches/:itemId', async (req, res) => {
+// controllers/dispatchController.js - COMPLETE API WITH CREATE AND EDIT
+const getAvailableBatchesForEdit = async (req, res) => {
   try {
-    const { itemId } = req.params;
-    
-    console.log(`🔍 Fetching available batches for item ID: ${itemId}`);
+    const itemId = req.params.itemId;
+    const dispatchId = req.params.dispatchId;
 
-    // STEP 1: Get all GRN records for this item using Sequelize
-    const grnRecords = await Stk_main.findAll({
-      where: { 
-        Stock_Type_ID: 1 // GRN type only
+    console.log(`🔍 EDIT MODE: Item_ID: ${itemId}, Dispatch_ID: ${dispatchId}`);
+
+    if (!itemId || !dispatchId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Item ID and Dispatch ID are required for edit mode'
+      });
+    }
+
+    // FIXED: SQL for edit mode - excludes current dispatch
+    const batches = await sequelize.query(`
+      SELECT 
+        sd.batchno,
+        sd.Item_ID,
+        zi.itemName,
+        
+        -- Total received from GRN
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_received_uom1,
+        
+        -- Other dispatches (excluding current dispatch)
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 AND sm.ID != :dispatchId 
+          THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_other_dispatched_uom1,
+        
+        -- Current dispatch being edited
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 AND sm.ID = :dispatchId 
+          THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END) as current_dispatch_uom1,
+        
+        -- Available = Received - Other Dispatches (excludes current)
+        (SUM(CASE 
+          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          ELSE 0 
+        END) - 
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 AND sm.ID != :dispatchId 
+          THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END)) as available_qty_uom1
+        
+      FROM stk_detail sd
+      INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+      INNER JOIN zitems zi ON sd.Item_ID = zi.id
+      WHERE sd.Item_ID = :itemId 
+        AND sd.batchno IS NOT NULL 
+        AND sd.batchno != ''
+      GROUP BY sd.batchno, sd.Item_ID, zi.itemName
+      ORDER BY sd.batchno ASC
+    `, {
+      replacements: { itemId, dispatchId },
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    const processedBatches = batches.map(batch => ({
+      batchno: batch.batchno,
+      item_id: batch.Item_ID,
+      item_name: batch.itemName,
+      total_received_uom1: parseFloat(batch.total_received_uom1) || 0,
+      total_other_dispatched_uom1: parseFloat(batch.total_other_dispatched_uom1) || 0,
+      current_dispatch_uom1: parseFloat(batch.current_dispatch_uom1) || 0,
+      available_qty_uom1: parseFloat(batch.available_qty_uom1) || 0,
+      edit_mode: true
+    }));
+
+    console.log(`✅ EDIT MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
+
+    res.json({
+      success: true,
+      data: processedBatches,
+      mode: 'edit'
+    });
+
+  } catch (error) {
+    console.error(`❌ EDIT API ERROR:`, error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+// EXISTING: Keep your current function for create/fromOrder (modify HAVING clause)
+const getAvailableBatchesForItem = async (req, res) => {
+  try {
+    const itemId = req.params.itemId;
+
+    console.log(`🔍 CREATE/FROM_ORDER MODE: Item_ID: ${itemId}`);
+
+    if (!itemId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Item ID is required'
+      });
+    }
+
+    // FIXED: Remove HAVING clause to show ALL batches (let frontend decide)
+    const availableBatches = await sequelize.query(`
+      SELECT 
+        sd.batchno,
+        sd.Item_ID,
+        zi.itemName,
+        
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_received_uom1,
+        
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_dispatched_uom1,
+        
+        (SUM(CASE 
+          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          ELSE 0 
+        END) - 
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END)) as available_qty_uom1
+        
+      FROM stk_detail sd
+      INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+      INNER JOIN zitems zi ON sd.Item_ID = zi.id
+      WHERE sd.Item_ID = :itemId 
+        AND sd.batchno IS NOT NULL 
+        AND sd.batchno != ''
+      GROUP BY sd.batchno, sd.Item_ID, zi.itemName
+      -- FIXED: No HAVING clause - show all batches
+      ORDER BY sd.batchno ASC
+    `, {
+      replacements: { itemId },
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    const processedBatches = availableBatches.map(batch => ({
+      batchno: batch.batchno,
+      item_id: batch.Item_ID,
+      item_name: batch.itemName,
+      total_received_uom1: parseFloat(batch.total_received_uom1) || 0,
+      total_dispatched_uom1: parseFloat(batch.total_dispatched_uom1) || 0,
+      available_qty_uom1: parseFloat(batch.available_qty_uom1) || 0,
+      edit_mode: false
+    }));
+
+    console.log(`✅ CREATE MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
+
+    res.json({
+      success: true,
+      data: processedBatches,
+      mode: 'create'
+    });
+
+  } catch (error) {
+    console.error(`❌ CREATE API ERROR:`, error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// CREATE dispatch with enhanced validation
+const createDispatch = async (req, res) => {
+  const { stockMain, stockDetails } = req.body;
+
+  console.log('📥 === CREATING DISPATCH ===');
+  console.log('Stock Main:', stockMain);
+  console.log('Stock Details:', stockDetails);
+
+  if (!stockMain || !stockDetails || stockDetails.length === 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'Stock main and details are required'
+    });
+  }
+
+  const transaction = await sequelize.transaction();
+
+  try {
+    // Generate dispatch number
+    const dispatchNumber = await generateDispatchNumber();
+    console.log(`🔢 Generated dispatch number: ${dispatchNumber}`);
+
+    // FIXED: Create stock main with proper Stock_Type_ID
+    const stockMainData = await Stk_main.create({
+      Stock_Type_ID: 12, // Dispatch type
+      COA_ID: stockMain.COA_ID,
+      Date: stockMain.Date,
+      Status: stockMain.Status || 'UnPost',
+      Purchase_Type: stockMain.Purchase_Type || 'Local selling',
+      Order_Main_ID: stockMain.Order_Main_ID,
+      Number: dispatchNumber,
+      Remarks: stockMain.Remarks || ''
+    }, { transaction });
+
+    console.log(`✅ Created Stk_main record with ID: ${stockMainData.ID}`);
+
+    // FIXED: Validate batch availability before creating details
+    for (const detail of stockDetails) {
+      if (!detail.batchno) {
+        throw new Error(`Batch number is required for Item_ID ${detail.Item_ID}`);
+      }
+
+      // Check if batch has enough stock
+      const batchCheck = await sequelize.query(`
+        SELECT 
+          (SUM(CASE WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) ELSE 0 END) - 
+           SUM(CASE WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) ELSE 0 END)) as available
+        FROM stk_detail sd
+        INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+        WHERE sd.Item_ID = :itemId AND sd.batchno = :batchno
+        GROUP BY sd.Item_ID, sd.batchno
+      `, {
+        replacements: { itemId: detail.Item_ID, batchno: detail.batchno },
+        type: sequelize.QueryTypes.SELECT,
+        transaction
+      });
+
+      const availableStock = batchCheck[0]?.available || 0;
+      const requestedQty = parseFloat(detail.Stock_out_UOM_Qty) || 0;
+
+      if (requestedQty > availableStock) {
+        throw new Error(`Insufficient stock for Item_ID ${detail.Item_ID} in batch ${detail.batchno}. Available: ${availableStock}, Requested: ${requestedQty}`);
+      }
+    }
+
+    // FIXED: Create stock details with proper field mapping
+    const stockDetailsWithMainId = stockDetails.map((detail, index) => ({
+      STK_Main_ID: stockMainData.ID,
+      Line_Id: detail.Line_Id || (index + 1),
+      Item_ID: detail.Item_ID,
+      batchno: detail.batchno,
+      Stock_Price: parseFloat(detail.Stock_Price) || 0,
+      Stock_out_UOM_Qty: parseFloat(detail.Stock_out_UOM_Qty) || 0,
+      Stock_out_SKU_UOM_Qty: parseFloat(detail.Stock_out_SKU_UOM_Qty) || 0,
+      Stock_out_UOM3_Qty: parseFloat(detail.Stock_out_UOM3_Qty) || 0,
+      // Set Stock_In quantities to 0 for dispatch
+      Stock_In_UOM_Qty: 0,
+      Stock_In_SKU_UOM_Qty: 0,
+      Stock_In_UOM3_Qty: 0,
+      Sale_Unit: detail.Sale_Unit || null,
+      Discount_A: parseFloat(detail.Discount_A) || 0,
+      Discount_B: parseFloat(detail.Discount_B) || 0,
+      Discount_C: parseFloat(detail.Discount_C) || 0,
+      Remarks: detail.Remarks || ''
+    }));
+
+    const createdDetails = await Stk_Detail.bulkCreate(stockDetailsWithMainId, {
+      transaction,
+      validate: true
+    });
+
+    console.log(`✅ Created ${createdDetails.length} Stk_Detail records`);
+
+    await transaction.commit();
+
+    // Fetch complete dispatch with associations for response
+    const completeDispatch = await Stk_main.findByPk(stockMainData.ID, {
+      include: [
+        {
+          model: Stk_Detail,
+          as: 'details',
+          include: [
+            {
+              model: ZItems,
+              as: 'item',
+              include: [
+                { model: Uom, as: 'uom1', attributes: ['uom'] },
+                { model: Uom, as: 'uomTwo', attributes: ['uom'] },
+                { model: Uom, as: 'uomThree', attributes: ['uom'] }
+              ]
+            }
+          ]
+        },
+        { model: ZCoa, as: 'account' }
+      ]
+    });
+
+    console.log(`🎉 === DISPATCH CREATED SUCCESSFULLY ===`);
+    console.log(`Dispatch Number: ${dispatchNumber}`);
+    console.log(`Dispatch ID: ${stockMainData.ID}`);
+    console.log(`Total Items Dispatched: ${createdDetails.length}`);
+
+    res.json({
+      success: true,
+      message: 'Dispatch created successfully',
+      data: {
+        dispatchId: stockMainData.ID,
+        dispatchNumber: dispatchNumber,
+        dispatch: completeDispatch,
+        itemsDispatched: createdDetails.length
+      }
+    });
+
+  } catch (error) {
+    await transaction.rollback();
+    console.error('❌ === DISPATCH CREATION ERROR ===', error);
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
+
+// GET all dispatches with enhanced filtering
+const getAllDispatches = async (req, res) => {
+  try {
+    const { page = 1, limit = 50, status, dateFrom, dateTo, customerId } = req.query;
+    const offset = (page - 1) * limit;
+
+    const whereClause = { Stock_Type_ID: 12 }; // Only dispatches
+
+    if (status && status !== 'all') {
+      whereClause.Status = status;
+    }
+
+    if (dateFrom && dateTo) {
+      whereClause.Date = {
+        [Op.between]: [dateFrom, dateTo]
+      };
+    }
+
+    if (customerId) {
+      whereClause.COA_ID = customerId;
+    }
+
+    const { count, rows } = await Stk_main.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: Stk_Detail,
+          as: 'details',
+          include: [
+            {
+              model: ZItems,
+              as: 'item',
+              attributes: ['id', 'itemName', 'sellingPrice'],
+              include: [
+                { model: Uom, as: 'uom1', attributes: ['uom'] },
+                { model: Uom, as: 'uomTwo', attributes: ['uom'] },
+                { model: Uom, as: 'uomThree', attributes: ['uom'] }
+              ]
+            }
+          ]
+        },
+        {
+          model: ZCoa,
+          as: 'account',
+          attributes: ['id', 'acName', 'city', 'mobileNo']
+        },
+        {
+          model: Order_Main,
+          as: 'order',
+          attributes: ['ID', 'Number', 'Date', 'Next_Status']
+        }
+      ],
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      distinct: true
+    });
+
+    console.log(`📋 Retrieved ${rows.length} dispatches out of ${count} total`);
+
+    res.json({
+      success: true,
+      data: rows,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(count / limit)
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error fetching dispatches:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+// GET dispatch by ID
+const getDispatchById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const dispatch = await Stk_main.findOne({
+      where: {
+        ID: id,
+        Stock_Type_ID: 12
       },
       include: [
         {
           model: Stk_Detail,
-          as: 'stock_details', // Use the alias from your associations
-          where: { 
-            Item_ID: itemId
-          },
-          required: true, // INNER JOIN
+          as: 'details',
           include: [
             {
               model: ZItems,
-              as: 'stock_item', // Use the alias from your associations
+              as: 'item',
               include: [
                 { model: Uom, as: 'uom1' },
                 { model: Uom, as: 'uomTwo' },
@@ -320,228 +469,307 @@ router.get('/available-batches/:itemId', async (req, res) => {
               ]
             }
           ]
+        },
+        {
+          model: ZCoa,
+          as: 'account',
+          attributes: ['id', 'acName', 'city', 'mobileNo']
+        },
+        {
+          model: Order_Main,
+          as: 'order',
+          attributes: ['ID', 'Number', 'Date', 'Next_Status']
         }
-      ],
-      order: [['Date', 'ASC']]
+      ]
     });
 
-    console.log(`📦 Found ${grnRecords.length} GRN records for item ${itemId}`);
-
-    if (grnRecords.length === 0) {
-      return res.json({
-        success: true,
-        data: [],
-        message: `No GRN records found for item ID ${itemId}. Create GRN first.`,
-        debug: {
-          itemId,
-          searchedFor: 'GRN records (Stock_Type_ID = 1)',
-          suggestion: 'Create GRN from Purchase Order first'
-        }
+    if (!dispatch) {
+      return res.status(404).json({
+        success: false,
+        error: 'Dispatch not found'
       });
     }
 
-    // STEP 2: Get dispatch records for this item to calculate consumed stock
-    const dispatchRecords = await Stk_main.findAll({
-      where: { 
-        Stock_Type_ID: 2 // Dispatch type only
-      },
-      include: [
-        {
-          model: Stk_Detail,
-          as: 'stock_details',
-          where: { 
-            Item_ID: itemId
-          },
-          required: true
-        }
-      ]
-    });
-
-    console.log(`🚚 Found ${dispatchRecords.length} dispatch records for item ${itemId}`);
-
-    // STEP 3: Calculate available stock by batch
-    const availableBatches = [];
-
-    grnRecords.forEach(grn => {
-      grn.stock_details.forEach(grnDetail => {
-        // Calculate total dispatched from this specific batch
-        let dispatchedUOM1 = 0;
-        let dispatchedUOM2 = 0;
-        let dispatchedUOM3 = 0;
-
-        dispatchRecords.forEach(dispatch => {
-          dispatch.stock_details.forEach(dispatchDetail => {
-            // Match by same batch
-            if (dispatchDetail.Batchno_id === grnDetail.Batchno_id) {
-              dispatchedUOM1 += parseFloat(dispatchDetail.Stock_out_UOM_Qty || 0);
-              dispatchedUOM2 += parseFloat(dispatchDetail.Stock_out_SKU_UOM_Qty || 0);
-              dispatchedUOM3 += parseFloat(dispatchDetail.Stock_out_UOM3_Qty || 0);
-            }
-          });
-        });
-
-        // Calculate available quantities
-        const receivedUOM1 = parseFloat(grnDetail.Stock_In_UOM_Qty || 0);
-        const receivedUOM2 = parseFloat(grnDetail.Stock_In_SKU_UOM_Qty || 0);
-        const receivedUOM3 = parseFloat(grnDetail.Stock_In_UOM3_Qty || 0);
-
-        const availableUOM1 = receivedUOM1 - dispatchedUOM1;
-        const availableUOM2 = receivedUOM2 - dispatchedUOM2;
-        const availableUOM3 = receivedUOM3 - dispatchedUOM3;
-
-        // Only include batches with available stock
-        if (availableUOM1 > 0 || availableUOM2 > 0 || availableUOM3 > 0) {
-          availableBatches.push({
-            batch_number: grn.Purchase_Batchno,
-            batch_id: grnDetail.Batchno_id,
-            grn_id: grn.ID,
-            grn_number: grn.Number,
-            grn_date: grn.Date,
-            
-            // Received quantities (from GRN)
-            received_qty_uom1: receivedUOM1,
-            received_qty_uom2: receivedUOM2,
-            received_qty_uom3: receivedUOM3,
-            
-            // Dispatched quantities (consumed)
-            dispatched_qty_uom1: dispatchedUOM1,
-            dispatched_qty_uom2: dispatchedUOM2,
-            dispatched_qty_uom3: dispatchedUOM3,
-            
-            // Available quantities (remaining)
-            available_qty: availableUOM1, // Default UOM1
-            available_qty_uom1: availableUOM1,
-            available_qty_uom2: availableUOM2,
-            available_qty_uom3: availableUOM3,
-
-            // Item details
-            item: grnDetail.stock_item
-          });
-        }
-      });
-    });
-
-    console.log(`📊 Calculated ${availableBatches.length} batches with available stock`);
+    console.log(`✅ Retrieved dispatch ID: ${id}, Number: ${dispatch.Number}`);
 
     res.json({
       success: true,
-      data: availableBatches,
-      count: availableBatches.length,
-      debug: {
-        itemId,
-        grnRecordsFound: grnRecords.length,
-        dispatchRecordsFound: dispatchRecords.length,
-        batchesWithStock: availableBatches.length
+      data: dispatch
+    });
+  } catch (error) {
+    console.error(`❌ Error fetching dispatch ID ${id}:`, error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+// UPDATE dispatch
+const updateDispatch = async (req, res) => {
+  const { id } = req.params;
+  const { stockMain, stockDetails } = req.body;
+
+  const transaction = await sequelize.transaction();
+
+  try {
+    console.log(`📝 === UPDATING DISPATCH ID: ${id} ===`);
+
+    // Check if dispatch exists
+    const existingDispatch = await Stk_main.findOne({
+      where: { ID: id, Stock_Type_ID: 12 }
+    });
+
+    if (!existingDispatch) {
+      await transaction.rollback();
+      return res.status(404).json({
+        success: false,
+        error: 'Dispatch not found'
+      });
+    }
+
+    // Update main record
+    const [updatedRows] = await Stk_main.update({
+      COA_ID: stockMain.COA_ID,
+      Date: stockMain.Date,
+      Status: stockMain.Status,
+      Purchase_Type: stockMain.Purchase_Type,
+      Remarks: stockMain.Remarks
+    }, {
+      where: { ID: id },
+      transaction
+    });
+
+    console.log(`✅ Updated ${updatedRows} main records`);
+
+    // Delete old details
+    const deletedDetails = await Stk_Detail.destroy({
+      where: { STK_Main_ID: id },
+      transaction
+    });
+
+    console.log(`🗑️ Deleted ${deletedDetails} old detail records`);
+
+    // Create new details with validation
+    const stockDetailsWithMainId = stockDetails.map((detail, index) => ({
+      STK_Main_ID: id,
+      Line_Id: detail.Line_Id || (index + 1),
+      Item_ID: detail.Item_ID,
+      batchno: detail.batchno,
+      Stock_Price: parseFloat(detail.Stock_Price) || 0,
+      Stock_out_UOM_Qty: parseFloat(detail.Stock_out_UOM_Qty) || 0,
+      Stock_out_SKU_UOM_Qty: parseFloat(detail.Stock_out_SKU_UOM_Qty) || 0,
+      Stock_out_UOM3_Qty: parseFloat(detail.Stock_out_UOM3_Qty) || 0,
+      Stock_In_UOM_Qty: 0,
+      Stock_In_SKU_UOM_Qty: 0,
+      Stock_In_UOM3_Qty: 0,
+      Remarks: detail.Remarks || '',
+      Sale_Unit: detail.Sale_Unit || null,
+      Discount_A: parseFloat(detail.Discount_A) || 0,
+      Discount_B: parseFloat(detail.Discount_B) || 0,
+      Discount_C: parseFloat(detail.Discount_C) || 0,
+    }));
+
+    const newDetails = await Stk_Detail.bulkCreate(stockDetailsWithMainId, {
+      transaction,
+      validate: true
+    });
+
+    console.log(`✅ Created ${newDetails.length} new detail records`);
+
+    await transaction.commit();
+
+    res.json({
+      success: true,
+      message: 'Dispatch updated successfully',
+      data: {
+        dispatchId: id,
+        updatedDetails: newDetails.length
       }
     });
   } catch (error) {
-    console.error('❌ Error fetching available batches:', error);
+    await transaction.rollback();
+    console.error(`❌ Error updating dispatch ID ${id}:`, error);
     res.status(500).json({
       success: false,
-      error: error.message,
-      debug: {
-        itemId: req.params.itemId,
-        errorType: error.name,
-        suggestion: 'Check if Stk_main and Stk_Detail tables exist and have proper associations'
-      }
+      error: error.message
     });
   }
-});
+};
 
-// ADD: Debug API to check what data exists
-router.get('/debug/check-data/:itemId', async (req, res) => {
+// DELETE dispatch
+const deleteDispatch = async (req, res) => {
+  const { id } = req.params;
+
+  const transaction = await sequelize.transaction();
+
+  try {
+    console.log(`🗑️ === DELETING DISPATCH ID: ${id} ===`);
+
+    // Check if dispatch exists
+    const existingDispatch = await Stk_main.findOne({
+      where: { ID: id, Stock_Type_ID: 12 }
+    });
+
+    if (!existingDispatch) {
+      await transaction.rollback();
+      return res.status(404).json({
+        success: false,
+        error: 'Dispatch not found'
+      });
+    }
+
+    console.log(`Found dispatch: ${existingDispatch.Number}`);
+
+    // Delete details first (foreign key constraint)
+    const deletedDetails = await Stk_Detail.destroy({
+      where: { STK_Main_ID: id },
+      transaction
+    });
+
+    console.log(`🗑️ Deleted ${deletedDetails} detail records`);
+
+    // Delete main record
+    const deletedMain = await Stk_main.destroy({
+      where: { ID: id },
+      transaction
+    });
+
+    console.log(`🗑️ Deleted ${deletedMain} main records`);
+
+    await transaction.commit();
+
+    res.json({
+      success: true,
+      message: `Dispatch ${existingDispatch.Number} deleted successfully`,
+      data: {
+        deletedDispatchId: id,
+        deletedDetails: deletedDetails,
+        dispatchNumber: existingDispatch.Number
+      }
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error(`❌ Error deleting dispatch ID ${id}:`, error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+// Get stock summary for item across all batches
+const getStockSummaryForItem = async (req, res) => {
   try {
     const { itemId } = req.params;
 
-    // Check if item exists in ZItems
-    const itemExists = await ZItems.findByPk(itemId);
-    
-    // Check total GRN records
-    const totalGRNs = await Stk_main.count({ where: { Stock_Type_ID: 1 } });
-    
-    // Check total dispatch records
-    const totalDispatches = await Stk_main.count({ where: { Stock_Type_ID: 2 } });
-    
-    // Check GRN details for this item
-    const grnDetailsForItem = await Stk_Detail.count({ 
-      include: [{
-        model: Stk_main,
-        as: 'stockMain',
-        where: { Stock_Type_ID: 1 }
-      }],
-      where: { Item_ID: itemId }
-    });
+    console.log(`📊 Getting stock summary for Item_ID: ${itemId}`);
 
-    // Sample GRN record
-    const sampleGRN = await Stk_main.findOne({
-      where: { Stock_Type_ID: 1 },
-      include: [
-        {
-          model: Stk_Detail,
-          as: 'stock_details',
-          limit: 1
-        }
-      ]
+    const stockSummary = await sequelize.query(`
+      SELECT 
+        sd.batchno,
+        zi.itemName,
+        zi.id as item_id,
+        SUM(CASE WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) ELSE 0 END) as total_grn,
+        SUM(CASE WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) ELSE 0 END) as total_dispatch,
+        (SUM(CASE WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) ELSE 0 END) - 
+         SUM(CASE WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) ELSE 0 END)) as current_stock,
+        COUNT(*) as total_transactions,
+        MIN(sm.Date) as first_transaction,
+        MAX(sm.Date) as last_transaction
+      FROM stk_detail sd
+      INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+      INNER JOIN zitems zi ON sd.Item_ID = zi.id
+      WHERE sd.Item_ID = :itemId AND sd.batchno IS NOT NULL
+      GROUP BY sd.batchno, zi.itemName, zi.id
+      ORDER BY first_transaction ASC
+    `, {
+      replacements: { itemId },
+      type: sequelize.QueryTypes.SELECT
     });
 
     res.json({
       success: true,
-      debug: {
-        itemId,
-        itemExists: !!itemExists,
-        itemName: itemExists?.itemName || 'Not found',
-        counts: {
-          totalGRNRecords: totalGRNs,
-          totalDispatchRecords: totalDispatches,
-          grnDetailsForThisItem: grnDetailsForItem
-        },
-        sampleGRN: sampleGRN ? {
-          id: sampleGRN.ID,
-          number: sampleGRN.Number,
-          date: sampleGRN.Date,
-          batchno: sampleGRN.Purchase_Batchno,
-          detailsCount: sampleGRN.stock_details?.length || 0
-        } : null,
-        suggestion: totalGRNs === 0 ? 'No GRN records exist. Create GRN first using Purchase Order.' : 'GRN records exist but not for this item.'
-      }
+      data: stockSummary,
+      itemId: itemId,
+      totalBatches: stockSummary.length,
+      totalCurrentStock: stockSummary.reduce((sum, batch) => sum + parseFloat(batch.current_stock), 0)
     });
   } catch (error) {
-    console.error('Debug error:', error);
+    console.error(`❌ Error fetching stock summary for Item_ID ${itemId}:`, error);
     res.status(500).json({
       success: false,
-      error: error.message,
-      details: 'Check model associations and table names'
+      error: error.message
     });
   }
-});
+};
 
-// ADD: Simple test API
-router.get('/test/simple', async (req, res) => {
+// FIXED: Generate dispatch number
+const generateDispatchNumber = async () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+
+  const lastDispatch = await Stk_main.findOne({
+    where: {
+      Stock_Type_ID: 12,
+      Number: { [Op.like]: `DN-${year}${month}%` }
+    },
+    order: [['Number', 'DESC']]
+  });
+
+  let sequence = 1;
+  if (lastDispatch && lastDispatch.Number) {
+    const parts = lastDispatch.Number.split('-');
+    if (parts.length >= 3) {
+      sequence = parseInt(parts[2]) + 1;
+    }
+  }
+
+  return `DN-${year}${month}-${String(sequence).padStart(4, '0')}`;
+};
+
+// Get dispatch statistics
+const getDispatchStatistics = async (req, res) => {
   try {
-    // Test basic table access
-    const stkMainCount = await Stk_main.count();
-    const stkDetailCount = await Stk_Detail.count();
-    
+    const stats = await sequelize.query(`
+      SELECT 
+        COUNT(DISTINCT sm.ID) as total_dispatches,
+        COUNT(DISTINCT sd.Item_ID) as unique_items_dispatched,
+        SUM(sd.Stock_out_UOM_Qty) as total_quantity_dispatched,
+        SUM(sd.Stock_out_UOM_Qty * sd.Stock_Price) as total_value_dispatched,
+        COUNT(DISTINCT sd.batchno) as batches_used,
+        DATE(MIN(sm.Date)) as first_dispatch_date,
+        DATE(MAX(sm.Date)) as last_dispatch_date
+      FROM stk_main sm
+      INNER JOIN stk_detail sd ON sm.ID = sd.STK_Main_ID
+      WHERE sm.Stock_Type_ID = 12
+    `, {
+      type: sequelize.QueryTypes.SELECT
+    });
+
     res.json({
       success: true,
-      message: 'API working',
-      data: {
-        stkMainRecords: stkMainCount,
-        stkDetailRecords: stkDetailCount,
-        timestamp: new Date().toISOString()
-      }
+      data: stats[0] || {},
+      generatedAt: new Date().toISOString()
     });
   } catch (error) {
+    console.error('❌ Error fetching dispatch statistics:', error);
     res.status(500).json({
       success: false,
-      error: error.message,
-      suggestion: 'Check if tables exist and models are properly imported'
+      error: error.message
     });
   }
-});
+};
 
-
-
-
-
-module.exports = router
+module.exports = {
+  getAvailableBatchesForEdit,
+  getAvailableBatchesForItem,
+  createDispatch,
+  getAllDispatches,
+  getDispatchById,
+  updateDispatch,
+  deleteDispatch,
+  getStockSummaryForItem,
+  getDispatchStatistics
+};

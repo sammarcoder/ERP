@@ -1,19 +1,20 @@
-// routes/grn.js
+
+// routes/grn.js - COMPLETE CRUD
 const express = require('express');
 const router = express.Router();
-const { Stk_main, Stk_Detail, ZItems, ZCOA, Order_Main } = require('../models');
+const { Stk_main, Stk_Detail, ZItems, ZCoa, Order_Main, Uom } = require('../models');
 const { Op } = require('sequelize');
 const sequelize = require('../../config/database');
 
-// Generate GRN Number based on type sequence
+// Generate GRN Number
 const generateGRNNumber = async () => {
   const today = new Date();
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
-  
+
   const lastGRN = await Stk_main.findOne({
-    where: { 
-      Stock_Type_ID: 1, // GRN type
+    where: {
+      Stock_Type_ID: 11,
       Number: { [Op.like]: `GRN-${year}${month}%` }
     },
     order: [['Number', 'DESC']]
@@ -28,83 +29,83 @@ const generateGRNNumber = async () => {
   return `GRN-${year}${month}-${String(sequence).padStart(4, '0')}`;
 };
 
-// GET /api/grn - Get all GRNs
+// GET all GRNs
 router.get('/', async (req, res) => {
   try {
     const grns = await Stk_main.findAll({
-      where: { Stock_Type_ID: 1 }, // Only GRN records
+      where: { Stock_Type_ID: 11 },
       include: [
         {
           model: Stk_Detail,
           as: 'details',
-          include: [
-            { 
-              model: ZItems, 
-              as: 'item',
-              include: [
-                { model: ZUOM, as: 'uom1' },
-                { model: ZUOM, as: 'uomTwo' },
-                { model: ZUOM, as: 'uomThree' }
-              ]
-            }
-          ]
+          include: [{ model: ZItems, as: 'item' }]
         },
-        { model: ZCOA, as: 'account' },
-        { model: Order_Main, as: 'order' },
-        { model: Ztransporter, as: 'transporter' }
+        { model: ZCoa, as: 'account' },
+        { model: Order_Main, as: 'order' }
       ],
       order: [['createdAt', 'DESC']]
     });
 
-    res.json({
-      success: true,
-      data: grns
-    });
+    res.json({ success: true, data: grns });
   } catch (error) {
     console.error('Error fetching GRNs:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// POST /api/grn - Create GRN
+// GET single GRN
+router.get('/:id', async (req, res) => {
+  try {
+    const grn = await Stk_main.findOne({
+      where: { ID: req.params.id, Stock_Type_ID: 11 },
+      include: [
+        {
+          model: Stk_Detail,
+          as: 'details',
+          include: [{ model: ZItems, as: 'item' }]
+        },
+        { model: ZCoa, as: 'account' },
+        { model: Order_Main, as: 'order' }
+      ]
+    });
+
+    if (!grn) {
+      return res.status(404).json({ success: false, error: 'GRN not found' });
+    }
+
+    res.json({ success: true, data: grn });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// CREATE GRN
 router.post('/', async (req, res) => {
   const transaction = await sequelize.transaction();
-  
+
   try {
     const { stockMain, stockDetails } = req.body;
 
-    // Generate auto GRN number as per type sequence
     const grnNumber = await generateGRNNumber();
-
-    // Create Stk_main record
+    // console.log('this is order stock main data ', ...stockMain)
     const grn = await Stk_main.create({
       ...stockMain,
       Number: grnNumber
     }, { transaction });
 
-    // Create Stk_Detail records
     const grnDetails = stockDetails.map((detail, index) => ({
       ...detail,
       STK_Main_ID: grn.ID,
-      Line_Id: index + 1
+      Line_Id: index + 1,
+      batchno: stockMain.batchno // Pass batch number from main
     }));
 
-    const createdDetails = await Stk_Detail.bulkCreate(grnDetails, { 
-      transaction,
-      validate: true 
-    });
+    await Stk_Detail.bulkCreate(grnDetails, { transaction });
 
-    // ADDED: Update Order_Main GRN_Status as per your requirement
     if (stockMain.Order_Main_ID) {
       await Order_Main.update(
-        { GRN_Status: 'Partial' }, // Can be made dynamic based on quantities
-        { 
-          where: { ID: stockMain.Order_Main_ID },
-          transaction 
-        }
+        { Next_Status: 'Partial' },
+        { where: { ID: stockMain.Order_Main_ID }, transaction }
       );
     }
 
@@ -113,56 +114,90 @@ router.post('/', async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'GRN created successfully',
-      data: { 
-        ...grn.toJSON(), 
-        details: createdDetails,
-        grnNumber: grnNumber
-      }
+      data: { ...grn.toJSON(), details: grnDetails, grnNumber }
     });
   } catch (error) {
     await transaction.rollback();
+    
     console.error('Error creating GRN:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// GET /api/grn/from-po/:orderId - Get GRN data from Purchase Order
-router.get('/from-po/:orderId', async (req, res) => {
+// UPDATE GRN
+router.put('/:id', async (req, res) => {
+  const transaction = await sequelize.transaction();
+
   try {
-    const { orderId } = req.params;
-    
-    const purchaseOrder = await Order_Main.findByPk(orderId, {
-      where: { Stock_Type_ID: 1 }, // Purchase order
-      include: [
-        {
-          model: Order_Detail,
-          as: 'details',
-          include: [{ model: ZItems, as: 'item' }]
-        },
-        { model: ZCOA, as: 'account' }
-      ]
+    const { id } = req.params;
+    const { stockMain, stockDetails } = req.body;
+
+    await Stk_main.update(stockMain, {
+      where: { ID: id, Stock_Type_ID: 11 },
+      transaction
     });
 
-    if (!purchaseOrder) {
-      return res.status(404).json({
-        success: false,
-        error: 'Purchase Order not found'
-      });
-    }
+    // Delete and recreate details
+    await Stk_Detail.destroy({
+      where: { STK_Main_ID: id },
+      transaction
+    });
+
+    const updatedDetails = stockDetails.map((detail, index) => ({
+      ...detail,
+      STK_Main_ID: id,
+      Line_Id: index + 1,
+      batchno: stockMain.batchno
+    }));
+
+    await Stk_Detail.bulkCreate(updatedDetails, { transaction });
+
+    await transaction.commit();
 
     res.json({
       success: true,
-      data: purchaseOrder
+      message: 'GRN updated successfully'
     });
   } catch (error) {
-    console.error('Error fetching PO for GRN:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
+    await transaction.rollback();
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// DELETE GRN
+router.delete('/:id', async (req, res) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const { id } = req.params;
+
+    await Stk_Detail.destroy({
+      where: { STK_Main_ID: id },
+      transaction
     });
+
+    const deleted = await Stk_main.destroy({
+      where: { ID: id, Stock_Type_ID: 11 },
+      transaction
+    });
+
+    if (!deleted) {
+      await transaction.rollback();
+      return res.status(404).json({
+        success: false,
+        error: 'GRN not found'
+      });
+    }
+
+    await transaction.commit();
+
+    res.json({
+      success: true,
+      message: 'GRN deleted successfully'
+    });
+  } catch (error) {
+    await transaction.rollback();
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

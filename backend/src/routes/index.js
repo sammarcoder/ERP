@@ -18,7 +18,8 @@ const zItemsRoutes = require('./zItemsRoutes.js')
 const orderRoutes = require('./orderRoutes.js')
 const stockRoutes = require('./stockRoutes.js')
 const grn = require('../controllers/grn.controller.js')
-const dispatchController = require('../controllers/dispatch.controller.js')
+// const dispatchController = require('../controllers/dispatch.controller.js')
+const dispatchController = require('./dispatch.js')
 
 router.use("/auth", authRoutes);
 router.use("/z-control", zRoutes);

@@ -54,7 +54,7 @@
 //     // await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
 //     // console.log('⚠️ Foreign key checks disabled');
     
-//     await sequelize.sync();
+//     await sequelize.sync({alter:true});
 //     console.log('✅ Models synced');
     
 //     // Re-enable foreign key checks

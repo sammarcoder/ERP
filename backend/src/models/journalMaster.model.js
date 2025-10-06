@@ -1,86 +1,3 @@
-// const sequelize = require('../../config/database');
-// const { DataTypes } = require('sequelize');
-// // const {JournalDetail} = require('./JournalDetail.model').ZJournalDetail;
-// // const { JournalDetail } = require('./JournalDetail.model');
-// // console.log(JournalDetail)
-// const { ZvoucherType } = require('./zVoucherType.model');
-
-// const JournalMaster = sequelize.define('JournalMaster', {
-//     date: {
-//         type: DataTypes.DATE,
-//         allowNull: false,
-//         validate: {
-//             notEmpty: true,
-//         }
-//     },
-
-    
-//     voucherTypeId: {
-//         type: DataTypes.INTEGER,
-//         allowNull: false,
-//         validate: {
-//             notEmpty: true,
-//         },
-//         references: {
-//             model: ZvoucherType,
-//             key: 'id'
-//         }
-//     },
-//     voucherNo: {
-//         type: DataTypes.STRING(50),
-//         allowNull: false,
-//         validate: {
-//             notEmpty: true,
-//         }
-//     },
-//     balacingId: {
-//         type: DataTypes.INTEGER,
-//         allowNull: false,
-//         validate: {
-//             notEmpty: true,
-//         }
-//     },
-//     status: {
-//         type: DataTypes.BOOLEAN,
-//         allowNull: false,
-//         defaultValue: true,
-//         validate: {
-//             notEmpty: true,
-//         }
-//     },
-//     // voucherNo: {
-//     //     type: DataTypes.STRING(50),
-//     //     allowNull: false,
-//     //     validate: {
-//     //         notEmpty: true,
-//     //     }
-//     // }
-// })
-
-// // Associations
-
-// JournalMaster.belongsTo(ZvoucherType, { foreign: 'voucherTypeId', as: 'voucherType' });
-// // JournalMaster.hasMany(JournalDetail, {
-// //     foreignKey: 'jmId', as: 'details'
-// // })
-
-// JournalMaster.hasMany(require('./JournalDetail.model').JournalDetail, {
-//     foreignKey: 'jmId',
-//     as: 'details'
-// });
-
-
-
-// module.exports = { JournalMaster };
-
-
-
-
-
-
-
-
-
 const sequelize = require('../../config/database');
 const { DataTypes } = require('sequelize');
 
@@ -91,6 +8,9 @@ const JournalMaster = sequelize.define('JournalMaster', {
         validate: {
             notEmpty: true,
         }
+    },
+    stk_Main_ID: {
+        type: DataTypes.INTEGER,
     },
     voucherTypeId: {
         type: DataTypes.INTEGER,
@@ -104,7 +24,8 @@ const JournalMaster = sequelize.define('JournalMaster', {
         allowNull: false,
         validate: {
             notEmpty: true,
-        }
+        },
+        unique: true,
     },
     balacingId: {
         type: DataTypes.INTEGER,
@@ -121,13 +42,23 @@ const JournalMaster = sequelize.define('JournalMaster', {
             notEmpty: true,
         }
     }
-});
+}
+,
+ {
+  tableName: 'JournalMaster', // 👈 match your existing migration table name
+  freezeTableName: true, }
+);
 
 // Define associations in a separate function
-JournalMaster.associate = function(models) {
-    JournalMaster.belongsTo(models.ZvoucherType, { 
-        foreignKey: 'voucherTypeId', 
-        as: 'voucherType' 
+JournalMaster.associate = function (models) {
+    JournalMaster.belongsTo(models.ZvoucherType, {
+        foreignKey: 'voucherTypeId',
+        as: 'voucherType'
+    });
+
+    JournalMaster.belongsTo(models.Stk_main, {
+        foreignKey: 'stk_Main_ID',
+        as: 'Voucher'
     });
     JournalMaster.hasMany(models.JournalDetail, {
         foreignKey: 'jmId',
@@ -136,3 +67,8 @@ JournalMaster.associate = function(models) {
 };
 
 module.exports = JournalMaster;
+
+
+
+
+
