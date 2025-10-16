@@ -8,7 +8,7 @@ const ZCoa = sequelize.define('ZCoa', {
         validate: { notEmpty: { msg: 'Account name cannot be empty' } },
         unique: true
     },
-    
+
     // FIXED: Remove notEmpty validators from nullable fields
     ch1Id: {
         type: DataTypes.INTEGER,
@@ -25,101 +25,101 @@ const ZCoa = sequelize.define('ZCoa', {
         allowNull: false, // This is required, so keep notEmpty
         validate: { notEmpty: { msg: 'COA Type ID cannot be empty' } }
     },
-    
+
     // FIXED: Remove notEmpty from all nullable fields
-    setupName: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    setupName: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'Setup Name cannot be empty' } }
     },
-    adress: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    adress: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'Address cannot be empty' } }
     },
-    city: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    city: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'City cannot be empty' } }
     },
-    personName: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    personName: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'Person Name cannot be empty' } }
     },
-    mobileNo: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    mobileNo: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'Mobile Number cannot be empty' } }
     },
-    taxStatus: { 
-        type: DataTypes.BOOLEAN, 
-        allowNull: true, 
-        defaultValue: false 
+    taxStatus: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false
     },
-    ntn: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    ntn: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'NTN cannot be empty' } }
     },
-    cnic: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    cnic: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'CNIC cannot be empty' } }
     },
-    salesLimit: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    salesLimit: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'Sales Limit cannot be empty' } }
     },
-    credit: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    credit: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'Credit cannot be empty' } }
     },
-    creditDoys: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    creditDoys: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'Credit Days cannot be empty' } }
     },
-    salesMan: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+    salesMan: {
+        type: DataTypes.STRING,
+        allowNull: true
         // REMOVED: validate: { notEmpty: { msg: 'Salesman cannot be empty' } }
     },
-    isJvBalance: { 
-        type: DataTypes.BOOLEAN, 
-        allowNull: true, 
-        defaultValue: false 
+    isJvBalance: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false
     },
-    
+
     // Discount fields remain the same
-    discountA: { 
-        type: DataTypes.DECIMAL(5,2), 
-        allowNull: false, 
+    discountA: {
+        type: DataTypes.DECIMAL(5, 2),
+        allowNull: false,
         defaultValue: 0.00,
-        validate: { 
-            min: 0, 
+        validate: {
+            min: 0,
             max: 100,
             isDecimal: { msg: 'Discount A must be a valid decimal number' }
         }
     },
-    discountB: { 
-        type: DataTypes.DECIMAL(5,2), 
-        allowNull: false, 
+    discountB: {
+        type: DataTypes.DECIMAL(5, 2),
+        allowNull: false,
         defaultValue: 0.00,
-        validate: { 
-            min: 0, 
+        validate: {
+            min: 0,
             max: 100,
             isDecimal: { msg: 'Discount B must be a valid decimal number' }
         }
     },
-    discountC: { 
-        type: DataTypes.DECIMAL(5,2), 
-        allowNull: false, 
+    discountC: {
+        type: DataTypes.DECIMAL(5, 2),
+        allowNull: false,
         defaultValue: 0.00,
-        validate: { 
-            min: 0, 
+        validate: {
+            min: 0,
             max: 100,
             isDecimal: { msg: 'Discount C must be a valid decimal number' }
         }
@@ -127,6 +127,47 @@ const ZCoa = sequelize.define('ZCoa', {
     batch_no: {
         type: DataTypes.STRING(30),
         allowNull: true
+    },
+    Transporter_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    freight_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    labour_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    bility_expense: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    other_expense: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    foreign_currency: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    sub_customer: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: false
+    },
+    sub_city: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    str: {
+        type: DataTypes.INTEGER,
+        allowNull:true
     }
 });
 
@@ -169,6 +210,19 @@ ZCoa.associate = function (models) {
             as: 'Voucher_carriage_account'
         });
     }
+    if (models && models.Ztransporter) {
+        ZCoa.belongsTo(models.Ztransporter, {
+            foreignKey: 'Transporter_ID',
+            as: 'transporter'
+        });
+    }
+    if (models && models.Stk_Detail) {
+        ZCoa.hasMany(models.Stk_Detail, {
+            foreignKey: 'batchno',
+            as: 'stock_batch'
+        });
+    }
+    
 };
 
 module.exports = ZCoa;

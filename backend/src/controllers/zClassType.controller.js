@@ -50,7 +50,7 @@ const getByClassID = async(req,res) =>{
         const getByclassID = await ZClassType.findAll({
             where:{classId}
         })
-        console.log('this is data of clas Id',getByclassID)
+        // console.log('this is data of clas Id',getByclassID)
         return res.status(200).json({sucess:true, getByclassID})
     }catch(err){
         return res.status(500).json({sucess: false, message : err.message})   }

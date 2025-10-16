@@ -1,12 +1,12 @@
-import React from 'react'
-import OrderForm from './OrderForm'
+// import React from 'react'
+// import OrderForm from './OrderForm'
 
-const page = () => {
-  return (
-    <div>
-        <OrderForm/>
-    </div>
-  )
-}
+// const page = () => {
+//   return (
+//     <div>
+//         <OrderForm/>
+//     </div>
+//   )
+// }
 
-export default page
+// export default page

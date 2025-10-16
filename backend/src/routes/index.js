@@ -43,4 +43,7 @@ router.use('/stock-order', stockRoutes)
 router.use('/grn', grn);
 router.use('/dispatch', dispatchController);
 
+router.use('/transporter', require('./transporterRoutes'));
+
+
 module.exports = router

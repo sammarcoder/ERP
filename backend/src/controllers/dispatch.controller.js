@@ -166,7 +166,8 @@ const getAvailableBatchesForItem = async (req, res) => {
       edit_mode: false
     }));
 
-    console.log(`✅ CREATE MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
+    // console.log(`✅ CREATE MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
+    console.log(  `Batches:`, processedBatches);
 
     res.json({
       success: true,
@@ -220,6 +221,161 @@ const getAvailableBatchesForItem = async (req, res) => {
 
 
 
+// // CREATE dispatch with enhanced validation
+// const createDispatch = async (req, res) => {
+//   const { stockMain, stockDetails } = req.body;
+
+//   console.log('📥 === CREATING DISPATCH ===');
+//   console.log('Stock Main:', stockMain);
+//   console.log('Stock Details:', stockDetails);
+
+//   if (!stockMain || !stockDetails || stockDetails.length === 0) {
+//     return res.status(400).json({
+//       success: false,
+//       error: 'Stock main and details are required'
+//     });
+//   }
+
+//   const transaction = await sequelize.transaction();
+
+//   try {
+//     // Generate dispatch number
+//     const dispatchNumber = await generateDispatchNumber();
+//     console.log(`🔢 Generated dispatch number: ${dispatchNumber}`);
+
+//     // FIXED: Create stock main with proper Stock_Type_ID
+//     const stockMainData = await Stk_main.create({
+//       Stock_Type_ID: 12, // Dispatch type
+//       COA_ID: stockMain.COA_ID,
+//       Date: stockMain.Date,
+//       Status: stockMain.Status || 'UnPost',
+//       Purchase_Type: stockMain.Purchase_Type || 'Local selling',
+//       Order_Main_ID: stockMain.Order_Main_ID,
+//       Number: dispatchNumber,
+//       Remarks: stockMain.Remarks || ''
+//     }, { transaction });
+
+//     console.log(`✅ Created Stk_main record with ID: ${stockMainData.ID}`);
+
+//     // FIXED: Validate batch availability before creating details
+//     for (const detail of stockDetails) {
+//       if (!detail.batchno) {
+//         throw new Error(`Batch number is required for Item_ID ${detail.Item_ID}`);
+//       }
+
+//       // Check if batch has enough stock
+//       const batchCheck = await sequelize.query(`
+//         SELECT 
+//           (SUM(CASE WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) ELSE 0 END) - 
+//            SUM(CASE WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) ELSE 0 END)) as available
+//         FROM stk_detail sd
+//         INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+//         WHERE sd.Item_ID = :itemId AND sd.batchno = :batchno
+//         GROUP BY sd.Item_ID, sd.batchno
+//       `, {
+//         replacements: { itemId: detail.Item_ID, batchno: detail.batchno },
+//         type: sequelize.QueryTypes.SELECT,
+//         transaction
+//       });
+
+//       const availableStock = batchCheck[0]?.available || 0;
+//       const requestedQty = parseFloat(detail.Stock_out_UOM_Qty) || 0;
+
+//       if (requestedQty > availableStock) {
+//         throw new Error(`Insufficient stock for Item_ID ${detail.Item_ID} in batch ${detail.batchno}. Available: ${availableStock}, Requested: ${requestedQty}`);
+//       }
+//     }
+
+//     // FIXED: Create stock details with proper field mapping
+//     const stockDetailsWithMainId = stockDetails.map((detail, index) => ({
+//       STK_Main_ID: stockMainData.ID,
+//       Line_Id: detail.Line_Id || (index + 1),
+//       Item_ID: detail.Item_ID,
+//       batchno: detail.batchno,
+//       Stock_Price: parseFloat(detail.Stock_Price) || 0,
+//       Stock_out_UOM_Qty: parseFloat(detail.Stock_out_UOM_Qty) || 0,
+//       Stock_out_SKU_UOM_Qty: parseFloat(detail.Stock_out_SKU_UOM_Qty) || 0,
+//       Stock_out_UOM3_Qty: parseFloat(detail.Stock_out_UOM3_Qty) || 0,
+//       // Set Stock_In quantities to 0 for dispatch
+//       Stock_In_UOM_Qty: 0,
+//       Stock_In_SKU_UOM_Qty: 0,
+//       Stock_In_UOM3_Qty: 0,
+//       Sale_Unit: detail.Sale_Unit || null,
+//       Discount_A: parseFloat(detail.Discount_A) || 0,
+//       Discount_B: parseFloat(detail.Discount_B) || 0,
+//       Discount_C: parseFloat(detail.Discount_C) || 0,
+//       Remarks: detail.Remarks || ''
+//     }));
+
+//     const createdDetails = await Stk_Detail.bulkCreate(stockDetailsWithMainId, {
+//       transaction,
+//       validate: true
+//     });
+
+//     console.log(`✅ Created ${createdDetails.length} Stk_Detail records`);
+
+//     await transaction.commit();
+
+//     // Fetch complete dispatch with associations for response
+//     const completeDispatch = await Stk_main.findByPk(stockMainData.ID, {
+//       include: [
+//         {
+//           model: Stk_Detail,
+//           as: 'details',
+//           include: [
+//             {
+//               model: ZItems,
+//               as: 'item',
+//               include: [
+//                 { model: Uom, as: 'uom1', attributes: ['uom'] },
+//                 { model: Uom, as: 'uomTwo', attributes: ['uom'] },
+//                 { model: Uom, as: 'uomThree', attributes: ['uom'] }
+//               ]
+//             }
+//           ]
+//         },
+//         { model: ZCoa, as: 'account' }
+//       ]
+//     });
+
+//     console.log(`🎉 === DISPATCH CREATED SUCCESSFULLY ===`);
+//     console.log(`Dispatch Number: ${dispatchNumber}`);
+//     console.log(`Dispatch ID: ${stockMainData.ID}`);
+//     console.log(`Total Items Dispatched: ${createdDetails.length}`);
+
+//     res.json({
+//       success: true,
+//       message: 'Dispatch created successfully',
+//       data: {
+//         dispatchId: stockMainData.ID,
+//         dispatchNumber: dispatchNumber,
+//         dispatch: completeDispatch,
+//         itemsDispatched: createdDetails.length
+//       }
+//     });
+
+//   } catch (error) {
+//     await transaction.rollback();
+//     console.error('❌ === DISPATCH CREATION ERROR ===', error);
+
+//     res.status(500).json({
+//       success: false,
+//       error: error.message,
+//       details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
 // CREATE dispatch with enhanced validation
 const createDispatch = async (req, res) => {
   const { stockMain, stockDetails } = req.body;
@@ -242,7 +398,7 @@ const createDispatch = async (req, res) => {
     const dispatchNumber = await generateDispatchNumber();
     console.log(`🔢 Generated dispatch number: ${dispatchNumber}`);
 
-    // FIXED: Create stock main with proper Stock_Type_ID
+    // Create stock main with proper Stock_Type_ID
     const stockMainData = await Stk_main.create({
       Stock_Type_ID: 12, // Dispatch type
       COA_ID: stockMain.COA_ID,
@@ -256,7 +412,7 @@ const createDispatch = async (req, res) => {
 
     console.log(`✅ Created Stk_main record with ID: ${stockMainData.ID}`);
 
-    // FIXED: Validate batch availability before creating details
+    // Validate batch availability before creating details
     for (const detail of stockDetails) {
       if (!detail.batchno) {
         throw new Error(`Batch number is required for Item_ID ${detail.Item_ID}`);
@@ -285,26 +441,43 @@ const createDispatch = async (req, res) => {
       }
     }
 
-    // FIXED: Create stock details with proper field mapping
-    const stockDetailsWithMainId = stockDetails.map((detail, index) => ({
-      STK_Main_ID: stockMainData.ID,
-      Line_Id: detail.Line_Id || (index + 1),
-      Item_ID: detail.Item_ID,
-      batchno: detail.batchno,
-      Stock_Price: parseFloat(detail.Stock_Price) || 0,
-      Stock_out_UOM_Qty: parseFloat(detail.Stock_out_UOM_Qty) || 0,
-      Stock_out_SKU_UOM_Qty: parseFloat(detail.Stock_out_SKU_UOM_Qty) || 0,
-      Stock_out_UOM3_Qty: parseFloat(detail.Stock_out_UOM3_Qty) || 0,
-      // Set Stock_In quantities to 0 for dispatch
-      Stock_In_UOM_Qty: 0,
-      Stock_In_SKU_UOM_Qty: 0,
-      Stock_In_UOM3_Qty: 0,
-      Sale_Unit: detail.Sale_Unit || null,
-      Discount_A: parseFloat(detail.Discount_A) || 0,
-      Discount_B: parseFloat(detail.Discount_B) || 0,
-      Discount_C: parseFloat(detail.Discount_C) || 0,
-      Remarks: detail.Remarks || ''
-    }));
+    // ✅ UPDATED: Create stock details with Stock_out_UOM field
+    const stockDetailsWithMainId = stockDetails.map((detail, index) => {
+      // Determine which UOM was selected (1, 2, or 3)
+      let selectedUomNumber = null;
+      if (detail.Stock_out_UOM === 1) selectedUomNumber = 1;
+      else if (detail.Stock_out_SKU_UOM === 2) selectedUomNumber = 2;
+      else if (detail.Stock_out_UOM3 === 3) selectedUomNumber = 3;
+
+      console.log(`📊 Item ${detail.Item_ID}: Selected UOM = ${selectedUomNumber}`);
+
+      return {
+        STK_Main_ID: stockMainData.ID,
+        Line_Id: detail.Line_Id || (index + 1),
+        Item_ID: detail.Item_ID,
+        batchno: detail.batchno,
+        Stock_Price: parseFloat(detail.Stock_Price) || 0,
+        
+        // ✅ ADDED: Store selected UOM number (1, 2, or 3)
+        Stock_out_UOM: selectedUomNumber,
+        
+        // Quantities
+        Stock_out_UOM_Qty: parseFloat(detail.Stock_out_UOM_Qty) || 0,
+        Stock_out_SKU_UOM_Qty: parseFloat(detail.Stock_out_SKU_UOM_Qty) || 0,
+        Stock_out_UOM3_Qty: parseFloat(detail.Stock_out_UOM3_Qty) || 0,
+        
+        // Set Stock_In quantities to 0 for dispatch
+        Stock_In_UOM_Qty: 0,
+        Stock_In_SKU_UOM_Qty: 0,
+        Stock_In_UOM3_Qty: 0,
+        
+        Sale_Unit: detail.Sale_Unit || null,
+        Discount_A: parseFloat(detail.Discount_A) || 0,
+        Discount_B: parseFloat(detail.Discount_B) || 0,
+        Discount_C: parseFloat(detail.Discount_C) || 0,
+        Remarks: detail.Remarks || ''
+      };
+    });
 
     const createdDetails = await Stk_Detail.bulkCreate(stockDetailsWithMainId, {
       transaction,
@@ -365,6 +538,27 @@ const createDispatch = async (req, res) => {
   }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // GET all dispatches with enhanced filtering
 const getAllDispatches = async (req, res) => {
   try {
@@ -403,7 +597,8 @@ const getAllDispatches = async (req, res) => {
                 { model: Uom, as: 'uomTwo', attributes: ['uom'] },
                 { model: Uom, as: 'uomThree', attributes: ['uom'] }
               ]
-            }
+            },
+            {model: ZCoa, as: 'batchDetails', attributes: ['id', 'acName', 'city', 'mobileNo']}
           ]
         },
         {
@@ -506,14 +701,115 @@ const getDispatchById = async (req, res) => {
 };
 
 // UPDATE dispatch
+// const updateDispatch = async (req, res) => {
+//   const { id } = req.params;
+//   // const { stockMain, stockDetails } = req.body;
+
+//   const transaction = await sequelize.transaction();
+
+//   try {
+//     console.log(`📝 === UPDATING DISPATCH ID: ${id} ===`);
+
+//     // Check if dispatch exists
+//     const existingDispatch = await Stk_main.findOne({
+//       where: { ID: id, Stock_Type_ID: 12 }
+//     });
+
+//     if (!existingDispatch) {
+//       await transaction.rollback();
+//       return res.status(404).json({
+//         success: false,
+//         error: 'Dispatch not found'
+//       });
+//     }
+
+//     // Update main record
+//     const [updatedRows] = await Stk_main.update({
+//       COA_ID: stockMain.COA_ID,
+//       Date: stockMain.Date,
+//       Status: stockMain.Status,
+//       Purchase_Type: stockMain.Purchase_Type,
+//       Remarks: stockMain.Remarks
+//     }, {
+//       where: { ID: id },
+//       transaction
+//     });
+
+//     console.log(`✅ Updated ${updatedRows} main records`);
+
+//     // Delete old details
+//     const deletedDetails = await Stk_Detail.destroy({
+//       where: { STK_Main_ID: id },
+//       transaction
+//     });
+
+//     console.log(`🗑️ Deleted ${deletedDetails} old detail records`);
+
+//     // Create new details with validation
+//     const stockDetailsWithMainId = stockDetails.map((detail, index) => ({
+//       STK_Main_ID: id,
+//       Line_Id: detail.Line_Id || (index + 1),
+//       Item_ID: detail.Item_ID,
+//       batchno: detail.batchno,
+//       Stock_Price: parseFloat(detail.Stock_Price) || 0,
+//       Stock_out_UOM_Qty: parseFloat(detail.Stock_out_UOM_Qty) || 0,
+//       Stock_out_SKU_UOM_Qty: parseFloat(detail.Stock_out_SKU_UOM_Qty) || 0,
+//       Stock_out_UOM3_Qty: parseFloat(detail.Stock_out_UOM3_Qty) || 0,
+//       Stock_In_UOM_Qty: 0,
+//       Stock_In_SKU_UOM_Qty: 0,
+//       Stock_In_UOM3_Qty: 0,
+//       Remarks: detail.Remarks || '',
+//       Sale_Unit: detail.Sale_Unit || null,
+//       Discount_A: parseFloat(detail.Discount_A) || 0,
+//       Discount_B: parseFloat(detail.Discount_B) || 0,
+//       Discount_C: parseFloat(detail.Discount_C) || 0,
+//     }));
+
+//     const newDetails = await Stk_Detail.bulkCreate(stockDetailsWithMainId, {
+//       transaction,
+//       validate: true
+//     });
+
+//     console.log(`✅ Created ${newDetails.length} new detail records`);
+
+//     await transaction.commit();
+
+//     res.json({
+//       success: true,
+//       message: 'Dispatch updated successfully',
+//       data: {
+//         dispatchId: id,
+//         updatedDetails: newDetails.length
+//       }
+//     });
+//   } catch (error) {
+//     await transaction.rollback();
+//     console.error(`❌ Error updating dispatch ID ${id}:`, error);
+//     res.status(500).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
+// UPDATE dispatch
 const updateDispatch = async (req, res) => {
   const { id } = req.params;
-  const { stockMain, stockDetails } = req.body;
+  const { stockMain, stockDetails } = req.body; // ✅ FIXED: Uncommented destructuring
 
   const transaction = await sequelize.transaction();
 
   try {
     console.log(`📝 === UPDATING DISPATCH ID: ${id} ===`);
+    console.log('Stock Main:', stockMain);
+    console.log('Stock Details:', stockDetails);
 
     // Check if dispatch exists
     const existingDispatch = await Stk_main.findOne({
@@ -528,13 +824,13 @@ const updateDispatch = async (req, res) => {
       });
     }
 
-    // Update main record
+    // ✅ FIXED: Update main record with proper data
     const [updatedRows] = await Stk_main.update({
       COA_ID: stockMain.COA_ID,
       Date: stockMain.Date,
       Status: stockMain.Status,
       Purchase_Type: stockMain.Purchase_Type,
-      Remarks: stockMain.Remarks
+      Remarks: stockMain.Remarks || ''
     }, {
       where: { ID: id },
       transaction
@@ -550,25 +846,43 @@ const updateDispatch = async (req, res) => {
 
     console.log(`🗑️ Deleted ${deletedDetails} old detail records`);
 
-    // Create new details with validation
-    const stockDetailsWithMainId = stockDetails.map((detail, index) => ({
-      STK_Main_ID: id,
-      Line_Id: detail.Line_Id || (index + 1),
-      Item_ID: detail.Item_ID,
-      batchno: detail.batchno,
-      Stock_Price: parseFloat(detail.Stock_Price) || 0,
-      Stock_out_UOM_Qty: parseFloat(detail.Stock_out_UOM_Qty) || 0,
-      Stock_out_SKU_UOM_Qty: parseFloat(detail.Stock_out_SKU_UOM_Qty) || 0,
-      Stock_out_UOM3_Qty: parseFloat(detail.Stock_out_UOM3_Qty) || 0,
-      Stock_In_UOM_Qty: 0,
-      Stock_In_SKU_UOM_Qty: 0,
-      Stock_In_UOM3_Qty: 0,
-      Remarks: detail.Remarks || '',
-      Sale_Unit: detail.Sale_Unit || null,
-      Discount_A: parseFloat(detail.Discount_A) || 0,
-      Discount_B: parseFloat(detail.Discount_B) || 0,
-      Discount_C: parseFloat(detail.Discount_C) || 0,
-    }));
+    // ✅ UPDATED: Create new details with Stock_out_UOM field
+    const stockDetailsWithMainId = stockDetails.map((detail, index) => {
+      // Determine which UOM was selected (1, 2, or 3)
+      let selectedUomNumber = null;
+      if (detail.Stock_out_UOM === 1) selectedUomNumber = 1;
+      else if (detail.Stock_out_SKU_UOM === 2) selectedUomNumber = 2;
+      else if (detail.Stock_out_UOM3 === 3) selectedUomNumber = 3;
+
+      console.log(`📊 UPDATE - Item ${detail.Item_ID}: Selected UOM = ${selectedUomNumber}`);
+
+      return {
+        STK_Main_ID: id,
+        Line_Id: detail.Line_Id || (index + 1),
+        Item_ID: detail.Item_ID,
+        batchno: detail.batchno,
+        Stock_Price: parseFloat(detail.Stock_Price) || 0,
+        
+        // ✅ ADDED: Store selected UOM number (1, 2, or 3)
+        Stock_out_UOM: selectedUomNumber,
+        
+        // Quantities
+        Stock_out_UOM_Qty: parseFloat(detail.Stock_out_UOM_Qty) || 0,
+        Stock_out_SKU_UOM_Qty: parseFloat(detail.Stock_out_SKU_UOM_Qty) || 0,
+        Stock_out_UOM3_Qty: parseFloat(detail.Stock_out_UOM3_Qty) || 0,
+        
+        // Set Stock_In quantities to 0 for dispatch
+        Stock_In_UOM_Qty: 0,
+        Stock_In_SKU_UOM_Qty: 0,
+        Stock_In_UOM3_Qty: 0,
+        
+        Sale_Unit: detail.Sale_Unit || null,
+        Discount_A: parseFloat(detail.Discount_A) || 0,
+        Discount_B: parseFloat(detail.Discount_B) || 0,
+        Discount_C: parseFloat(detail.Discount_C) || 0,
+        Remarks: detail.Remarks || ''
+      };
+    });
 
     const newDetails = await Stk_Detail.bulkCreate(stockDetailsWithMainId, {
       transaction,
@@ -579,23 +893,61 @@ const updateDispatch = async (req, res) => {
 
     await transaction.commit();
 
+    // ✅ ADDED: Fetch updated dispatch with associations for response
+    const updatedDispatch = await Stk_main.findByPk(id, {
+      include: [
+        {
+          model: Stk_Detail,
+          as: 'details',
+          include: [
+            {
+              model: ZItems,
+              as: 'item',
+              include: [
+                { model: Uom, as: 'uom1', attributes: ['uom'] },
+                { model: Uom, as: 'uomTwo', attributes: ['uom'] },
+                { model: Uom, as: 'uomThree', attributes: ['uom'] }
+              ]
+            }
+          ]
+        },
+        { model: ZCoa, as: 'account' }
+      ]
+    });
+
+    console.log(`🎉 === DISPATCH UPDATED SUCCESSFULLY ===`);
+    console.log(`Dispatch ID: ${id}`);
+    console.log(`Updated Items: ${newDetails.length}`);
+
     res.json({
       success: true,
       message: 'Dispatch updated successfully',
       data: {
         dispatchId: id,
-        updatedDetails: newDetails.length
+        updatedDetails: newDetails.length,
+        dispatch: updatedDispatch
       }
     });
+
   } catch (error) {
     await transaction.rollback();
     console.error(`❌ Error updating dispatch ID ${id}:`, error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };
+
+
+
+
+
+
+
+
+
 
 // DELETE dispatch
 const deleteDispatch = async (req, res) => {

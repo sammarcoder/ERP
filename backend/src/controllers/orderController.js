@@ -74,6 +74,7 @@ const createCompleteOrder = async (req, res) => {
     const orderNumber = await generateOrderNumber(master.Stock_Type_ID);
 
     // Create master with generated number
+    console.log('order master data ', master)
     const orderMaster = await Order_Main.create({
       ...master,
       Number: orderNumber

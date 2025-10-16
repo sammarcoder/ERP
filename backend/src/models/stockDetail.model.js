@@ -24,7 +24,7 @@ const Stk_Detail = sequelize.define('Stk_Detail', {
   // Batch number field
   batchno: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
     comment: 'Batch number for this item'
   },
 
@@ -110,6 +110,10 @@ Stk_Detail.associate = function (models) {
   Stk_Detail.belongsTo(models.Uom, {
     foreignKey: 'Sale_Unit',
     as: 'SaleUnit'
+  });
+  Stk_Detail.belongsTo(models.ZCoa, {
+    foreignKey: 'batchno',
+    as: 'batchDetails'
   });
 };
 

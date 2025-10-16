@@ -32,8 +32,10 @@ const generateGRNNumber = async () => {
 // GET all GRNs
 router.get('/', async (req, res) => {
   try {
+    // console.log('🧩 Stk_main attributes:', Object.keys(Stk_main.rawAttributes));
     const grns = await Stk_main.findAll({
       where: { Stock_Type_ID: 11 },
+      // logging: console.log,
       include: [
         {
           model: Stk_Detail,

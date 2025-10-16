@@ -47,26 +47,28 @@ const Stk_main = sequelize.define('Stk_main', {
         defaultValue: false,
         comment: 'True/False for accounting entry status'
     },
-      Carriage_ID: {
+    Carriage_ID: {
         type: DataTypes.INTEGER,
         comment: 'Foreign key to ZCOA for carriage account'
-      },
+    },
     Carriage_Amount: {
         type: DataTypes.DECIMAL(10, 2),
         comment: 'Numeric field for carriage amount'
     },
-    //   Transporter: {
-    //     type: DataTypes.INTEGER,
-    //     comment: 'Foreign key to Ztransporter'
-    //   },
+   
     Order_Main_ID: {
         type: DataTypes.INTEGER,
         comment: 'Reference to original PO/SO - Need to update Order_main table'
     },
-     is_Voucher_Generated:{
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
-  }
+    is_Voucher_Generated: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    Transporter_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    }
+
 }, {
     tableName: 'Stk_main',
     timestamps: true
@@ -99,16 +101,16 @@ Stk_main.associate = function (models) {
     //   });
 
     // Stk_main belongs to ZCOA for carriage cost
-      Stk_main.belongsTo(models.ZCoa, {
+    Stk_main.belongsTo(models.ZCoa, {
         foreignKey: 'Carriage_ID',
         as: 'carriage_Account'
-      });
+    });
 
     // Stk_main belongs to Ztransporter
-    //   Stk_main.belongsTo(models.Ztransporter, {
-    //     foreignKey: 'Transporter',
-    //     as: 'transporter'
-    //   });
+    Stk_main.belongsTo(models.Ztransporter, {
+        foreignKey: 'Transporter_ID',
+        as: 'transporter'
+    });
 
     // Stk_main belongs to Order_Main (original order)
     Stk_main.belongsTo(models.Order_Main, {
