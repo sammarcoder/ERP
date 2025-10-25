@@ -1,9 +1,6 @@
-import React from 'react'
+'use client'
+import { UomManager } from '@/components/uom/UomManager'
 
-const page = () => {
-  return (
-    <div>page</div>
-  )
+export default function UomPage() {
+  return <UomManager />
 }
-
-export default page

@@ -1,10 +1,6 @@
 // controllers/zControlHead2Controller.js
 const db = require('../models')
 const {ZControlHead2, ZControlHead1} = db
-// console.log(ZControlHead2 === undefined ? 'Model not found' : 'Model imported');
-// console.log('gdfjkgherjvbdsh csddfdgdfgdf vd sdg df')
-// Create ZControlHead2
-// const {ZControlHead2 , ZControlHead1} = require('../models/zControlHead.model.js')
 const createZControlHead2 = async (req, res) => {
     const { zHead2, zHead1Id } = req.body;
     

@@ -11,6 +11,7 @@ const ZCoaCreate = async (req, res) => {
         credit, creditDoys, salesMan, isJvBalance,
         discountA, discountB, discountC,
         batch_no,
+        isPettyCash,
         // NEW DISCOUNT FIELDS
     } = req.body;
 
@@ -33,6 +34,7 @@ const ZCoaCreate = async (req, res) => {
             creditDoys,
             salesMan,
             isJvBalance,
+            isPettyCash,
             discountA: discountA || 0, // Default to 0 if not provided
             discountB: discountB || 0,
             discountC: discountC || 0,
@@ -126,6 +128,7 @@ const ZCoaUpdate = async (req, res) => {
         personName, mobileNo, taxStatus, ntn, cnic,
         salesLimit, credit, creditDoys, salesMan, isJvBalance,
         discountA, discountB, discountC, batch_no,
+        isPettyCash
         // Transporter_ID,
         // freight_crt,
         // labour_crt,
@@ -163,6 +166,7 @@ const ZCoaUpdate = async (req, res) => {
             creditDoys,
             salesMan,
             isJvBalance,
+            isPettyCash,
             discountA: discountA !== undefined ? discountA : zCoa.discountA,
             discountB: discountB !== undefined ? discountB : zCoa.discountB,
             discountC: discountC !== undefined ? discountC : zCoa.discountC,

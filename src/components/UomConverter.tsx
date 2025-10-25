@@ -912,12 +912,12 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
           {data.uomThree?.uom || 'BOX'}
         </label>
         <input
-          type="number"
+          type="text"
           step="0.01"
           value={uom3Val}
           onChange={handleUom3Change}
           placeholder="0"
-          className={`border rounded-md px-3 py-0.5 w-16 h-10 text-sm focus:ring-1 transition-all ${saleUnit === 'uomThree' && !isPurchase
+          className={`border rounded-md px-1 py-0.5 w-22 h-10 text-sm focus:ring-1 transition-all ${saleUnit === 'uomThree' && !isPurchase
             ? 'border-green-400 bg-green-50 focus:ring-green-500'
             : 'border-gray-300 focus:ring-purple-500'
             }`}
@@ -941,12 +941,12 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
           {data.uomTwo?.uom || 'DOZ'}
         </label>
         <input
-          type="number"
+          type="text"
           step="0.01"
           value={uom2Val}
           onChange={handleUom2Change}
           placeholder="0"
-          className={`border rounded-md px-3 py-0.5 w-16 h-10 text-sm focus:ring-1 transition-all ${saleUnit === 'uomTwo' && !isPurchase
+          className={`border rounded-md px-1 py-0.5 w-22 h-10 text-sm focus:ring-1 transition-all ${saleUnit === 'uomTwo' && !isPurchase
             ? 'border-green-400 bg-green-50 focus:ring-green-500'
             : 'border-gray-300 focus:ring-blue-500'
             }`}
@@ -970,12 +970,12 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
           {data.uom1?.uom || 'PCS'}
         </label>
         <input
-          type="number"
+          type="text"
           step="0.01"
           value={uom1Val}
           onChange={handleUom1Change}
           placeholder="0"
-          className={`border rounded-md px-3 py-0.5 w-16 h-10 text-sm focus:ring-1 transition-all ${saleUnit === 'uom1' && !isPurchase
+          className={`border rounded-md px-1 py-0.5 w-22 h-10 text-sm focus:ring-1 transition-all ${saleUnit === 'uom1' && !isPurchase
             ? 'border-green-400 bg-green-50 focus:ring-green-500'
             : 'border-gray-300 focus:ring-blue-500'
             }`}

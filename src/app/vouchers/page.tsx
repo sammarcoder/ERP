@@ -1,5 +1,5 @@
-import { VoucherDashboard } from '@/components/vouchers'
+// import { VoucherDashboard } from '@/components/vouchers'
 
-export default function VouchersPage() {
-  return <VoucherDashboard />
-}
+// export default function VouchersPage() {
+//   return <VoucherDashboard />
+// }

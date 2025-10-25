@@ -93,6 +93,12 @@ const ZCoa = sequelize.define('ZCoa', {
         defaultValue: false
     },
 
+    isPettyCash: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false
+    },
+
     // Discount fields remain the same
     discountA: {
         type: DataTypes.DECIMAL(5, 2),

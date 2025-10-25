@@ -1,6 +1,3 @@
-// const { ZsalesMan } = require('../models/zSalesMan.model');
-// const sequelize = require('../../config/database');
-
 const db = require('../models')
 const { ZsalesMan } = db
 

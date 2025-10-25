@@ -2207,25 +2207,6 @@ export function DispatchListWithVoucher() {
           />
         )}
       </div>
-
-      {/* COMMENTED OUT RESET CONFIRMATION */}
-      {/*
-      <ConfirmationModal
-        isOpen={showDeleteConfirm}
-        onClose={() => {
-          setShowDeleteConfirm(false)
-          setDispatchToResetVoucher(null)
-        }}
-        onConfirm={handleConfirmResetVoucher}
-        title="Reset Voucher Status"
-        message={`Reset voucher status for dispatch "${dispatchToResetVoucher?.Number}"?`}
-        confirmText="Yes, Reset"
-        cancelText="Cancel"
-        type="warning"
-        loading={deleteLoading}
-      />
-      */}
-
       {/* POST/UNPOST CONFIRMATION MODAL */}
       <ConfirmationModal
         isOpen={showJournalModal}

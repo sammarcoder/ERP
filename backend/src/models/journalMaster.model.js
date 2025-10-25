@@ -5,9 +5,7 @@ const JournalMaster = sequelize.define('JournalMaster', {
     date: {
         type: DataTypes.DATE,
         allowNull: false,
-        validate: {
-            notEmpty: true,
-        }
+       
     },
     stk_Main_ID: {
         type: DataTypes.INTEGER,
@@ -15,32 +13,22 @@ const JournalMaster = sequelize.define('JournalMaster', {
     voucherTypeId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        validate: {
-            notEmpty: true,
-        }
+      
     },
     voucherNo: {
         type: DataTypes.STRING(50),
         allowNull: false,
-        validate: {
-            notEmpty: true,
-        },
         unique: true,
     },
     balacingId: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        validate: {
-            notEmpty: true,
-        }
+     
     },
     status: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
-        validate: {
-            notEmpty: true,
-        }
     }
 }
 ,

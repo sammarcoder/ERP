@@ -5882,11 +5882,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                       <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-700 font-medium pointer-events-none z-10">
                         {master.Date ? OrderLogic.formatDateDisplay(master.Date) : 'Select date'}
                       </div>
-                      {/* <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div> */}
+                    
                     </div>
 
 
@@ -5984,19 +5980,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                               {/* PRODUCT/ITEM * */}
                               <span className="text-xs text-gray-400 ml-1">(select item)</span>
                             </label>
-                            {/* <EnhancedSelectableTable
-                              label=""
-                              name="Item_ID"
-                              value={detail.Item_ID}
-                              onChange={handleItemSelection}
-                              options={itemOptions}
-                              placeholder="select item"
-                              displayKey="label"
-                              valueKey="id"
-                              columns={itemColumns}
-                              pageSize={6}
-                              classData={classData}
-                            /> */}
+                           
                             <EnhancedSelectableTable
                               label=""
                               name="Item_ID"
@@ -6102,17 +6086,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                               </div>
                             </div>
                           </div>
-                          {/* <div className="col-span-3">
-                            <label className="text-xs text-gray-500 font-semibold mb-1 block">NOTES</label>
-                            <input
-                              type="text"
-                              value={detail.Remarks}
-                              onChange={(e) => handleDetailChange(index, 'Remarks', e.target.value)}
-                              className="w-full h-10 px-3 py-1 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Add notes"
-                              title="Add any notes for this line item"
-                            />
-                          </div> */}
+                        
                           {/* Delete Action */}
                           <div className="col-span-1 text-center">
                             <label className="text-xs text-gray-500 font-semibold mb-1 block">ACTION</label>
@@ -6158,70 +6132,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                           <div className=" w-70 grid grid-cols-12 gap-4 py-2 bg-white rounded-lg border-gray-200 mx-2 mb-2 shadow-sm">
                             <div className="col-span-1"></div>
 
-                            {/* Discount Fields */}
-                            {/* <div className="col-span-5">
-                              <div className="flex gap-3">
-                                <div className="flex-1">
-                                  <label className="text-xs text-gray-500 mb-1 block font-medium">TIER A (%)</label>
-                                  <div className="relative">
-                                    <NumberInput
-                                      value={detail.Discount_A}
-                                      onChange={(value) => handleDetailChange(index, 'Discount_A', value)}
-                                      className="w-full px-2 py-1 pr-8 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                      placeholder="0"
-                                      suffix="%"
-                                      min={0}
-                                      max={100}
-                                      step={0.01}
-                                    />
-                                  </div>
-                                </div>
-                                <div className="flex-1">
-                                  <label className="text-xs text-gray-500 mb-1 block font-medium">TIER B (%)</label>
-                                  <div className="relative">
-                                    <NumberInput
-                                      value={detail.Discount_B}
-                                      onChange={(value) => handleDetailChange(index, 'Discount_B', value)}
-                                      className="w-full px-2 py-1 pr-8 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                      placeholder="0"
-                                      suffix="%"
-                                      min={0}
-                                      max={100}
-                                      step={0.01}
-                                    />
-                                  </div>
-                                </div>
-                                <div className="flex-1">
-                                  <label className="text-xs text-gray-500 mb-1 block font-medium">TIER C (%)</label>
-                                  <div className="relative">
-                                    <NumberInput
-                                      value={detail.Discount_C}
-                                      onChange={(value) => handleDetailChange(index, 'Discount_C', value)}
-                                      className="w-full px-2 py-1 pr-8 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                      placeholder="0"
-                                      suffix="%"
-                                      min={0}
-                                      max={100}
-                                      step={0.01}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div> */}
-
-                            {/* Notes */}
-                            {/* <div className="col-span-3">
-                              <label className="text-xs text-gray-500 font-semibold mb-1 block">NOTES</label>
-                              <input
-                                type="text"
-                                value={detail.Remarks}
-                                onChange={(e) => handleDetailChange(index, 'Remarks', e.target.value)}
-                                className="w-full px-1 py-1 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Add notes for this line item..."
-                                title="Add any notes for this line item"
-                              />
-                            </div> */}
-
+                           
                             {/* Totals Display */}
                             <div className="col-span-3 grid grid-cols-2 gap-4 w-60">
                               <div>

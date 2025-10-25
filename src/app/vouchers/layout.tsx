@@ -1,8 +1,10 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Voucher Management | ERP System',
-  description: 'Manage sales and purchase vouchers',
+  // title: 'Voucher Management | ERP System',
+  // description: 'Manage sales and purchase vouchers',
+  title: '',
+  description: '',
 }
 
 export default function VouchersLayout({
@@ -12,7 +14,7 @@ export default function VouchersLayout({
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
+      {/* <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <h1 className="text-2xl font-bold text-gray-900">Voucher Management</h1>
@@ -21,8 +23,8 @@ export default function VouchersLayout({
             </div>
           </div>
         </div>
-      </div>
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      </div> */}
+      <main className="max-w-7xl mx-auto">
         {children}
       </main>
     </div>

@@ -33,7 +33,7 @@
 
 
 
-export { VoucherDashboard } from './VoucherDashboard'
+// export { VoucherDashboard } from './VoucherDashboard'
 export { SalesVoucher } from './SalesVoucher'
 export { PurchaseVoucher } from './PurchaseVoucehr'
 export { DispatchListWithVoucher } from './DispatchListWithVoucher'

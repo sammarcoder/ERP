@@ -59,15 +59,6 @@ const DispatchModal = ({
     return 'uom1';
   };
 
-
-
-
-
-
-
-
-
-
   // ✅ FUNCTION: Get UOM position number (1, 2, or 3)
   const getUomPositionNumber = (saleUnit, item) => {
     if (saleUnit === 'uom1') return 1;
@@ -77,18 +68,6 @@ const DispatchModal = ({
   };
 
   // In your stockDetails mapping:
-
-
-
-
-
-
-
-
-
-
-
-
 
   // NEW: Function to get COA name by ID
   const getCoaNameById = (coaId) => {
@@ -118,7 +97,7 @@ const DispatchModal = ({
 
   useEffect(() => {
     initializeModal();
-    console.log('this', availableBatches)
+    // console.log('this', availableBatches)
     // console.log('this is itemId',items,'122')
   }, [mode, salesOrder, dispatchId]);
 
@@ -283,7 +262,7 @@ const DispatchModal = ({
     try {
       for (const item of items) {
         if (item.Item_ID) {
-          const response = await fetch(`http://${window.location.hostname}:4000/api/dispatch/available-batches/64`);
+          const response = await fetch(`http://${window.location.hostname}:4000/api/dispatch/available-batches/${item.Item_ID}`);
           // const response = await fetch(`http://${window.location.hostname}:4000/api/dispatch/available-batches/${item.Item_ID}`);
           const result = await response.json();
 
@@ -469,7 +448,9 @@ const DispatchModal = ({
     console.log('Input batchNumber:', batchNumber, typeof batchNumber);
     console.log('availableBatches:', JSON.stringify(availableBatches, null, 2));
 
-    if (!itemId || !batchNumber) {
+    // if (!itemId || !batchNumber)
+    if (!itemId )
+       {
       console.log('❌ Missing required parameters');
       return 0;
     }
@@ -507,7 +488,6 @@ const DispatchModal = ({
 
     return available;
   };
-
 
 
   const getBatchOptions = (itemId) => {

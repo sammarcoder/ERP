@@ -44,6 +44,7 @@ const Sidebar = () => {
             path: null,
             subItems: [
                 { id: 'journal-voucher', title: 'Journal Voucher', path: '/vouchers/journal' },
+                // { id: 'journal-voucher', title: 'Journal Voucher', path: '/vouchers/journal' },
                 { id: 'petty-voucher', title: 'Petty Voucher', path: '/vouchers/petty' },
                 { id: 'purchase-voucher', title: 'Purchase Voucher', path: '/vouchers/purchase' },
                 { id: 'lc-voucher', title: 'LC Voucher', path: '/vouchers/lc' },
@@ -91,7 +92,9 @@ const Sidebar = () => {
             subItems: [
                 { id: 'items', title: 'Items', path: '/items' },
                 { id: 'item-class', title: 'Item Class', path: '/items-class' },
-                { id: 'uom', title: 'UOM', path: '/definition-inventory/uom' }
+                { id: 'uom', title: 'UOM', path: '/uom' },
+                { id: 'sales-man', title: 'Sales Man', path: '/salesMan' },
+                { id: 'currency', title: 'Currency', path: '/currency' }
             ]
         },
         {
