@@ -1,23 +1,11 @@
-// import React from 'react'
-// import ItemsClass from './ItmesClass'
-
-// const Page = () => {
-//   return (
-//     <div>
-//         <ItemsClass/>
-        
-//     </div>
-//   )
-// }
-
-// export default Page
 
 
 
-// 'use client'
-// import { ItemsClassManager } from '@/components/itemsClass/ItemsClassManager'
+// import ItemClassManager from '../../components/itemsClass/ItemsClassManager'
+
+
 // export default function ItemsClassPage() {
-//   return <ItemsClassManager />
+//   return <ItemClassManager />
 // }
 
 
@@ -37,9 +25,25 @@
 
 
 
-'use client'
-import { ItemClassManager } from '@/components/itemsClass/ItemsClassManager'
 
-export default function ControlHead2Page() {
-  return <ItemClassManager />
+
+
+
+
+
+
+
+
+import React from 'react'
+import ItemsClass from '../control-headTwo/ItmesClass'
+
+const Page = () => {
+  return (
+    <div>
+        <ItemsClass/>
+        
+    </div>
+  )
 }
+
+export default Page

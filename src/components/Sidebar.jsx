@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 
 const Sidebar = () => {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const [expandedSections, setExpandedSections] = useState({});
     const router = useRouter();
@@ -81,7 +81,9 @@ const Sidebar = () => {
             path: null,
             subItems: [
                 { id: 'coa', title: 'COA', path: '/coa' },
-                { id: 'purchase-order-def', title: 'Purchase Order', path: '/definition-ac/purchase-order' }
+                // { id: 'purchase-order-def', title: 'Purchase Order', path: '/definition-ac/purchase-order' },
+                 { id: 'currency', title: 'Currency', path: '/currency' },
+                 { id: 'control head 2', title: 'control head 2', path: '/control-headTwo' },
             ]
         },
         {
@@ -94,7 +96,7 @@ const Sidebar = () => {
                 { id: 'item-class', title: 'Item Class', path: '/items-class' },
                 { id: 'uom', title: 'UOM', path: '/uom' },
                 { id: 'sales-man', title: 'Sales Man', path: '/salesMan' },
-                { id: 'currency', title: 'Currency', path: '/currency' }
+                { id: 'Transpoter', title: 'Transporter', path: '/transporter' }
             ]
         },
         {
