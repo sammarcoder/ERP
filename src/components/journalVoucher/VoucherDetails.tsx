@@ -1156,7 +1156,7 @@ const VoucherDetails: React.FC<VoucherDetailsProps> = ({
 
         {/* ✅ NEW: Opening/Closing checkboxes + Add Row button */}
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <input
               type="checkbox"
               id="opening"
@@ -1180,7 +1180,7 @@ const VoucherDetails: React.FC<VoucherDetailsProps> = ({
             <label htmlFor="closing" className="text-sm font-medium text-gray-700">
               Closing
             </label>
-          </div>
+          </div> */}
 
           <Button
             variant="primary"

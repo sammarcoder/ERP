@@ -237,6 +237,18 @@ const VoucherHeader: React.FC<VoucherHeaderProps> = ({
         <div className="ml-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
           {filteredCoaAccounts.length} accounts available
         </div>
+         <div className="flex items-center space-x-2 ml-4">
+            <input
+              type="checkbox"
+              id="opening"
+              // checked={isOpening}
+              // onChange={(e) => setIsOpening(e.target.checked)}
+              className="h-4 w-4 text-[#509ee3] focus:ring-[#509ee3] border-gray-300 rounded"
+            />
+            <label htmlFor="opening" className="text-sm font-medium text-gray-700">
+              Opening
+            </label>
+          </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
