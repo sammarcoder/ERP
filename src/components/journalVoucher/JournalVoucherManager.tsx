@@ -62,7 +62,7 @@
 //   // Calculate totals for voucher
 //   const calculateVoucherTotals = (details: any[]) => {
 //     if (!details || !Array.isArray(details)) return { debit: 0, credit: 0 }
-    
+
 //     const debit = details.reduce((sum, detail) => sum + (detail.ownDb || 0), 0)
 //     const credit = details.reduce((sum, detail) => sum + (detail.ownCr || 0), 0)
 //     return { debit, credit }
@@ -123,7 +123,7 @@
 //             Manage your voucher entries ({filteredVouchers.length} total)
 //           </p>
 //         </div>
-        
+
 //         <div className="flex space-x-3">
 //           {(voucherType === 'all' || voucherType === 'journal') && (
 //             <Button 
@@ -163,7 +163,7 @@
 //               />
 //             </div>
 //           </div>
-          
+
 //           {searchTerm && (
 //             <Button
 //               variant="secondary"
@@ -227,7 +227,7 @@
 //                 {filteredVouchers.map((voucher: any) => {
 //                   const config = getVoucherTypeConfig(voucher.voucherTypeId)
 //                   const totals = calculateVoucherTotals(voucher.details || [])
-                  
+
 //                   return (
 //                     <tr key={voucher.id} className="hover:bg-gray-50 transition-colors">
 //                       {/* Voucher Info */}
@@ -424,26 +424,26 @@
 //   const { data: journalVouchers = [], isLoading: journalLoading, error: journalError } = useGetJournalVouchersByTypeQuery(undefined, {
 //     skip: voucherType === 'pettycash'
 //   })
-  
+
 //   const { data: pettyCashVouchers = [], isLoading: pettyCashLoading, error: pettyCashError } = useGetPettyCashVouchersByTypeQuery(undefined, {
 //     skip: voucherType === 'journal'
 //   })
-  
+
 //   const [deleteVoucher, { isLoading: isDeleting }] = useDeleteJournalVoucherMutation()
 //   const [postUnpostVoucher, { isLoading: isPostingUnposting }] = usePostUnpostVoucherMutation()
 
 //   // Combine vouchers based on type
 //   const allVouchers = useMemo(() => {
 //     let combined: any[] = []
-    
+
 //     if (voucherType === 'all' || voucherType === 'journal') {
 //       combined = [...combined, ...journalVouchers]
 //     }
-    
+
 //     if (voucherType === 'all' || voucherType === 'pettycash') {
 //       combined = [...combined, ...pettyCashVouchers]
 //     }
-    
+
 //     // Sort by creation date (newest first)
 //     return combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 //   }, [journalVouchers, pettyCashVouchers, voucherType])
@@ -477,7 +477,7 @@
 //   // Calculate totals for voucher
 //   const calculateVoucherTotals = (details: any[]) => {
 //     if (!details || !Array.isArray(details)) return { debit: 0, credit: 0 }
-    
+
 //     const debit = details.reduce((sum, detail) => sum + (detail.ownDb || 0), 0)
 //     const credit = details.reduce((sum, detail) => sum + (detail.ownCr || 0), 0)
 //     return { debit, credit }
@@ -555,7 +555,7 @@
 //             Manage your voucher entries ({filteredVouchers.length} total)
 //           </p>
 //         </div>
-        
+
 //         <div className="flex space-x-3">
 //           {(voucherType === 'all' || voucherType === 'journal') && (
 //             <Button 
@@ -595,7 +595,7 @@
 //               />
 //             </div>
 //           </div>
-          
+
 //           {searchTerm && (
 //             <Button
 //               variant="secondary"
@@ -658,7 +658,7 @@
 //                   const totals = calculateVoucherTotals(voucher.details || [])
 //                   const statusInfo = getVoucherStatusInfo(voucher.status)
 //                   const postUnpostInfo = getPostUnpostButtonInfo(voucher.status)
-                  
+
 //                   return (
 //                     <tr key={voucher.id} className="hover:bg-gray-50 transition-colors">
 //                       {/* Voucher Info */}
@@ -735,7 +735,7 @@
 //                           >
 //                             {postUnpostInfo.text}
 //                           </Button>
-                          
+
 //                           {/* Edit Button */}
 //                           <Button
 //                             variant="secondary"
@@ -744,7 +744,7 @@
 //                           >
 //                             Edit
 //                           </Button>
-                          
+
 //                           {/* Delete Button */}
 //                           <Button
 //                             variant="danger"
@@ -907,26 +907,26 @@
 //   const { data: journalVouchers = [], isLoading: journalLoading, error: journalError, refetch: refetchJournal } = useGetJournalVouchersByTypeQuery(undefined, {
 //     skip: voucherType === 'pettycash'
 //   })
-  
+
 //   const { data: pettyCashVouchers = [], isLoading: pettyCashLoading, error: pettyCashError, refetch: refetchPetty } = useGetPettyCashVouchersByTypeQuery(undefined, {
 //     skip: voucherType === 'journal'
 //   })
-  
+
 //   const [deleteVoucher, { isLoading: isDeleting }] = useDeleteJournalVoucherMutation()
 //   const [postUnpostVoucher, { isLoading: isPostingUnposting }] = usePostUnpostVoucherMutation()
 
 //   // Combine vouchers based on type
 //   const allVouchers = useMemo(() => {
 //     let combined: any[] = []
-    
+
 //     if (voucherType === 'all' || voucherType === 'journal') {
 //       combined = [...combined, ...journalVouchers]
 //     }
-    
+
 //     if (voucherType === 'all' || voucherType === 'pettycash') {
 //       combined = [...combined, ...pettyCashVouchers]
 //     }
-    
+
 //     return combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 //   }, [journalVouchers, pettyCashVouchers, voucherType])
 
@@ -981,7 +981,7 @@
 //   // Calculate totals for voucher
 //   const calculateVoucherTotals = (details: any[]) => {
 //     if (!details || !Array.isArray(details)) return { debit: 0, credit: 0 }
-    
+
 //     const debit = details.reduce((sum, detail) => sum + (detail.ownDb || 0), 0)
 //     const credit = details.reduce((sum, detail) => sum + (detail.ownCr || 0), 0)
 //     return { debit, credit }
@@ -1032,7 +1032,7 @@
 //         setSuccessMessage(`Voucher ${confirmModal.type}ed successfully!`)
 //       }
 //       setConfirmModal({ isOpen: false })
-      
+
 //       // Auto-hide success message
 //       setTimeout(() => setSuccessMessage(null), 5000)
 //     } catch (err) {
@@ -1216,7 +1216,7 @@
 //                   const statusInfo = getVoucherStatusInfo(voucher.status)
 //                   const postUnpostInfo = getPostUnpostButtonInfo(voucher.status)
 //                   const IconComponent = config.icon
-                  
+
 //                   return (
 //                     <tr key={voucher.id} className="hover:bg-blue-50 transition-colors duration-200">
 //                       {/* Voucher Info */}
@@ -1287,7 +1287,7 @@
 //                             {voucher.status ? <XCircle className="w-3 h-3 mr-1" /> : <CheckCircle className="w-3 h-3 mr-1" />}
 //                             {postUnpostInfo.text}
 //                           </button>
-                          
+
 //                           {/* Edit Button */}
 //                           <button
 //                             onClick={() => handleEdit(voucher)}
@@ -1297,7 +1297,7 @@
 //                             <Edit className="w-3 h-3 mr-1" />
 //                             Edit
 //                           </button>
-                          
+
 //                           {/* Delete Button */}
 //                           <button
 //                             onClick={() => handleDeleteClick(voucher.id)}
@@ -1442,11 +1442,11 @@
 //   const { data: journalVouchers = [], isLoading: journalLoading, refetch: refetchJournal } = useGetJournalVouchersByTypeQuery(undefined, {
 //     skip: voucherType === 'pettycash'
 //   })
-  
+
 //   const { data: pettyCashVouchers = [], isLoading: pettyCashLoading, refetch: refetchPetty } = useGetPettyCashVouchersByTypeQuery(undefined, {
 //     skip: voucherType === 'journal'
 //   })
-  
+
 //   const [deleteVoucher, { isLoading: isDeleting }] = useDeleteJournalVoucherMutation()
 //   const [postUnpostVoucher, { isLoading: isPostingUnposting }] = usePostUnpostVoucherMutation()
 
@@ -1553,7 +1553,7 @@
 //             {filteredVouchers.length} vouchers found
 //           </p>
 //         </div>
-        
+
 //         <div className="flex space-x-3">
 //           <Button
 //             variant="secondary"
@@ -1595,7 +1595,7 @@
 //               icon={<Search className="w-4 h-4" />}
 //             />
 //           </div>
-          
+
 //           <div className="flex space-x-2">
 //             <Button
 //               variant={statusFilter === 'all' ? 'primary' : 'secondary'}
@@ -1639,7 +1639,7 @@
 //             {filteredVouchers.map((voucher: any) => {
 //               const totals = calculateVoucherTotals(voucher.details || [])
 //               const isJournal = voucher.voucherTypeId === 10
-              
+
 //               return (
 //                 <tr key={voucher.id} className="hover:bg-gray-50">
 //                   <td className="px-6 py-4">
@@ -1653,7 +1653,7 @@
 //                       </div>
 //                     </div>
 //                   </td>
-                  
+
 //                   <td className="px-6 py-4">
 //                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
 //                       isJournal 
@@ -1892,11 +1892,11 @@
 //   const { data: journalVouchers = [], isLoading: journalLoading, refetch: refetchJournal } = useGetJournalVouchersByTypeQuery(undefined, {
 //     skip: voucherType === 'pettycash'
 //   })
-  
+
 //   const { data: pettyCashVouchers = [], isLoading: pettyCashLoading, refetch: refetchPetty } = useGetPettyCashVouchersByTypeQuery(undefined, {
 //     skip: voucherType === 'journal'
 //   })
-  
+
 //   const [deleteVoucher, { isLoading: isDeleting }] = useDeleteJournalVoucherMutation()
 //   const [postUnpostVoucher, { isLoading: isPostingUnposting }] = usePostUnpostVoucherMutation()
 
@@ -2010,7 +2010,7 @@
 //               Manage voucher entries and posting status • {filteredVouchers.length} total vouchers
 //             </p>
 //           </div>
-          
+
 //           <div className="flex space-x-3">
 //             <Button
 //               variant="secondary"
@@ -2056,7 +2056,7 @@
 //               icon={<Search className="w-4 h-4" />}
 //             />
 //           </div>
-          
+
 //           <div className="flex space-x-2">
 //             <Button
 //               variant={statusFilter === 'all' ? 'primary' : 'secondary'}
@@ -2102,7 +2102,7 @@
 //               const totals = calculateVoucherTotals(voucher.details || [])
 //               const isJournal = voucher.voucherTypeId === 10
 //               const serialNumber = index + 1 // ✅ SERIAL NUMBER starting from 1
-              
+
 //               return (
 //                 <tr key={voucher.id} className="hover:bg-blue-50 transition-colors duration-200">
 //                   {/* ✅ SERIAL NUMBER instead of ID */}
@@ -2120,7 +2120,7 @@
 //                       </div>
 //                     </div>
 //                   </td>
-                  
+
 //                   <td className="px-6 py-4">
 //                     <span className={`inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border ${
 //                       isJournal 
@@ -2193,7 +2193,7 @@
 //                       >
 //                         View
 //                       </Button>
-                      
+
 //                       <Button
 //                         variant={voucher.status ? "warning" : "success"}
 //                         size="sm"
@@ -2203,7 +2203,7 @@
 //                       >
 //                         {voucher.status ? 'Unpost' : 'Post'}
 //                       </Button>
-                      
+
 //                       <Button
 //                         variant="primary"
 //                         size="sm"
@@ -2213,7 +2213,7 @@
 //                       >
 //                         Edit
 //                       </Button>
-                      
+
 //                       <Button
 //                         variant="danger"
 //                         size="sm"
@@ -2309,7 +2309,7 @@
 //                   <tbody className="bg-white divide-y divide-gray-200">
 //                     {viewModal.voucher.details?.map((detail: any, index: number) => {
 //                       const isAutoBalance = detail.description === "Auto Balancing Entry"
-                      
+
 //                       return (
 //                         <tr 
 //                           key={index} 
@@ -2336,7 +2336,7 @@
 //                               )}
 //                             </div>
 //                           </td>
-                          
+
 //                           <td className="px-4 py-4">
 //                             <div className="text-sm font-medium text-gray-900">
 //                               {detail.coa?.acName || 'N/A'}
@@ -2345,7 +2345,7 @@
 //                               ID: {detail.coaId}
 //                             </div>
 //                           </td>
-                          
+
 //                           <td className="px-4 py-4">
 //                             <div className={`text-sm ${
 //                               isAutoBalance 
@@ -2360,7 +2360,7 @@
 //                               </div>
 //                             )}
 //                           </td>
-                          
+
 //                           <td className="px-4 py-4 text-right">
 //                             <div className={`text-sm font-bold ${
 //                               detail.ownDb > 0 
@@ -2370,7 +2370,7 @@
 //                               {formatAmount(detail.ownDb)}
 //                             </div>
 //                           </td>
-                          
+
 //                           <td className="px-4 py-4 text-right">
 //                             <div className={`text-sm font-bold ${
 //                               detail.ownCr > 0 
@@ -2380,7 +2380,7 @@
 //                               {formatAmount(detail.ownCr)}
 //                             </div>
 //                           </td>
-                          
+
 //                           <td className="px-4 py-4 text-center">
 //                             <span className={`inline-flex items-center px-2 py-1 text-xs font-bold rounded-full ${
 //                               detail.status 
@@ -2394,7 +2394,7 @@
 //                       )
 //                     })}
 //                   </tbody>
-                  
+
 //                   {/* Totals in Modal */}
 //                   <tfoot className="bg-gradient-to-r from-gray-100 to-gray-200">
 //                     <tr>
@@ -2530,10 +2530,10 @@ import { Loading } from '@/components/ui/Loading'
 import { ConfirmationModal } from '@/components/common/ConfirmationModal'
 import { useRouter } from 'next/navigation'
 import { formatDisplayDate, formatAmount } from '@/utils/formatters'
-import { 
-  Search, 
-  Plus, 
-  RefreshCw, 
+import {
+  Search,
+  Plus,
+  RefreshCw,
   FileText,
   DollarSign,
   Edit,
@@ -2563,11 +2563,11 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
   const { data: journalVouchers = [], isLoading: journalLoading, refetch: refetchJournal } = useGetJournalVouchersByTypeQuery(undefined, {
     skip: voucherType === 'pettycash'
   })
-  
+
   const { data: pettyCashVouchers = [], isLoading: pettyCashLoading, refetch: refetchPetty } = useGetPettyCashVouchersByTypeQuery(undefined, {
     skip: voucherType === 'journal'
   })
-  
+
   const [deleteVoucher, { isLoading: isDeleting }] = useDeleteJournalVoucherMutation()
   const [postUnpostVoucher, { isLoading: isPostingUnposting }] = usePostUnpostVoucherMutation()
 
@@ -2594,7 +2594,7 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
     }
 
     if (searchTerm.trim()) {
-      filtered = filtered.filter(voucher => 
+      filtered = filtered.filter(voucher =>
         voucher.voucherNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         voucher.id.toString().includes(searchTerm)
       )
@@ -2623,8 +2623,8 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
 
   const calculateVoucherTotals = (details: any[]) => {
     if (!details || !Array.isArray(details)) return { debit: 0, credit: 0 }
-    const debit = details.reduce((sum, detail) => sum + (detail.ownDb || 0), 0)
-    const credit = details.reduce((sum, detail) => sum + (detail.ownCr || 0), 0)
+    const debit = details.reduce((sum, detail) => sum + (detail.amountDb || 0), 0)
+    const credit = details.reduce((sum, detail) => sum + (detail.amountCr || 0), 0)
     return { debit, credit }
   }
 
@@ -2642,10 +2642,10 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
   }
 
   const handlePostUnpostClick = (voucherId: number, currentStatus: boolean) => {
-    setConfirmModal({ 
-      isOpen: true, 
-      voucherId, 
-      type: currentStatus ? 'unpost' : 'post' 
+    setConfirmModal({
+      isOpen: true,
+      voucherId,
+      type: currentStatus ? 'unpost' : 'post'
     })
   }
 
@@ -2680,15 +2680,15 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
           <div>
             <h1 className="text-2xl font-bold flex items-center">
               <Receipt className="w-8 h-8 mr-3" />
-              {voucherType === 'all' ? 'All Vouchers' : 
-               voucherType === 'journal' ? 'Journal Vouchers' : 
-               'Petty Cash Vouchers'} Management
+              {voucherType === 'all' ? 'All Vouchers' :
+                voucherType === 'journal' ? 'Journal Vouchers' :
+                  'Petty Cash Vouchers'} Management
             </h1>
             <p className="text-blue-100 mt-2">
               Manage voucher entries and posting status • {filteredVouchers.length} total vouchers
             </p>
           </div>
-          
+
           <div className="flex space-x-3">
             <Button
               variant="secondary"
@@ -2700,7 +2700,7 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
               Refresh
             </Button>
             {(voucherType === 'all' || voucherType === 'journal') && (
-              <Button 
+              <Button
                 variant="secondary"
                 onClick={() => handleCreate('journal')}
                 icon={<Plus className="w-4 h-4" />}
@@ -2710,7 +2710,7 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
               </Button>
             )}
             {(voucherType === 'all' || voucherType === 'pettycash') && (
-              <Button 
+              <Button
                 variant="secondary"
                 onClick={() => handleCreate('petty')}
                 icon={<Plus className="w-4 h-4" />}
@@ -2728,14 +2728,14 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex-1 max-w-[300px] ">
             <Input
-            className='w-96 '
+              className='w-96 '
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search vouchers by number or ID..."
               icon={<Search className="w-4 h-4" />}
             />
           </div>
-          
+
           <div className="flex space-x-2 mr-10">
             <Button
               variant={statusFilter === 'all' ? 'primary' : 'secondary'}
@@ -2782,13 +2782,12 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
               const isJournal = voucher.voucherTypeId === 10
               const serialNumber = index + 1 // ✅ Serial number starting from 1
               const isExpanded = expandedRows.has(voucher.id)
-              
+
               return (
                 <React.Fragment key={voucher.id}>
                   {/* ✅ MAIN ROW */}
-                  <tr className={`border-b border-gray-200 hover:bg-blue-50 transition-colors duration-200 ${
-                    isExpanded ? 'bg-blue-50' : ''
-                  }`}>
+                  <tr className={`border-b border-gray-200 hover:bg-blue-50 transition-colors duration-200 ${isExpanded ? 'bg-blue-50' : ''
+                    }`}>
                     {/* Serial Number */}
                     <td className="px-4 py-4">
                       <div className="w-8 h-8 bg-gradient-to-r from-[#509ee3] to-[#4990d6] text-white rounded-lg flex items-center justify-center text-sm font-bold shadow-md">
@@ -2803,14 +2802,13 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
                         <div className="text-xs text-gray-500">ID: {voucher.id}</div>
                       </div>
                     </td>
-                    
+
                     {/* Type */}
                     <td className="px-4 py-4">
-                      <span className={`inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border ${
-                        isJournal 
-                          ? 'bg-blue-100 text-blue-800 border-blue-300' 
+                      <span className={`inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border ${isJournal
+                          ? 'bg-blue-100 text-blue-800 border-blue-300'
                           : 'bg-green-100 text-green-800 border-green-300'
-                      }`}>
+                        }`}>
                         {isJournal ? (
                           <>
                             <FileText className="w-3 h-3 mr-1" />
@@ -2849,11 +2847,10 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
 
                     {/* Status */}
                     <td className="px-4 py-4">
-                      <span className={`inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border ${
-                        voucher.status 
-                          ? 'bg-green-100 text-green-800 border-green-300' 
+                      <span className={`inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border ${voucher.status
+                          ? 'bg-green-100 text-green-800 border-green-300'
                           : 'bg-red-100 text-red-800 border-red-300'
-                      }`}>
+                        }`}>
                         {voucher.status ? (
                           <>
                             <CheckCircle className="w-3 h-3 mr-1" />
@@ -2881,7 +2878,7 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
                         >
                           {isExpanded ? 'Hide' : 'View'}
                         </Button>
-                        
+
                         <Button
                           variant={voucher.status ? "warning" : "success"}
                           size="sm"
@@ -2891,7 +2888,7 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
                         >
                           {voucher.status ? 'Unpost' : 'Post'}
                         </Button>
-                        
+
                         <Button
                           variant="primary"
                           size="sm"
@@ -2901,7 +2898,7 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
                         >
                           Edit
                         </Button>
-                        
+
                         <Button
                           variant="danger"
                           size="sm"
@@ -2930,7 +2927,7 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
                             </div>
                           </div>
 
-                          {/* ✅ DETAILS TABLE with Auto-Balance Highlighting */}
+                          {/* ✅ FIXED: DETAILS TABLE - Use amountDb/amountCr instead of ownDb/ownCr */}
                           <div className="overflow-x-auto border border-gray-200 rounded-lg">
                             <table className="w-full">
                               <thead className="bg-gray-50">
@@ -2949,23 +2946,21 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
                               <tbody className="divide-y divide-gray-200">
                                 {voucher.details?.map((detail: any, detailIndex: number) => {
                                   const isAutoBalance = detail.description === "Auto Balancing Entry"
-                                  
+
                                   return (
-                                    <tr 
-                                      key={detailIndex} 
-                                      className={`transition-colors duration-200 ${
-                                        isAutoBalance 
-                                          ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-400' 
+                                    <tr
+                                      key={detailIndex}
+                                      className={`transition-colors duration-200 ${isAutoBalance
+                                          ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-400'
                                           : 'hover:bg-gray-50'
-                                      }`}
+                                        }`}
                                     >
                                       <td className="px-3 py-3">
                                         <div className="flex items-center">
-                                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                            isAutoBalance 
-                                              ? 'bg-yellow-400 text-yellow-900' 
+                                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isAutoBalance
+                                              ? 'bg-yellow-400 text-yellow-900'
                                               : 'bg-[#509ee3] text-white'
-                                          }`}>
+                                            }`}>
                                             {isAutoBalance ? '⚡' : detail.lineId}
                                           </div>
                                           {isAutoBalance && (
@@ -2973,44 +2968,37 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
                                           )}
                                         </div>
                                       </td>
-                                      
+
                                       <td className="px-3 py-3">
                                         <div className="text-sm font-medium text-gray-900">
                                           {detail.coa?.acName || 'N/A'}
                                         </div>
-                                        {/* <div className="text-xs text-gray-500">ID: {detail.coaId}</div> */}
                                       </td>
-                                      
+
                                       <td className="px-3 py-3">
-                                        <div className={`text-sm ${
-                                          isAutoBalance ? 'font-bold text-yellow-800' : 'text-gray-900'
-                                        }`}>
+                                        <div className={`text-sm ${isAutoBalance ? 'font-bold text-yellow-800' : 'text-gray-900'
+                                          }`}>
                                           {detail.description || '-'}
                                         </div>
-                                        {/* {isAutoBalance && (
-                                          <div className="text-xs text-yellow-600 font-medium">
-                                            System Generated
-                                          </div>
-                                        )} */}
                                       </td>
-                                      
+
+                                      {/* ✅ FIXED: Use amountDb instead of ownDb for DEBIT column */}
                                       <td className="px-3 py-3 text-right">
-                                        <div className={`text-sm font-bold ${
-                                          detail.ownDb > 0 
-                                            ? (isAutoBalance ? 'text-yellow-700' : 'text-green-600') 
+                                        <div className={`text-sm font-bold ${detail.amountDb > 0
+                                            ? (isAutoBalance ? 'text-yellow-700' : 'text-green-600')
                                             : 'text-gray-400'
-                                        }`}>
-                                          {formatAmount(detail.ownDb)}
+                                          }`}>
+                                          {formatAmount(detail.amountDb)}
                                         </div>
                                       </td>
-                                      
+
+                                      {/* ✅ FIXED: Use amountCr instead of ownCr for CREDIT column */}
                                       <td className="px-3 py-3 text-right">
-                                        <div className={`text-sm font-bold ${
-                                          detail.ownCr > 0 
-                                            ? (isAutoBalance ? 'text-yellow-700' : 'text-blue-600') 
+                                        <div className={`text-sm font-bold ${detail.amountCr > 0
+                                            ? (isAutoBalance ? 'text-yellow-700' : 'text-blue-600')
                                             : 'text-gray-400'
-                                        }`}>
-                                          {formatAmount(detail.ownCr)}
+                                          }`}>
+                                          {formatAmount(detail.amountCr)}
                                         </div>
                                       </td>
 
@@ -3052,21 +3040,20 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
                                           )}
                                         </div>
                                       </td>
-                                      
+
                                       <td className="px-3 py-3 text-center">
-                                        <span className={`inline-flex items-center px-2 py-1 text-xs font-bold rounded-full ${
-                                          detail.status 
-                                            ? 'bg-green-100 text-green-800' 
+                                        <span className={`inline-flex items-center px-2 py-1 text-xs font-bold rounded-full ${detail.status
+                                            ? 'bg-green-100 text-green-800'
                                             : 'bg-red-100 text-red-800'
-                                        }`}>
+                                          }`}>
                                           {detail.status ? 'Active' : 'Inactive'}
                                         </span>
                                       </td>
                                     </tr>
                                   )
                                 })}
-                                
-                                {/* Totals Row */}
+
+                                {/* ✅ FIXED: Totals Row - Make sure totals also use amountDb/amountCr */}
                                 <tr className="bg-gray-100 font-bold">
                                   <td colSpan={3} className="px-3 py-2 text-right text-gray-900">TOTALS:</td>
                                   <td className="px-3 py-2 text-right text-green-700">{formatAmount(totals.debit)}</td>
@@ -3084,6 +3071,8 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
                       </td>
                     </tr>
                   )}
+
+
                 </React.Fragment>
               )
             })}
@@ -3098,15 +3087,15 @@ export const JournalVoucherManager: React.FC<Props> = ({ voucherType = 'all' }) 
         onConfirm={handleConfirmAction}
         title={
           confirmModal.type === 'delete' ? 'Delete Voucher' :
-          confirmModal.type === 'post' ? 'Post Voucher' :
-          'Unpost Voucher'
+            confirmModal.type === 'post' ? 'Post Voucher' :
+              'Unpost Voucher'
         }
         message={
-          confirmModal.type === 'delete' 
+          confirmModal.type === 'delete'
             ? 'Are you sure you want to delete this voucher? This action cannot be undone.'
             : confirmModal.type === 'post'
-            ? 'Post this voucher? All details will become active.'
-            : 'Unpost this voucher? It will become draft again.'
+              ? 'Post this voucher? All details will become active.'
+              : 'Unpost this voucher? It will become draft again.'
         }
         confirmText={confirmModal.type === 'delete' ? 'Delete' : confirmModal.type === 'post' ? 'Post' : 'Unpost'}
         cancelText="Cancel"

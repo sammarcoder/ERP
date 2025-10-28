@@ -1524,6 +1524,1806 @@
 
 
 
+// 'use client'
+// import React, { useState, useMemo, useEffect } from 'react'
+// import { useRouter } from 'next/navigation'
+// import {
+//   useCreateJournalVoucherMutation,
+//   useUpdateJournalVoucherMutation,
+//   useGetCoaAccountsQuery,
+//   useGetCurrenciesQuery,
+// } from '@/store/slice/journalVoucherSlice'
+// import VoucherHeader from './VoucherHeader'
+// import VoucherDetails from './VoucherDetails'
+// import { Button } from '@/components/ui/Button'
+// import { ConfirmationModal } from '@/components/common/ConfirmationModal'
+// import { JournalDetail } from '@/types/journalVoucher'
+// import { Save, X } from 'lucide-react'
+
+// interface VoucherFormProps {
+//   mode: 'create' | 'edit'
+//   voucherType: 'journal' | 'pettycash'
+//   initialData?: {
+//     master: any
+//     details: any[]
+//   }
+// }
+
+// const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialData }) => {
+//   const router = useRouter()
+
+//   // Form configuration
+//   const config = {
+//     journal: {
+//       title: 'Journal Voucher',
+//       type: 10,
+//       coaFilter: 'isJvBalance',
+//       balanceLabel: 'Journal Balance Account'
+//     },
+//     pettycash: {
+//       title: 'Petty Cash Voucher',
+//       type: 14,
+//       coaFilter: 'isPettyCash',
+//       balanceLabel: 'Petty Cash Account'
+//     }
+//   }[voucherType]
+
+//   // State
+//   const [formData, setFormData] = useState({
+//     voucherNo: '',
+//     date: new Date().toISOString().split('T')[0],
+//     coaId: null as number | null,
+//     status: false
+//   })
+
+//   const [journalDetails, setJournalDetails] = useState<JournalDetail[]>([])
+//   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+//   // ✅ FIXED: Confirmation modal state with proper types
+//   const [confirmModal, setConfirmModal] = useState<{
+//     isOpen: boolean
+//     action: 'save' | 'cancel'
+//     title: string
+//     message: string
+//   }>({
+//     isOpen: false,
+//     action: 'save',
+//     title: '',
+//     message: ''
+//   })
+
+//   // RTK Queries & Mutations
+//   const { data: coaData = [] } = useGetCoaAccountsQuery()
+//   const { data: currencyData = [] } = useGetCurrenciesQuery()
+//   const [createVoucher, { isLoading: isCreating }] = useCreateJournalVoucherMutation()
+//   const [updateVoucher, { isLoading: isUpdating }] = useUpdateJournalVoucherMutation()
+
+//   // Filtered COA accounts
+//   const filteredCoaAccounts = useMemo(() => {
+//     return coaData
+//       .filter(account => account[config.coaFilter] === true)
+//       .map(account => ({
+//         id: account.id,
+//         label: `${account.acCode} - ${account.acName}`,
+//         acCode: account.acCode,
+//         acName: account.acName
+//       }))
+//   }, [coaData, config.coaFilter])
+
+//   // Currency options
+//   const currencyOptions = useMemo(() => {
+//     return currencyData.map(currency => ({
+//       id: currency.id,
+//       label: `${currency.currencyName}`,
+//       currencyName: currency.currencyName
+//     }))
+//   }, [currencyData])
+
+//   // Auto-balance filtering
+//   const isAutoBalanceEntry = (detail: any) => {
+//     if (!detail) return false
+
+//     const description = String(detail.description || '').toLowerCase().trim()
+
+//     const descriptionMatches = [
+//       'auto balancing entry',
+//       'auto balance entry',
+//       'auto balancing',
+//       'auto balance',
+//       'balancing entry',
+//       'system generated'
+//     ].some(match => description.includes(match))
+
+//     return descriptionMatches
+//   }
+
+//   // Load data for edit mode
+//   useEffect(() => {
+//     if (mode === 'edit' && initialData && initialData.details) {
+//       console.log('🔍 EDIT MODE - Loading data')
+
+//       setFormData({
+//         voucherNo: initialData.master.voucherNo || '',
+//         date: initialData.master.date ? new Date(initialData.master.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+//         coaId: initialData.master.balacingId || null,
+//         status: initialData.master.status || false
+//       })
+
+//       const manualEntries = initialData.details.filter((detail, index) => {
+//         const isAuto = isAutoBalanceEntry(detail)
+//         console.log(`Entry ${index + 1}: "${detail.description}" → Keep: ${!isAuto}`)
+//         return !isAuto
+//       })
+
+//       console.log(`🔍 Filtered: ${initialData.details.length} → ${manualEntries.length} entries`)
+
+//       const mappedEntries = manualEntries.map((detail, index) => ({
+//         lineId: index + 1,
+//         coaId: Number(detail.coaId) || 0,
+//         description: detail.description || '',
+//         chqNo: detail.chqNo || '',
+//         recieptNo: detail.recieptNo || '',
+//         ownDb: Number(detail.ownDb) || 0,
+//         ownCr: Number(detail.ownCr) || 0,
+//         rate: Number(detail.rate) || 1,
+//         amountDb: Number(detail.amountDb) || 0,
+//         amountCr: Number(detail.amountCr) || 0,
+//         isCost: Boolean(detail.isCost),
+//         currencyId: Number(detail.currencyId) || 1,
+//         status: Boolean(detail.status),
+//         idCard: detail.idCard || '',
+//         bank: detail.bank || '',
+//         bankDate: detail.bankDate || ''
+//       }))
+
+//       setJournalDetails(mappedEntries)
+
+//     } else {
+//       // CREATE MODE: Start with empty row
+//       setJournalDetails([{
+//         lineId: 1,
+//         coaId: 0,
+//         description: '',
+//         chqNo: '',
+//         recieptNo: '',
+//         ownDb: 0,
+//         ownCr: 0,
+//         rate: 1,
+//         amountDb: 0,
+//         amountCr: 0,
+//         isCost: false,
+//         currencyId: 1,
+//         status: false,
+//         idCard: '',
+//         bank: '',
+//         bankDate: ''
+//       }])
+//     }
+//   }, [mode, initialData])
+
+//   // Calculate totals
+//   const totals = useMemo(() => {
+//     const validEntries = journalDetails.filter(detail =>
+//       detail.coaId > 0 && (detail.ownDb > 0 || detail.ownCr > 0)
+//     )
+
+//     const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.ownDb) || 0), 0)
+//     const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.ownCr) || 0), 0)
+//     const difference = Math.abs(debitTotal - creditTotal)
+
+//     return { debitTotal, creditTotal, difference }
+//   }, [journalDetails])
+
+//   // Prepare submission data
+//   const prepareSubmissionData = () => {
+//     const validEntries = journalDetails.filter(detail => {
+//       const hasValidCoa = detail.coaId > 0
+//       const hasValidAmount = (Number(detail.ownDb) > 0 || Number(detail.ownCr) > 0)
+//       const isNotAutoBalance = !isAutoBalanceEntry(detail)
+
+//       return hasValidCoa && hasValidAmount && isNotAutoBalance
+//     })
+
+//     const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.ownDb) || 0), 0)
+//     const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.ownCr) || 0), 0)
+//     const difference = Math.abs(debitTotal - creditTotal)
+
+//     // let finalEntries = validEntries.map((detail, index) => ({
+//     //   lineId: index + 1,
+//     //   coaId: Number(detail.coaId),
+//     //   description: String(detail.description || ''),
+//     //   chqNo: String(detail.chqNo || ''),
+//     //   recieptNo: String(detail.recieptNo || ''),
+//     //   ownDb: Number(detail.ownDb || 0),
+//     //   ownCr: Number(detail.ownCr || 0),
+//     //   rate: Number(detail.rate || 1),
+//     //   amountDb: Number(detail.ownDb || 0),
+//     //   amountCr: Number(detail.ownCr || 0),
+//     //   isCost: Boolean(detail.isCost),
+//     //   currencyId: Number(detail.currencyId || 1),
+//     //   status: Boolean(detail.status),
+//     //   idCard: detail.idCard || null,
+//     //   bank: detail.bank || null,
+//     //   bankDate: detail.bankDate || null
+//     // }))
+//     // ✅ FIXED: Keep separate values
+//     let finalEntries = validEntries.map((detail, index) => ({
+//       lineId: index + 1,
+//       coaId: Number(detail.coaId),
+//       description: String(detail.description || ''),
+//       chqNo: String(detail.chqNo || ''),
+//       recieptNo: String(detail.recieptNo || ''),
+//       ownDb: Number(detail.ownDb || 0),      // ✅ Own Debit value
+//       ownCr: Number(detail.ownCr || 0),      // ✅ Own Credit value
+//       rate: Number(detail.rate || 1),
+//       amountDb: Number(detail.amountDb || 0), // ✅ Actual Debit value (separate)
+//       amountCr: Number(detail.amountCr || 0), // ✅ Actual Credit value (separate)
+//       isCost: Boolean(detail.isCost),
+//       currencyId: Number(detail.currencyId || 1),
+//       status: Boolean(detail.status),
+//       idCard: detail.idCard || null,
+//       bank: detail.bank || null,
+//       bankDate: detail.bankDate || null
+//     }))
+
+
+//     // Add auto-balance if needed
+//     if (difference > 0 && formData.coaId) {
+//       const autoBalanceEntry = {
+//         lineId: finalEntries.length + 1,
+//         coaId: Number(formData.coaId),
+//         description: 'Auto Balancing Entry',
+//         chqNo: '',
+//         recieptNo: '',
+//         ownDb: creditTotal > debitTotal ? difference : 0,
+//         ownCr: debitTotal > creditTotal ? difference : 0,
+//         rate: 1,
+//         amountDb: creditTotal > debitTotal ? difference : 0,
+//         amountCr: debitTotal > creditTotal ? difference : 0,
+//         isCost: false,
+//         currencyId: 1,
+//         status: true,
+//         idCard: null,
+//         bank: null,
+//         bankDate: null
+//       }
+
+//       finalEntries.push(autoBalanceEntry)
+//     }
+
+//     return finalEntries
+//   }
+
+//   // Form handlers
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target
+//     setFormData(prev => ({ ...prev, [name]: value }))
+//     if (errors[name]) {
+//       setErrors(prev => ({ ...prev, [name]: '' }))
+//     }
+//   }
+
+//   const handleCoaChange = (name: string, value: number | null) => {
+//     setFormData(prev => ({ ...prev, coaId: value }))
+//     if (errors.coaId) {
+//       setErrors(prev => ({ ...prev, coaId: '' }))
+//     }
+//   }
+
+//   const handleDetailChange = (index: number, field: string, value: any) => {
+//     setJournalDetails(prev => {
+//       const updated = [...prev]
+//       updated[index] = { ...updated[index], [field]: value }
+//       return updated
+//     })
+//   }
+
+//   const handleAddRow = () => {
+//     const newRow: JournalDetail = {
+//       lineId: journalDetails.length + 1,
+//       coaId: 0,
+//       description: '',
+//       chqNo: '',
+//       recieptNo: '',
+//       ownDb: 0,
+//       ownCr: 0,
+//       rate: 1,
+//       amountDb: 0,
+//       amountCr: 0,
+//       isCost: false,
+//       currencyId: 1,
+//       status: false,
+//       idCard: '',
+//       bank: '',
+//       bankDate: ''
+//     }
+//     setJournalDetails(prev => [...prev, newRow])
+//   }
+
+//   const handleRemoveRow = (index: number) => {
+//     if (journalDetails.length > 1) {
+//       setJournalDetails(prev => prev.filter((_, i) => i !== index))
+//     }
+//   }
+
+//   const validateForm = () => {
+//     const newErrors: { [key: string]: string } = {}
+
+//     if (!formData.voucherNo.trim()) {
+//       newErrors.voucherNo = 'Voucher number is required'
+//     }
+//     if (!formData.date) {
+//       newErrors.date = 'Date is required'
+//     }
+//     if (!formData.coaId) {
+//       newErrors.coaId = `${config.balanceLabel} is required`
+//     }
+
+//     const validDetails = journalDetails.filter(detail =>
+//       detail.coaId > 0 && (detail.ownDb > 0 || detail.ownCr > 0)
+//     )
+//     if (validDetails.length === 0) {
+//       newErrors.details = 'At least one journal detail is required'
+//     }
+
+//     setErrors(newErrors)
+//     return Object.keys(newErrors).length === 0
+//   }
+
+//   // ✅ FIXED: Handle save button click (show confirmation)
+//   const handleSaveClick = () => {
+//     if (!validateForm()) {
+//       console.log('🔍 Validation failed')
+//       return
+//     }
+
+//     setConfirmModal({
+//       isOpen: true,
+//       action: 'save',
+//       title: `${mode === 'create' ? 'Create' : 'Update'} ${config.title}`,
+//       message: `Are you sure you want to ${mode === 'create' ? 'create this new' : 'update this'} ${config.title.toLowerCase()}?`
+//     })
+//   }
+
+//   // ✅ FIXED: Handle cancel button click (show confirmation)
+//   const handleCancelClick = () => {
+//     setConfirmModal({
+//       isOpen: true,
+//       action: 'cancel',
+//       title: 'Cancel Changes',
+//       message: 'Are you sure you want to cancel? All unsaved changes will be lost.'
+//     })
+//   }
+
+//   // ✅ FIXED: Actual submit logic (called after confirmation)
+//   // const handleSubmit = async () => {
+//   //   try {
+//   //     const finalDetails = prepareSubmissionData()
+
+//   //     const submissionData = {
+//   //       master: {
+//   //         date: formData.date,
+//   //         voucherTypeId: config.type,
+//   //         voucherNo: formData.voucherNo,
+//   //         status: formData.status,
+//   //         balacingId: formData.coaId
+//   //       },
+//   //       details: finalDetails
+//   //     }
+
+//   //     console.log('🔍 SUBMITTING:', submissionData)
+
+//   //     if (mode === 'create') {
+//   //       await createVoucher(submissionData).unwrap()
+//   //       console.log('✅ Created successfully')
+//   //     } else {
+//   //       await updateVoucher({
+//   //         id: initialData?.master.id,
+//   //         ...submissionData
+//   //       }).unwrap()
+//   //       console.log('✅ Updated successfully')
+//   //     }
+
+//   //     router.push('/vouchers')
+//   //   } catch (err: any) {
+//   //     console.error('❌ Submit failed:', err)
+//   //     setErrors({ general: err?.data?.message || `Failed to ${mode} voucher` })
+//   //   }
+//   // }
+
+//   // // ✅ FIXED: Handle confirmation modal actions
+//   // const handleConfirmAction = async () => {
+//   //   setConfirmModal(prev => ({ ...prev, isOpen: false }))
+
+//   //   if (confirmModal.action === 'save') {
+//   //     await handleSubmit()
+//   //   } else if (confirmModal.action === 'cancel') {
+//   //     router.push('/vouchers')
+//   //   }
+//   // }
+
+
+
+
+
+
+
+
+
+
+//   const handleSubmit = async () => {
+//     try {
+//       const finalDetails = prepareSubmissionData()
+
+//       const submissionData = {
+//         master: {
+//           date: formData.date,
+//           voucherTypeId: config.type,
+//           voucherNo: formData.voucherNo,
+//           status: formData.status,
+//           balacingId: formData.coaId
+//         },
+//         details: finalDetails
+//       }
+
+//       console.log('🔍 SUBMITTING:', submissionData)
+
+//       if (mode === 'create') {
+//         await createVoucher(submissionData).unwrap()
+//         console.log('✅ Created successfully')
+//       } else {
+//         await updateVoucher({
+//           id: initialData?.master.id,
+//           ...submissionData
+//         }).unwrap()
+//         console.log('✅ Updated successfully')
+//       }
+
+//       // ✅ FIXED: Dynamic routing based on voucher type
+//       const redirectPath = voucherType === 'journal' ? '/vouchers/journal' : '/vouchers/petty'
+//       console.log('🔍 Redirecting to:', redirectPath)
+//       router.push(redirectPath)
+
+//     } catch (err: any) {
+//       console.error('❌ Submit failed:', err)
+//       setErrors({ general: err?.data?.message || `Failed to ${mode} voucher` })
+//     }
+//   }
+
+//   // ✅ FIXED: Handle confirmation modal actions with dynamic routing
+//   const handleConfirmAction = async () => {
+//     setConfirmModal(prev => ({ ...prev, isOpen: false }))
+
+//     if (confirmModal.action === 'save') {
+//       await handleSubmit()
+//     } else if (confirmModal.action === 'cancel') {
+//       // ✅ FIXED: Dynamic routing for cancel too
+//       const redirectPath = voucherType === 'journal' ? '/vouchers/journal' : '/vouchers/petty'
+//       console.log('🔍 Canceling, redirecting to:', redirectPath)
+//       router.push(redirectPath)
+//     }
+//   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//   const handleCancelConfirmation = () => {
+//     setConfirmModal(prev => ({ ...prev, isOpen: false }))
+//   }
+
+//   return (
+//     <div className="max-w-6xl mx-auto p-">
+//       <div className="">
+//         {/* Header */}
+//         <div className="">
+//           {/* <div>
+//             <h1 className="text-2xl font-bold text-gray-900">
+//               {mode === 'create' ? 'Create New' : 'Edit'} {config.title}
+//             </h1>
+//             <p className="text-gray-600 mt-1">
+//               {mode === 'create' ? 'Create a new voucher entry' : 'Update existing voucher entry'}
+//             </p>
+//           </div> */}
+//         </div>
+
+//         {/* Error Display */}
+//         {errors.general && (
+//           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+//             <div className="text-red-600">
+//               <strong>Error:</strong> {errors.general}
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Form Components */}
+//         <VoucherHeader
+//           voucherType={voucherType}
+//           formData={formData}
+//           filteredCoaAccounts={filteredCoaAccounts}
+//           errors={errors}
+//           onInputChange={handleInputChange}
+//           onCoaChange={handleCoaChange}
+//         />
+
+//         <VoucherDetails
+//           journalDetails={journalDetails}
+//           allCoaAccounts={coaData.map(account => ({
+//             id: account.id,
+//             label: `${account.acName}`,
+//             acCode: account.acCode,
+//             acName: account.acName
+//           }))}
+//           currencyOptions={currencyOptions}
+//           totals={totals}
+//           balancingCoaId={formData.coaId}
+//           onDetailChange={handleDetailChange}
+//           onAddRow={handleAddRow}
+//           onRemoveRow={handleRemoveRow}
+//         />
+
+//         {errors.details && (
+//           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+//             <div className="text-red-600">{errors.details}</div>
+//           </div>
+//         )}
+
+//         {/* ✅ FIXED: Bottom action buttons */}
+//         <div className="">
+//           <div className="flex items-center justify-end space-x-4">
+//             <Button
+//               type="button"
+//               variant="secondary"
+//               onClick={handleCancelClick}
+//               disabled={isCreating || isUpdating}
+//               icon={<X className="w-4 h-4" />}
+//               size="md"
+//             >
+//               Cancel
+//             </Button>
+//             <Button
+//               type="button"
+//               variant="primary"
+//               onClick={handleSaveClick}
+//               loading={isCreating || isUpdating}
+//               disabled={isCreating || isUpdating}
+//               icon={<Save className="w-4 h-4" />}
+//               size="md"
+//             >
+//               {mode === 'create' ? 'Create' : 'Update'} Voucher
+//             </Button>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* ✅ FIXED: Confirmation Modal with proper type handling */}
+//       {/* ✅ FIXED: Using correct type values */}
+//       <ConfirmationModal
+//         isOpen={confirmModal.isOpen}
+//         onClose={handleCancelConfirmation}
+//         onConfirm={handleConfirmAction}
+//         title={confirmModal.title}
+//         message={confirmModal.message}
+//         confirmText={confirmModal.action === 'save' ? (mode === 'create' ? 'Create' : 'Update') : 'Yes, Cancel'}
+//         cancelText={confirmModal.action === 'save' ? 'Review Again' : 'Keep Editing'}
+//         type={confirmModal.action === 'save' ? 'info' : 'warning'}
+//         loading={isCreating || isUpdating}
+//       />
+
+//     </div>
+//   )
+// }
+
+// export default VoucherForm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 'use client'
+// import React, { useState, useMemo, useEffect } from 'react'
+// import { useRouter } from 'next/navigation'
+// import {
+//   useCreateJournalVoucherMutation,
+//   useUpdateJournalVoucherMutation,
+//   useGetCoaAccountsQuery,
+//   useGetCurrenciesQuery,
+// } from '@/store/slice/journalVoucherSlice'
+// import VoucherHeader from './VoucherHeader'
+// import VoucherDetails from './VoucherDetails'
+// import { Button } from '@/components/ui/Button'
+// import { ConfirmationModal } from '@/components/common/ConfirmationModal'
+// import { JournalDetail } from '@/types/journalVoucher'
+// import { Save, X } from 'lucide-react'
+
+// interface VoucherFormProps {
+//   mode: 'create' | 'edit'
+//   voucherType: 'journal' | 'pettycash'
+//   initialData?: {
+//     master: any
+//     details: any[]
+//   }
+// }
+
+// const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialData }) => {
+//   const router = useRouter()
+
+//   // Form configuration
+//   const config = {
+//     journal: {
+//       title: 'Journal Voucher',
+//       type: 10,
+//       coaFilter: 'isJvBalance',
+//       balanceLabel: 'Journal Balance Account'
+//     },
+//     pettycash: {
+//       title: 'Petty Cash Voucher',
+//       type: 14,
+//       coaFilter: 'isPettyCash',
+//       balanceLabel: 'Petty Cash Account'
+//     }
+//   }[voucherType]
+
+//   // State
+//   const [formData, setFormData] = useState({
+//     voucherNo: '',
+//     date: new Date().toISOString().split('T')[0],
+//     coaId: null as number | null,
+//     status: false
+//   })
+
+//   const [journalDetails, setJournalDetails] = useState<JournalDetail[]>([])
+//   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+//   const [confirmModal, setConfirmModal] = useState<{
+//     isOpen: boolean
+//     action: 'save' | 'cancel'
+//     title: string
+//     message: string
+//   }>({
+//     isOpen: false,
+//     action: 'save',
+//     title: '',
+//     message: ''
+//   })
+
+//   // RTK Queries & Mutations
+//   const { data: coaData = [] } = useGetCoaAccountsQuery()
+//   const { data: currencyData = [] } = useGetCurrenciesQuery()
+//   const [createVoucher, { isLoading: isCreating }] = useCreateJournalVoucherMutation()
+//   const [updateVoucher, { isLoading: isUpdating }] = useUpdateJournalVoucherMutation()
+
+//   // Filtered COA accounts
+//   const filteredCoaAccounts = useMemo(() => {
+//     return coaData
+//       .filter(account => account[config.coaFilter] === true)
+//       .map(account => ({
+//         id: account.id,
+//         label: `${account.acCode} - ${account.acName}`,
+//         acCode: account.acCode,
+//         acName: account.acName
+//       }))
+//   }, [coaData, config.coaFilter])
+
+//   // Currency options
+//   const currencyOptions = useMemo(() => {
+//     return currencyData.map(currency => ({
+//       id: currency.id,
+//       label: `${currency.currencyName}`,
+//       currencyName: currency.currencyName
+//     }))
+//   }, [currencyData])
+
+//   // Auto-balance filtering
+//   const isAutoBalanceEntry = (detail: any) => {
+//     if (!detail) return false
+
+//     const description = String(detail.description || '').toLowerCase().trim()
+
+//     const descriptionMatches = [
+//       'auto balancing entry',
+//       'auto balance entry',
+//       'auto balancing',
+//       'auto balance',
+//       'balancing entry',
+//       'system generated'
+//     ].some(match => description.includes(match))
+
+//     return descriptionMatches
+//   }
+
+//   // Load data for edit mode
+//   useEffect(() => {
+//     if (mode === 'edit' && initialData && initialData.details) {
+//       console.log('🔍 EDIT MODE - Loading data')
+
+//       setFormData({
+//         voucherNo: initialData.master.voucherNo || '',
+//         date: initialData.master.date ? new Date(initialData.master.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+//         coaId: initialData.master.balacingId || null,
+//         status: initialData.master.status || false
+//       })
+
+//       const manualEntries = initialData.details.filter((detail, index) => {
+//         const isAuto = isAutoBalanceEntry(detail)
+//         console.log(`Entry ${index + 1}: "${detail.description}" → Keep: ${!isAuto}`)
+//         return !isAuto
+//       })
+
+//       console.log(`🔍 Filtered: ${initialData.details.length} → ${manualEntries.length} entries`)
+
+//       const mappedEntries = manualEntries.map((detail, index) => ({
+//         lineId: index + 1,
+//         coaId: Number(detail.coaId) || 0,
+//         description: detail.description || '',
+//         chqNo: detail.chqNo || '',
+//         recieptNo: detail.recieptNo || '',
+//         ownDb: Number(detail.ownDb) || 0,
+//         ownCr: Number(detail.ownCr) || 0,
+//         rate: Number(detail.rate) || 1,
+//         amountDb: Number(detail.amountDb) || 0,
+//         amountCr: Number(detail.amountCr) || 0,
+//         isCost: Boolean(detail.isCost),
+//         currencyId: Number(detail.currencyId) || 1,
+//         status: Boolean(detail.status),
+//         idCard: detail.idCard || '',
+//         bank: detail.bank || '',
+//         bankDate: detail.bankDate || ''
+//       }))
+
+//       setJournalDetails(mappedEntries)
+
+//     } else {
+//       // CREATE MODE: Start with empty row
+//       setJournalDetails([{
+//         lineId: 1,
+//         coaId: 0,
+//         description: '',
+//         chqNo: '',
+//         recieptNo: '',
+//         ownDb: 0,
+//         ownCr: 0,
+//         rate: 1,
+//         amountDb: 0,
+//         amountCr: 0,
+//         isCost: false,
+//         currencyId: 1,
+//         status: false,
+//         idCard: '',
+//         bank: '',
+//         bankDate: ''
+//       }])
+//     }
+//   }, [mode, initialData])
+
+//   // ✅ FIXED: Calculate totals from DEBIT and CREDIT columns ONLY (not own fields)
+//   const totals = useMemo(() => {
+//     const validEntries = journalDetails.filter(detail =>
+//       detail.coaId > 0 && (detail.amountDb > 0 || detail.amountCr > 0) // ✅ FIXED: Use amountDb/amountCr
+//     )
+
+//     // ✅ FIXED: Calculate from DEBIT and CREDIT columns only
+//     const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountDb) || 0), 0)
+//     const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountCr) || 0), 0)
+//     const difference = Math.abs(debitTotal - creditTotal)
+
+//     return { debitTotal, creditTotal, difference }
+//   }, [journalDetails])
+
+//   // ✅ FIXED: Prepare submission data based on DEBIT/CREDIT columns only
+//   const prepareSubmissionData = () => {
+//     const validEntries = journalDetails.filter(detail => {
+//       const hasValidCoa = detail.coaId > 0
+//       const hasValidAmount = (Number(detail.amountDb) > 0 || Number(detail.amountCr) > 0) // ✅ FIXED: Use amountDb/amountCr
+//       const isNotAutoBalance = !isAutoBalanceEntry(detail)
+
+//       return hasValidCoa && hasValidAmount && isNotAutoBalance
+//     })
+
+//     // ✅ FIXED: Calculate totals from DEBIT and CREDIT columns only
+//     const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountDb) || 0), 0)
+//     const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountCr) || 0), 0)
+//     const difference = Math.abs(debitTotal - creditTotal)
+
+//     let finalEntries = validEntries.map((detail, index) => ({
+//       lineId: index + 1,
+//       coaId: Number(detail.coaId),
+//       description: String(detail.description || ''),
+//       chqNo: String(detail.chqNo || ''),
+//       recieptNo: String(detail.recieptNo || ''),
+//       ownDb: Number(detail.ownDb || 0),      // ✅ Independent optional fields
+//       ownCr: Number(detail.ownCr || 0),      // ✅ Independent optional fields
+//       rate: Number(detail.rate || 1),
+//       amountDb: Number(detail.amountDb || 0), // ✅ Main DEBIT field
+//       amountCr: Number(detail.amountCr || 0), // ✅ Main CREDIT field
+//       isCost: Boolean(detail.isCost),
+//       currencyId: Number(detail.currencyId || 1),
+//       status: Boolean(detail.status),
+//       idCard: detail.idCard || null,
+//       bank: detail.bank || null,
+//       bankDate: detail.bankDate || null
+//     }))
+
+//     // ✅ FIXED: Auto-balance based on DEBIT vs CREDIT difference only
+//     if (difference > 0 && formData.coaId) {
+//       const autoBalanceEntry = {
+//         lineId: finalEntries.length + 1,
+//         coaId: Number(formData.coaId),
+//         description: 'Auto Balancing Entry',
+//         chqNo: '',
+//         recieptNo: '',
+//         ownDb: 0,  // ✅ Auto-balance doesn't use own fields
+//         ownCr: 0,  // ✅ Auto-balance doesn't use own fields
+//         rate: 1,
+//         amountDb: creditTotal > debitTotal ? difference : 0,  // ✅ Based on DEBIT/CREDIT only
+//         amountCr: debitTotal > creditTotal ? difference : 0,  // ✅ Based on DEBIT/CREDIT only
+//         isCost: false,
+//         currencyId: 1,
+//         status: true,
+//         idCard: null,
+//         bank: null,
+//         bankDate: null
+//       }
+
+//       finalEntries.push(autoBalanceEntry)
+//     }
+
+//     return finalEntries
+//   }
+
+//   // Form handlers
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target
+//     setFormData(prev => ({ ...prev, [name]: value }))
+//     if (errors[name]) {
+//       setErrors(prev => ({ ...prev, [name]: '' }))
+//     }
+//   }
+
+//   const handleCoaChange = (name: string, value: number | null) => {
+//     setFormData(prev => ({ ...prev, coaId: value }))
+//     if (errors.coaId) {
+//       setErrors(prev => ({ ...prev, coaId: '' }))
+//     }
+//   }
+
+//   const handleDetailChange = (index: number, field: string, value: any) => {
+//     setJournalDetails(prev => {
+//       const updated = [...prev]
+//       updated[index] = { ...updated[index], [field]: value }
+//       return updated
+//     })
+//   }
+
+//   const handleAddRow = () => {
+//     const newRow: JournalDetail = {
+//       lineId: journalDetails.length + 1,
+//       coaId: 0,
+//       description: '',
+//       chqNo: '',
+//       recieptNo: '',
+//       ownDb: 0,
+//       ownCr: 0,
+//       rate: 1,
+//       amountDb: 0,
+//       amountCr: 0,
+//       isCost: false,
+//       currencyId: 1,
+//       status: false,
+//       idCard: '',
+//       bank: '',
+//       bankDate: ''
+//     }
+//     setJournalDetails(prev => [...prev, newRow])
+//   }
+
+//   const handleRemoveRow = (index: number) => {
+//     if (journalDetails.length > 1) {
+//       setJournalDetails(prev => prev.filter((_, i) => i !== index))
+//     }
+//   }
+
+//   // ✅ FIXED: Validation based on DEBIT/CREDIT columns only
+//   const validateForm = () => {
+//     const newErrors: { [key: string]: string } = {}
+
+//     if (!formData.voucherNo.trim()) {
+//       newErrors.voucherNo = 'Voucher number is required'
+//     }
+//     if (!formData.date) {
+//       newErrors.date = 'Date is required'
+//     }
+//     if (!formData.coaId) {
+//       newErrors.coaId = `${config.balanceLabel} is required`
+//     }
+
+//     // ✅ FIXED: Validate based on DEBIT/CREDIT columns only
+//     const validDetails = journalDetails.filter(detail =>
+//       detail.coaId > 0 && (detail.amountDb > 0 || detail.amountCr > 0) // ✅ FIXED: Use amountDb/amountCr
+//     )
+//     if (validDetails.length === 0) {
+//       newErrors.details = 'At least one journal detail with debit or credit amount is required'
+//     }
+
+//     setErrors(newErrors)
+//     return Object.keys(newErrors).length === 0
+//   }
+
+//   const handleSaveClick = () => {
+//     if (!validateForm()) {
+//       console.log('🔍 Validation failed')
+//       return
+//     }
+
+//     setConfirmModal({
+//       isOpen: true,
+//       action: 'save',
+//       title: `${mode === 'create' ? 'Create' : 'Update'} ${config.title}`,
+//       message: `Are you sure you want to ${mode === 'create' ? 'create this new' : 'update this'} ${config.title.toLowerCase()}?`
+//     })
+//   }
+
+//   const handleCancelClick = () => {
+//     setConfirmModal({
+//       isOpen: true,
+//       action: 'cancel',
+//       title: 'Cancel Changes',
+//       message: 'Are you sure you want to cancel? All unsaved changes will be lost.'
+//     })
+//   }
+
+//   const handleSubmit = async () => {
+//     try {
+//       const finalDetails = prepareSubmissionData()
+
+//       const submissionData = {
+//         master: {
+//           date: formData.date,
+//           voucherTypeId: config.type,
+//           voucherNo: formData.voucherNo,
+//           status: formData.status,
+//           balacingId: formData.coaId
+//         },
+//         details: finalDetails
+//       }
+
+//       console.log('🔍 SUBMITTING:', submissionData)
+
+//       if (mode === 'create') {
+//         await createVoucher(submissionData).unwrap()
+//         console.log('✅ Created successfully')
+//       } else {
+//         await updateVoucher({
+//           id: initialData?.master.id,
+//           ...submissionData
+//         }).unwrap()
+//         console.log('✅ Updated successfully')
+//       }
+
+//       const redirectPath = voucherType === 'journal' ? '/vouchers/journal' : '/vouchers/petty'
+//       console.log('🔍 Redirecting to:', redirectPath)
+//       router.push(redirectPath)
+
+//     } catch (err: any) {
+//       console.error('❌ Submit failed:', err)
+//       setErrors({ general: err?.data?.message || `Failed to ${mode} voucher` })
+//     }
+//   }
+
+//   const handleConfirmAction = async () => {
+//     setConfirmModal(prev => ({ ...prev, isOpen: false }))
+
+//     if (confirmModal.action === 'save') {
+//       await handleSubmit()
+//     } else if (confirmModal.action === 'cancel') {
+//       const redirectPath = voucherType === 'journal' ? '/vouchers/journal' : '/vouchers/petty'
+//       console.log('🔍 Canceling, redirecting to:', redirectPath)
+//       router.push(redirectPath)
+//     }
+//   }
+
+//   const handleCancelConfirmation = () => {
+//     setConfirmModal(prev => ({ ...prev, isOpen: false }))
+//   }
+
+//   return (
+//     <div className="max-w-6xl mx-auto p-">
+//       <div className="">
+//         {/* Error Display */}
+//         {errors.general && (
+//           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+//             <div className="text-red-600">
+//               <strong>Error:</strong> {errors.general}
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Form Components */}
+//         <VoucherHeader
+//           voucherType={voucherType}
+//           formData={formData}
+//           filteredCoaAccounts={filteredCoaAccounts}
+//           errors={errors}
+//           onInputChange={handleInputChange}
+//           onCoaChange={handleCoaChange}
+//         />
+
+//         <VoucherDetails
+//           journalDetails={journalDetails}
+//           allCoaAccounts={coaData.map(account => ({
+//             id: account.id,
+//             label: `${account.acName}`,
+//             acCode: account.acCode,
+//             acName: account.acName
+//           }))}
+//           currencyOptions={currencyOptions}
+//           totals={totals}
+//           balancingCoaId={formData.coaId}
+//           onDetailChange={handleDetailChange}
+//           onAddRow={handleAddRow}
+//           onRemoveRow={handleRemoveRow}
+//         />
+
+//         {errors.details && (
+//           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+//             <div className="text-red-600">{errors.details}</div>
+//           </div>
+//         )}
+
+//         {/* Bottom action buttons */}
+//         <div className="">
+//           <div className="flex items-center justify-end space-x-4">
+//             <Button
+//               type="button"
+//               variant="secondary"
+//               onClick={handleCancelClick}
+//               disabled={isCreating || isUpdating}
+//               icon={<X className="w-4 h-4" />}
+//               size="md"
+//             >
+//               Cancel
+//             </Button>
+//             <Button
+//               type="button"
+//               variant="primary"
+//               onClick={handleSaveClick}
+//               loading={isCreating || isUpdating}
+//               disabled={isCreating || isUpdating}
+//               icon={<Save className="w-4 h-4" />}
+//               size="md"
+//             >
+//               {mode === 'create' ? 'Create' : 'Update'} Voucher
+//             </Button>
+//           </div>
+//         </div>
+//       </div>
+
+//       <ConfirmationModal
+//         isOpen={confirmModal.isOpen}
+//         onClose={handleCancelConfirmation}
+//         onConfirm={handleConfirmAction}
+//         title={confirmModal.title}
+//         message={confirmModal.message}
+//         confirmText={confirmModal.action === 'save' ? (mode === 'create' ? 'Create' : 'Update') : 'Yes, Cancel'}
+//         cancelText={confirmModal.action === 'save' ? 'Review Again' : 'Keep Editing'}
+//         type={confirmModal.action === 'save' ? 'info' : 'warning'}
+//         loading={isCreating || isUpdating}
+//       />
+//     </div>
+//   )
+// }
+
+// export default VoucherForm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 'use client'
+// import React, { useState, useMemo, useEffect } from 'react'
+// import { useRouter } from 'next/navigation'
+// import {
+//   useCreateJournalVoucherMutation,
+//   useUpdateJournalVoucherMutation,
+//   useGetCoaAccountsQuery,
+//   useGetCurrenciesQuery,
+// } from '@/store/slice/journalVoucherSlice'
+// import VoucherHeader from './VoucherHeader'
+// import VoucherDetails from './VoucherDetails'
+// import { Button } from '@/components/ui/Button'
+// import { ConfirmationModal } from '@/components/common/ConfirmationModal'
+// import { JournalDetail } from '@/types/journalVoucher'
+// import { Save, X } from 'lucide-react'
+
+// interface VoucherFormProps {
+//   mode: 'create' | 'edit'
+//   voucherType: 'journal' | 'pettycash'
+//   initialData?: {
+//     master: any
+//     details: any[]
+//   }
+// }
+
+// const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialData }) => {
+//   const router = useRouter()
+
+//   const config = {
+//     journal: {
+//       title: 'Journal Voucher',
+//       type: 10,
+//       coaFilter: 'isJvBalance',
+//       balanceLabel: 'Journal Balance Account'
+//     },
+//     pettycash: {
+//       title: 'Petty Cash Voucher',
+//       type: 14,
+//       coaFilter: 'isPettyCash',
+//       balanceLabel: 'Petty Cash Account'
+//     }
+//   }[voucherType]
+
+//   const [formData, setFormData] = useState({
+//     voucherNo: '',
+//     date: new Date().toISOString().split('T')[0],
+//     coaId: null as number | null,
+//     status: false
+//   })
+
+//   const [journalDetails, setJournalDetails] = useState<JournalDetail[]>([])
+//   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+//   const [confirmModal, setConfirmModal] = useState<{
+//     isOpen: boolean
+//     action: 'save' | 'cancel'
+//     title: string
+//     message: string
+//   }>({
+//     isOpen: false,
+//     action: 'save',
+//     title: '',
+//     message: ''
+//   })
+
+//   const { data: coaData = [] } = useGetCoaAccountsQuery()
+//   const { data: currencyData = [] } = useGetCurrenciesQuery()
+//   const [createVoucher, { isLoading: isCreating }] = useCreateJournalVoucherMutation()
+//   const [updateVoucher, { isLoading: isUpdating }] = useUpdateJournalVoucherMutation()
+
+//   const filteredCoaAccounts = useMemo(() => {
+//     return coaData
+//       .filter(account => account[config.coaFilter] === true)
+//       .map(account => ({
+//         id: account.id,
+//         label: `${account.acCode} - ${account.acName}`,
+//         acCode: account.acCode,
+//         acName: account.acName
+//       }))
+//   }, [coaData, config.coaFilter])
+
+//   // ✅ FIXED: Currency options - NO "Select Currency" placeholder
+//   const currencyOptions = useMemo(() => {
+//     return currencyData.map(currency => ({
+//       id: currency.id,
+//       label: `${currency.currencyName}`,
+//       currencyName: currency.currencyName
+//     }))
+//     // ✅ REMOVED: No "Select Currency" option added
+//   }, [currencyData])
+
+//   const isAutoBalanceEntry = (detail: any) => {
+//     if (!detail) return false
+
+//     const description = String(detail.description || '').toLowerCase().trim()
+
+//     const descriptionMatches = [
+//       'auto balancing entry',
+//       'auto balance entry',
+//       'auto balancing',
+//       'auto balance',
+//       'balancing entry',
+//       'system generated'
+//     ].some(match => description.includes(match))
+
+//     return descriptionMatches
+//   }
+
+//   useEffect(() => {
+//     if (mode === 'edit' && initialData && initialData.details) {
+//       console.log('🔍 EDIT MODE - Loading data')
+
+//       setFormData({
+//         voucherNo: initialData.master.voucherNo || '',
+//         date: initialData.master.date ? new Date(initialData.master.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+//         coaId: initialData.master.balacingId || null,
+//         status: initialData.master.status || false
+//       })
+
+//       const manualEntries = initialData.details.filter((detail, index) => {
+//         const isAuto = isAutoBalanceEntry(detail)
+//         console.log(`Entry ${index + 1}: "${detail.description}" → Keep: ${!isAuto}`)
+//         return !isAuto
+//       })
+
+//       console.log(`🔍 Filtered: ${initialData.details.length} → ${manualEntries.length} entries`)
+
+//       const mappedEntries = manualEntries.map((detail, index) => ({
+//         lineId: index + 1,
+//         coaId: Number(detail.coaId) || 0,
+//         description: detail.description || '',
+//         chqNo: detail.chqNo || '',
+//         recieptNo: detail.recieptNo || '',
+//         ownDb: Number(detail.ownDb) || 0,
+//         ownCr: Number(detail.ownCr) || 0,
+//         rate: 0,
+//         amountDb: Number(detail.amountDb) || 0,
+//         amountCr: Number(detail.amountCr) || 0,
+//         isCost: Boolean(detail.isCost),
+//         currencyId: Number(detail.currencyId) || null,
+//         status: Boolean(detail.status),
+//         idCard: detail.idCard || '',
+//         bank: detail.bank || '',
+//         bankDate: detail.bankDate || ''
+//       }))
+
+//       setJournalDetails(mappedEntries)
+
+//     } else {
+//       // ✅ CREATE MODE
+//       setJournalDetails([{
+//         lineId: 1,
+//         coaId: 0,
+//         description: '',
+//         chqNo: '',
+//         recieptNo: '',
+//         ownDb: 0,
+//         ownCr: 0,
+//         rate: 0,
+//         amountDb: 0,
+//         amountCr: 0,
+//         isCost: false,
+//         currencyId: null,  // ✅ Default to null
+//         status: false,
+//         idCard: '',
+//         bank: '',
+//         bankDate: ''
+//       }])
+//     }
+//   }, [mode, initialData])
+
+//   const totals = useMemo(() => {
+//     const validEntries = journalDetails.filter(detail =>
+//       detail.coaId > 0 && (detail.amountDb > 0 || detail.amountCr > 0)
+//     )
+
+//     const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountDb) || 0), 0)
+//     const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountCr) || 0), 0)
+//     const difference = Math.abs(debitTotal - creditTotal)
+
+//     return { debitTotal, creditTotal, difference }
+//   }, [journalDetails])
+
+//   const prepareSubmissionData = () => {
+//     const validEntries = journalDetails.filter(detail => {
+//       const hasValidCoa = detail.coaId > 0
+//       const hasValidAmount = (Number(detail.amountDb) > 0 || Number(detail.amountCr) > 0)
+//       const isNotAutoBalance = !isAutoBalanceEntry(detail)
+
+//       return hasValidCoa && hasValidAmount && isNotAutoBalance
+//     })
+
+//     const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountDb) || 0), 0)
+//     const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountCr) || 0), 0)
+//     const difference = Math.abs(debitTotal - creditTotal)
+
+//     let finalEntries = validEntries.map((detail, index) => ({
+//       lineId: index + 1,
+//       coaId: Number(detail.coaId),
+//       description: String(detail.description || ''),
+//       chqNo: String(detail.chqNo || ''),
+//       recieptNo: String(detail.recieptNo || ''),
+//       ownDb: Number(detail.ownDb || 0),
+//       ownCr: Number(detail.ownCr || 0),
+//       rate: Number(detail.rate || 0),
+//       amountDb: Number(detail.amountDb || 0),
+//       amountCr: Number(detail.amountCr || 0),
+//       isCost: Boolean(detail.isCost),
+//       currencyId: Number(detail.currencyId || 0),
+//       status: Boolean(detail.status),
+//       idCard: detail.idCard || null,
+//       bank: detail.bank || null,
+//       bankDate: detail.bankDate || null
+//     }))
+
+//     // ✅ FIXED: Auto-balance entry with currencyId: null
+//     if (difference > 0 && formData.coaId) {
+//       const autoBalanceEntry = {
+//         lineId: finalEntries.length + 1,
+//         coaId: Number(formData.coaId),
+//         description: 'Auto Balancing Entry',
+//         chqNo: '',
+//         recieptNo: '',
+//         ownDb: 0,
+//         ownCr: 0,
+//         rate: 0,
+//         amountDb: creditTotal > debitTotal ? difference : 0,
+//         amountCr: debitTotal > creditTotal ? difference : 0,
+//         isCost: false,
+//         currencyId: null,  // ✅ Auto-balance uses null for currency
+//         status: true,
+//         idCard: null,
+//         bank: null,
+//         bankDate: null
+//       }
+
+//       finalEntries.push(autoBalanceEntry)
+//     }
+
+//     return finalEntries
+//   }
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target
+//     setFormData(prev => ({ ...prev, [name]: value }))
+//     if (errors[name]) {
+//       setErrors(prev => ({ ...prev, [name]: '' }))
+//     }
+//   }
+
+//   const handleCoaChange = (name: string, value: number | null) => {
+//     setFormData(prev => ({ ...prev, coaId: value }))
+//     if (errors.coaId) {
+//       setErrors(prev => ({ ...prev, coaId: '' }))
+//     }
+//   }
+
+//   const handleDetailChange = (index: number, field: string, value: any) => {
+//     setJournalDetails(prev => {
+//       const updated = [...prev]
+//       updated[index] = { ...updated[index], [field]: value }
+//       return updated
+//     })
+//   }
+
+//   const handleAddRow = () => {
+//     const newRow: JournalDetail = {
+//       lineId: journalDetails.length + 1,
+//       coaId: 0,
+//       description: '',
+//       chqNo: '',
+//       recieptNo: '',
+//       ownDb: 0,
+//       ownCr: 0,
+//       rate: 0,
+//       amountDb: 0,
+//       amountCr: 0,
+//       isCost: false,
+//       currencyId: null,  // ✅ Default to null
+//       status: false,
+//       idCard: '',
+//       bank: '',
+//       bankDate: ''
+//     }
+//     setJournalDetails(prev => [...prev, newRow])
+//   }
+
+//   const handleRemoveRow = (index: number) => {
+//     if (journalDetails.length > 1) {
+//       setJournalDetails(prev => prev.filter((_, i) => i !== index))
+//     }
+//   }
+
+//   // ✅ FIXED: Validation with currency required
+//   const validateForm = () => {
+//     const newErrors: { [key: string]: string } = {}
+
+//     if (!formData.voucherNo.trim()) {
+//       newErrors.voucherNo = 'Voucher number is required'
+//     }
+//     if (!formData.date) {
+//       newErrors.date = 'Date is required'
+//     }
+//     if (!formData.coaId) {
+//       newErrors.coaId = `${config.balanceLabel} is required`
+//     }
+
+//     const validDetails = journalDetails.filter(detail =>
+//       detail.coaId > 0 && (detail.amountDb > 0 || detail.amountCr > 0)
+//     )
+    
+//     if (validDetails.length === 0) {
+//       newErrors.details = 'At least one journal detail with debit or credit amount is required'
+//     }
+
+//     // ✅ NEW: Check if any manual entry is missing currency
+//     const entriesWithoutCurrency = validDetails.filter(detail => !detail.currencyId)
+//     if (entriesWithoutCurrency.length > 0) {
+//       newErrors.currency = 'Currency is required for all entries'
+//     }
+
+//     setErrors(newErrors)
+//     return Object.keys(newErrors).length === 0
+//   }
+
+//   const handleSaveClick = () => {
+//     if (!validateForm()) {
+//       console.log('🔍 Validation failed')
+//       return
+//     }
+
+//     setConfirmModal({
+//       isOpen: true,
+//       action: 'save',
+//       title: `${mode === 'create' ? 'Create' : 'Update'} ${config.title}`,
+//       message: `Are you sure you want to ${mode === 'create' ? 'create this new' : 'update this'} ${config.title.toLowerCase()}?`
+//     })
+//   }
+
+//   const handleCancelClick = () => {
+//     setConfirmModal({
+//       isOpen: true,
+//       action: 'cancel',
+//       title: 'Cancel Changes',
+//       message: 'Are you sure you want to cancel? All unsaved changes will be lost.'
+//     })
+//   }
+
+//   const handleSubmit = async () => {
+//     try {
+//       const finalDetails = prepareSubmissionData()
+
+//       const submissionData = {
+//         master: {
+//           date: formData.date,
+//           voucherTypeId: config.type,
+//           voucherNo: formData.voucherNo,
+//           status: formData.status,
+//           balacingId: formData.coaId
+//         },
+//         details: finalDetails
+//       }
+
+//       console.log('🔍 SUBMITTING:', submissionData)
+
+//       if (mode === 'create') {
+//         await createVoucher(submissionData).unwrap()
+//         console.log('✅ Created successfully')
+//       } else {
+//         await updateVoucher({
+//           id: initialData?.master.id,
+//           ...submissionData
+//         }).unwrap()
+//         console.log('✅ Updated successfully')
+//       }
+
+//       const redirectPath = voucherType === 'journal' ? '/vouchers/journal' : '/vouchers/petty'
+//       console.log('🔍 Redirecting to:', redirectPath)
+//       router.push(redirectPath)
+
+//     } catch (err: any) {
+//       console.error('❌ Submit failed:', err)
+//       setErrors({ general: err?.data?.message || `Failed to ${mode} voucher` })
+//     }
+//   }
+
+//   const handleConfirmAction = async () => {
+//     setConfirmModal(prev => ({ ...prev, isOpen: false }))
+
+//     if (confirmModal.action === 'save') {
+//       await handleSubmit()
+//     } else if (confirmModal.action === 'cancel') {
+//       const redirectPath = voucherType === 'journal' ? '/vouchers/journal' : '/vouchers/petty'
+//       console.log('🔍 Canceling, redirecting to:', redirectPath)
+//       router.push(redirectPath)
+//     }
+//   }
+
+//   const handleCancelConfirmation = () => {
+//     setConfirmModal(prev => ({ ...prev, isOpen: false }))
+//   }
+
+//   return (
+//     <div className="max-w-6xl mx-auto p-">
+//       <div className="">
+//         {errors.general && (
+//           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+//             <div className="text-red-600">
+//               <strong>Error:</strong> {errors.general}
+//             </div>
+//           </div>
+//         )}
+
+//         {/* ✅ NEW: Currency validation error */}
+//         {errors.currency && (
+//           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+//             <div className="text-red-600">
+//               <strong>Error:</strong> {errors.currency}
+//             </div>
+//           </div>
+//         )}
+
+//         <VoucherHeader
+//           voucherType={voucherType}
+//           formData={formData}
+//           filteredCoaAccounts={filteredCoaAccounts}
+//           errors={errors}
+//           onInputChange={handleInputChange}
+//           onCoaChange={handleCoaChange}
+//         />
+
+//         <VoucherDetails
+//           journalDetails={journalDetails}
+//           allCoaAccounts={coaData.map(account => ({
+//             id: account.id,
+//             label: `${account.acName}`,
+//             acCode: account.acCode,
+//             acName: account.acName
+//           }))}
+//           currencyOptions={currencyOptions}
+//           totals={totals}
+//           balancingCoaId={formData.coaId}
+//           onDetailChange={handleDetailChange}
+//           onAddRow={handleAddRow}
+//           onRemoveRow={handleRemoveRow}
+//         />
+
+//         {errors.details && (
+//           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+//             <div className="text-red-600">{errors.details}</div>
+//           </div>
+//         )}
+
+//         <div className="">
+//           <div className="flex items-center justify-end space-x-4">
+//             <Button
+//               type="button"
+//               variant="secondary"
+//               onClick={handleCancelClick}
+//               disabled={isCreating || isUpdating}
+//               icon={<X className="w-4 h-4" />}
+//               size="md"
+//             >
+//               Cancel
+//             </Button>
+//             <Button
+//               type="button"
+//               variant="primary"
+//               onClick={handleSaveClick}
+//               loading={isCreating || isUpdating}
+//               disabled={isCreating || isUpdating}
+//               icon={<Save className="w-4 h-4" />}
+//               size="md"
+//             >
+//               {mode === 'create' ? 'Create' : 'Update'} Voucher
+//             </Button>
+//           </div>
+//         </div>
+//       </div>
+
+//       <ConfirmationModal
+//         isOpen={confirmModal.isOpen}
+//         onClose={handleCancelConfirmation}
+//         onConfirm={handleConfirmAction}
+//         title={confirmModal.title}
+//         message={confirmModal.message}
+//         confirmText={confirmModal.action === 'save' ? (mode === 'create' ? 'Create' : 'Update') : 'Yes, Cancel'}
+//         cancelText={confirmModal.action === 'save' ? 'Review Again' : 'Keep Editing'}
+//         type={confirmModal.action === 'save' ? 'info' : 'warning'}
+//         loading={isCreating || isUpdating}
+//       />
+//     </div>
+//   )
+// }
+
+// export default VoucherForm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 'use client'
 import React, { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -1552,7 +3352,6 @@ interface VoucherFormProps {
 const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialData }) => {
   const router = useRouter()
 
-  // Form configuration
   const config = {
     journal: {
       title: 'Journal Voucher',
@@ -1568,7 +3367,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
     }
   }[voucherType]
 
-  // State
   const [formData, setFormData] = useState({
     voucherNo: '',
     date: new Date().toISOString().split('T')[0],
@@ -1578,8 +3376,8 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
 
   const [journalDetails, setJournalDetails] = useState<JournalDetail[]>([])
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [validationErrors, setValidationErrors] = useState<string[]>([]) // ✅ NEW: Separate validation errors
 
-  // ✅ FIXED: Confirmation modal state with proper types
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean
     action: 'save' | 'cancel'
@@ -1592,13 +3390,11 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
     message: ''
   })
 
-  // RTK Queries & Mutations
   const { data: coaData = [] } = useGetCoaAccountsQuery()
   const { data: currencyData = [] } = useGetCurrenciesQuery()
   const [createVoucher, { isLoading: isCreating }] = useCreateJournalVoucherMutation()
   const [updateVoucher, { isLoading: isUpdating }] = useUpdateJournalVoucherMutation()
 
-  // Filtered COA accounts
   const filteredCoaAccounts = useMemo(() => {
     return coaData
       .filter(account => account[config.coaFilter] === true)
@@ -1610,7 +3406,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
       }))
   }, [coaData, config.coaFilter])
 
-  // Currency options
   const currencyOptions = useMemo(() => {
     return currencyData.map(currency => ({
       id: currency.id,
@@ -1619,7 +3414,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
     }))
   }, [currencyData])
 
-  // Auto-balance filtering
   const isAutoBalanceEntry = (detail: any) => {
     if (!detail) return false
 
@@ -1637,7 +3431,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
     return descriptionMatches
   }
 
-  // Load data for edit mode
   useEffect(() => {
     if (mode === 'edit' && initialData && initialData.details) {
       console.log('🔍 EDIT MODE - Loading data')
@@ -1665,11 +3458,11 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
         recieptNo: detail.recieptNo || '',
         ownDb: Number(detail.ownDb) || 0,
         ownCr: Number(detail.ownCr) || 0,
-        rate: Number(detail.rate) || 1,
+        rate: 0,
         amountDb: Number(detail.amountDb) || 0,
         amountCr: Number(detail.amountCr) || 0,
         isCost: Boolean(detail.isCost),
-        currencyId: Number(detail.currencyId) || 1,
+        currencyId: Number(detail.currencyId) || null,
         status: Boolean(detail.status),
         idCard: detail.idCard || '',
         bank: detail.bank || '',
@@ -1679,7 +3472,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
       setJournalDetails(mappedEntries)
 
     } else {
-      // CREATE MODE: Start with empty row
       setJournalDetails([{
         lineId: 1,
         coaId: 0,
@@ -1688,11 +3480,11 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
         recieptNo: '',
         ownDb: 0,
         ownCr: 0,
-        rate: 1,
+        rate: 0,
         amountDb: 0,
         amountCr: 0,
         isCost: false,
-        currencyId: 1,
+        currencyId: null,
         status: false,
         idCard: '',
         bank: '',
@@ -1701,73 +3493,51 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
     }
   }, [mode, initialData])
 
-  // Calculate totals
   const totals = useMemo(() => {
     const validEntries = journalDetails.filter(detail =>
-      detail.coaId > 0 && (detail.ownDb > 0 || detail.ownCr > 0)
+      detail.coaId > 0 && (detail.amountDb > 0 || detail.amountCr > 0)
     )
 
-    const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.ownDb) || 0), 0)
-    const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.ownCr) || 0), 0)
+    const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountDb) || 0), 0)
+    const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountCr) || 0), 0)
     const difference = Math.abs(debitTotal - creditTotal)
 
     return { debitTotal, creditTotal, difference }
   }, [journalDetails])
 
-  // Prepare submission data
   const prepareSubmissionData = () => {
     const validEntries = journalDetails.filter(detail => {
       const hasValidCoa = detail.coaId > 0
-      const hasValidAmount = (Number(detail.ownDb) > 0 || Number(detail.ownCr) > 0)
+      const hasValidAmount = (Number(detail.amountDb) > 0 || Number(detail.amountCr) > 0)
+      const hasDescription = detail.description && detail.description.trim() !== ''
       const isNotAutoBalance = !isAutoBalanceEntry(detail)
 
-      return hasValidCoa && hasValidAmount && isNotAutoBalance
+      return hasValidCoa && hasValidAmount && hasDescription && isNotAutoBalance
     })
 
-    const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.ownDb) || 0), 0)
-    const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.ownCr) || 0), 0)
+    const debitTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountDb) || 0), 0)
+    const creditTotal = validEntries.reduce((sum, detail) => sum + (Number(detail.amountCr) || 0), 0)
     const difference = Math.abs(debitTotal - creditTotal)
 
-    // let finalEntries = validEntries.map((detail, index) => ({
-    //   lineId: index + 1,
-    //   coaId: Number(detail.coaId),
-    //   description: String(detail.description || ''),
-    //   chqNo: String(detail.chqNo || ''),
-    //   recieptNo: String(detail.recieptNo || ''),
-    //   ownDb: Number(detail.ownDb || 0),
-    //   ownCr: Number(detail.ownCr || 0),
-    //   rate: Number(detail.rate || 1),
-    //   amountDb: Number(detail.ownDb || 0),
-    //   amountCr: Number(detail.ownCr || 0),
-    //   isCost: Boolean(detail.isCost),
-    //   currencyId: Number(detail.currencyId || 1),
-    //   status: Boolean(detail.status),
-    //   idCard: detail.idCard || null,
-    //   bank: detail.bank || null,
-    //   bankDate: detail.bankDate || null
-    // }))
-    // ✅ FIXED: Keep separate values
     let finalEntries = validEntries.map((detail, index) => ({
       lineId: index + 1,
       coaId: Number(detail.coaId),
       description: String(detail.description || ''),
       chqNo: String(detail.chqNo || ''),
       recieptNo: String(detail.recieptNo || ''),
-      ownDb: Number(detail.ownDb || 0),      // ✅ Own Debit value
-      ownCr: Number(detail.ownCr || 0),      // ✅ Own Credit value
-      rate: Number(detail.rate || 1),
-      amountDb: Number(detail.amountDb || 0), // ✅ Actual Debit value (separate)
-      amountCr: Number(detail.amountCr || 0), // ✅ Actual Credit value (separate)
+      ownDb: Number(detail.ownDb || 0),
+      ownCr: Number(detail.ownCr || 0),
+      rate: Number(detail.rate || 0),
+      amountDb: Number(detail.amountDb || 0),
+      amountCr: Number(detail.amountCr || 0),
       isCost: Boolean(detail.isCost),
-      currencyId: Number(detail.currencyId || 1),
+      currencyId: detail.currencyId ? Number(detail.currencyId) : null,
       status: Boolean(detail.status),
       idCard: detail.idCard || null,
       bank: detail.bank || null,
       bankDate: detail.bankDate || null
     }))
 
-
-    // Add auto-balance if needed
     if (difference > 0 && formData.coaId) {
       const autoBalanceEntry = {
         lineId: finalEntries.length + 1,
@@ -1775,13 +3545,13 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
         description: 'Auto Balancing Entry',
         chqNo: '',
         recieptNo: '',
-        ownDb: creditTotal > debitTotal ? difference : 0,
-        ownCr: debitTotal > creditTotal ? difference : 0,
-        rate: 1,
+        ownDb: 0,
+        ownCr: 0,
+        rate: 0,
         amountDb: creditTotal > debitTotal ? difference : 0,
         amountCr: debitTotal > creditTotal ? difference : 0,
         isCost: false,
-        currencyId: 1,
+        currencyId: null,
         status: true,
         idCard: null,
         bank: null,
@@ -1794,7 +3564,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
     return finalEntries
   }
 
-  // Form handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -1816,6 +3585,11 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
       updated[index] = { ...updated[index], [field]: value }
       return updated
     })
+    
+    // ✅ Clear validation errors when user makes changes
+    if (validationErrors.length > 0) {
+      setValidationErrors([])
+    }
   }
 
   const handleAddRow = () => {
@@ -1827,11 +3601,11 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
       recieptNo: '',
       ownDb: 0,
       ownCr: 0,
-      rate: 1,
+      rate: 0,
       amountDb: 0,
       amountCr: 0,
       isCost: false,
-      currencyId: 1,
+      currencyId: null,
       status: false,
       idCard: '',
       bank: '',
@@ -1846,37 +3620,131 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
     }
   }
 
-  const validateForm = () => {
+  // ✅ BULLETPROOF: Comprehensive validation function
+  const validateForm = (): { isValid: boolean; errors: string[] } => {
+    console.log('🔍 Starting validation...')
+    
+    const validationErrors: string[] = []
     const newErrors: { [key: string]: string } = {}
 
-    if (!formData.voucherNo.trim()) {
+    // ✅ Header validation
+    if (!formData.voucherNo || !formData.voucherNo.trim()) {
       newErrors.voucherNo = 'Voucher number is required'
+      validationErrors.push('Voucher number is required')
     }
     if (!formData.date) {
       newErrors.date = 'Date is required'
+      validationErrors.push('Date is required')
     }
     if (!formData.coaId) {
       newErrors.coaId = `${config.balanceLabel} is required`
+      validationErrors.push(`${config.balanceLabel} is required`)
     }
 
-    const validDetails = journalDetails.filter(detail =>
-      detail.coaId > 0 && (detail.ownDb > 0 || detail.ownCr > 0)
-    )
-    if (validDetails.length === 0) {
-      newErrors.details = 'At least one journal detail is required'
+    // ✅ Details validation - Check EVERY row
+    let hasCompleteRows = false
+    
+    journalDetails.forEach((detail, index) => {
+      const rowNum = index + 1
+      console.log(`🔍 Checking Row ${rowNum}:`, {
+        coaId: detail.coaId,
+        description: detail.description?.trim(),
+        amountDb: detail.amountDb,
+        amountCr: detail.amountCr
+      })
+      
+      // ✅ Check if row has ANY data
+      const hasAnyData = (
+        (detail.coaId && detail.coaId > 0) ||
+        (detail.description && detail.description.trim() !== '') ||
+        (detail.amountDb && detail.amountDb > 0) ||
+        (detail.amountCr && detail.amountCr > 0) ||
+        (detail.ownDb && detail.ownDb > 0) ||
+        (detail.ownCr && detail.ownCr > 0) ||
+        (detail.recieptNo && detail.recieptNo.trim() !== '') ||
+        (detail.chqNo && detail.chqNo.trim() !== '') ||
+        (detail.idCard && detail.idCard.trim() !== '') ||
+        (detail.bank && detail.bank.trim() !== '') ||
+        detail.bankDate ||
+        detail.currencyId
+      )
+      
+      console.log(`🔍 Row ${rowNum} hasAnyData:`, hasAnyData)
+      
+      if (hasAnyData) {
+        // ✅ Row has data, validate required fields
+        let rowHasErrors = false
+        
+        if (!detail.coaId || detail.coaId === 0) {
+          validationErrors.push(`Row ${rowNum}: Please select an Account`)
+          rowHasErrors = true
+        }
+        
+        if (!detail.description || detail.description.trim() === '') {
+          validationErrors.push(`Row ${rowNum}: Please enter Description`)
+          rowHasErrors = true
+        }
+        
+        if ((!detail.amountDb || detail.amountDb === 0) && (!detail.amountCr || detail.amountCr === 0)) {
+          validationErrors.push(`Row ${rowNum}: Please enter Debit or Credit amount`)
+          rowHasErrors = true
+        }
+        
+        // ✅ Check if this row is complete
+        if (!rowHasErrors) {
+          hasCompleteRows = true
+        }
+        
+        console.log(`🔍 Row ${rowNum} validation:`, { rowHasErrors, hasCompleteRows })
+      }
+    })
+
+    // ✅ Must have at least one complete row
+    if (!hasCompleteRows) {
+      validationErrors.push('At least one complete journal entry is required (Account + Description + Debit OR Credit)')
     }
+
+    console.log('🔍 Validation result:', { 
+      validationErrors, 
+      isValid: validationErrors.length === 0 
+    })
 
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    setValidationErrors(validationErrors)
+
+    return {
+      isValid: validationErrors.length === 0,
+      errors: validationErrors
+    }
   }
 
-  // ✅ FIXED: Handle save button click (show confirmation)
-  const handleSaveClick = () => {
-    if (!validateForm()) {
-      console.log('🔍 Validation failed')
-      return
+  // ✅ FIXED: Bulletproof save handler
+  const handleSaveClick = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault() // ✅ Prevent any default behavior
+      e.stopPropagation()
+    }
+    
+    console.log('🔍 Save button clicked!')
+    console.log('🔍 Current journal details:', journalDetails)
+    
+    // ✅ STRICT validation
+    const validation = validateForm()
+    
+    console.log('🔍 Validation complete:', validation)
+    
+    if (!validation.isValid) {
+      console.log('❌ VALIDATION FAILED - Showing errors and STAYING on page')
+      console.log('❌ Validation errors:', validation.errors)
+      
+      // ✅ Force scroll to top to show errors
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      
+      return false // ✅ STOP EXECUTION
     }
 
+    console.log('✅ Validation passed - showing confirmation')
+    
     setConfirmModal({
       isOpen: true,
       action: 'save',
@@ -1885,7 +3753,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
     })
   }
 
-  // ✅ FIXED: Handle cancel button click (show confirmation)
   const handleCancelClick = () => {
     setConfirmModal({
       isOpen: true,
@@ -1895,65 +3762,25 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
     })
   }
 
-  // ✅ FIXED: Actual submit logic (called after confirmation)
-  // const handleSubmit = async () => {
-  //   try {
-  //     const finalDetails = prepareSubmissionData()
-
-  //     const submissionData = {
-  //       master: {
-  //         date: formData.date,
-  //         voucherTypeId: config.type,
-  //         voucherNo: formData.voucherNo,
-  //         status: formData.status,
-  //         balacingId: formData.coaId
-  //       },
-  //       details: finalDetails
-  //     }
-
-  //     console.log('🔍 SUBMITTING:', submissionData)
-
-  //     if (mode === 'create') {
-  //       await createVoucher(submissionData).unwrap()
-  //       console.log('✅ Created successfully')
-  //     } else {
-  //       await updateVoucher({
-  //         id: initialData?.master.id,
-  //         ...submissionData
-  //       }).unwrap()
-  //       console.log('✅ Updated successfully')
-  //     }
-
-  //     router.push('/vouchers')
-  //   } catch (err: any) {
-  //     console.error('❌ Submit failed:', err)
-  //     setErrors({ general: err?.data?.message || `Failed to ${mode} voucher` })
-  //   }
-  // }
-
-  // // ✅ FIXED: Handle confirmation modal actions
-  // const handleConfirmAction = async () => {
-  //   setConfirmModal(prev => ({ ...prev, isOpen: false }))
-
-  //   if (confirmModal.action === 'save') {
-  //     await handleSubmit()
-  //   } else if (confirmModal.action === 'cancel') {
-  //     router.push('/vouchers')
-  //   }
-  // }
-
-
-
-
-
-
-
-
-
-
   const handleSubmit = async () => {
     try {
+      console.log('🔍 Final submission attempt...')
+      
+      // ✅ Final validation check
+      const validation = validateForm()
+      if (!validation.isValid) {
+        console.log('❌ Final validation failed - aborting')
+        return
+      }
+
       const finalDetails = prepareSubmissionData()
+      
+      if (finalDetails.length === 0) {
+        console.log('❌ No valid details to submit')
+        setErrors({ general: 'No valid journal entries to submit' })
+        setValidationErrors(['No valid journal entries found'])
+        return
+      }
 
       const submissionData = {
         master: {
@@ -1979,64 +3806,56 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
         console.log('✅ Updated successfully')
       }
 
-      // ✅ FIXED: Dynamic routing based on voucher type
+      // ✅ Only redirect after successful submission
       const redirectPath = voucherType === 'journal' ? '/vouchers/journal' : '/vouchers/petty'
-      console.log('🔍 Redirecting to:', redirectPath)
+      console.log('🔍 Success - redirecting to:', redirectPath)
       router.push(redirectPath)
 
     } catch (err: any) {
       console.error('❌ Submit failed:', err)
       setErrors({ general: err?.data?.message || `Failed to ${mode} voucher` })
+      setValidationErrors([err?.data?.message || `Failed to ${mode} voucher`])
     }
   }
 
-  // ✅ FIXED: Handle confirmation modal actions with dynamic routing
   const handleConfirmAction = async () => {
     setConfirmModal(prev => ({ ...prev, isOpen: false }))
 
     if (confirmModal.action === 'save') {
       await handleSubmit()
     } else if (confirmModal.action === 'cancel') {
-      // ✅ FIXED: Dynamic routing for cancel too
       const redirectPath = voucherType === 'journal' ? '/vouchers/journal' : '/vouchers/petty'
       console.log('🔍 Canceling, redirecting to:', redirectPath)
       router.push(redirectPath)
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   const handleCancelConfirmation = () => {
     setConfirmModal(prev => ({ ...prev, isOpen: false }))
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-">
-      <div className="">
-        {/* Header */}
-        <div className="">
-          {/* <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {mode === 'create' ? 'Create New' : 'Edit'} {config.title}
-            </h1>
-            <p className="text-gray-600 mt-1">
-              {mode === 'create' ? 'Create a new voucher entry' : 'Update existing voucher entry'}
-            </p>
-          </div> */}
-        </div>
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="space-y-6">
+        {/* ✅ FIXED: Prominent validation errors display */}
+        {validationErrors.length > 0 && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 shadow-lg">
+            {/* <div className="flex items-center mb-2">
+              <div className="text-red-600 font-bold text-lg">⚠️ Validation Errors</div>
+            </div> */}
+            <div className="text-red-700">
+              <div className="text-sm space-y-1">
+                {validationErrors.map((error, index) => (
+                  <div key={index} className="flex items-start">
+                    <span className="text-red-500 mr-2">•</span>
+                    <span>{error}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* Error Display */}
         {errors.general && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="text-red-600">
@@ -2045,7 +3864,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
           </div>
         )}
 
-        {/* Form Components */}
         <VoucherHeader
           voucherType={voucherType}
           formData={formData}
@@ -2071,14 +3889,7 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
           onRemoveRow={handleRemoveRow}
         />
 
-        {errors.details && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="text-red-600">{errors.details}</div>
-          </div>
-        )}
-
-        {/* ✅ FIXED: Bottom action buttons */}
-        <div className="">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-end space-x-4">
             <Button
               type="button"
@@ -2090,6 +3901,7 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
             >
               Cancel
             </Button>
+            {/* ✅ FIXED: Explicit button handler */}
             <Button
               type="button"
               variant="primary"
@@ -2105,8 +3917,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
         </div>
       </div>
 
-      {/* ✅ FIXED: Confirmation Modal with proper type handling */}
-      {/* ✅ FIXED: Using correct type values */}
       <ConfirmationModal
         isOpen={confirmModal.isOpen}
         onClose={handleCancelConfirmation}
@@ -2118,7 +3928,6 @@ const VoucherForm: React.FC<VoucherFormProps> = ({ mode, voucherType, initialDat
         type={confirmModal.action === 'save' ? 'info' : 'warning'}
         loading={isCreating || isUpdating}
       />
-
     </div>
   )
 }
