@@ -4990,7 +4990,7 @@ import EnhancedSelectableTable from './EnhancedSelectableTable';
 import MultiSelectItemTable from './MultiSelectItemTable';
 
 // ✅ Your requested components
-import { DateFormat } from './common/DateFormat';
+// import { DateFormat } from './common/DateFormat';
 import { CurrencyFormat, NumberInput } from './common/NumberFormat';
 import { ConfirmationModal } from './common/ConfirmationModal';
 
@@ -5753,7 +5753,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                       <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-700 font-medium pointer-events-none z-10">
                         {master.Date ? OrderLogic.formatDateDisplay(master.Date) : 'Select date'}
                       </div>
-                    
+
                     </div>
 
 
@@ -5776,7 +5776,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                               className="mr-2"
                             />
                             <span className="text-sm">
-                              {isPurchase ? 'Suppliers Only' : 'Customers Only'}
+                              {isPurchase ? 'Suppliers' : 'Customers'}
                             </span>
                           </label>
                           <label className="flex items-center">
@@ -5790,7 +5790,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                               }}
                               className="mr-2"
                             />
-                            <span className="text-sm">Show All COA</span>
+                            <span className="text-sm"> All COA</span>
                           </label>
                         </div>
                         <SelectableTable
@@ -5851,7 +5851,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                               {/* PRODUCT/ITEM * */}
                               <span className="text-xs text-gray-400 ml-1">(select item)</span>
                             </label>
-                           
+
                             <EnhancedSelectableTable
                               label=""
                               name="Item_ID"
@@ -5864,7 +5864,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                               columns={itemColumns}
                               pageSize={6}
                               classData={classData}
-                              // className="w-10 h-20 border"
+                            // className="w-10 h-20 border"
                             />
                           </div>
 
@@ -5893,7 +5893,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                             <div className="">
                               {/* ✅ FIXED: Force UomConverter re-render with proper itemId */}
                               <UomConverter
-                                key={`uom-${detail.Item_ID || 'empty'}-${index}-${Date.now()}`}
+                                key={`uom-${detail.Item_ID || 'empty'}-${index}`}
                                 itemId={detail.Item_ID}
                                 onChange={(values) => handleUomChange(index, values)}
                                 initialValues={{
@@ -5957,7 +5957,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                               </div>
                             </div>
                           </div>
-                        
+
                           {/* Delete Action */}
                           <div className="col-span-1 text-center">
                             <label className="text-xs text-gray-500 font-semibold mb-1 block">ACTION</label>
@@ -6003,7 +6003,7 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                           <div className=" w-70 grid grid-cols-12 gap-4 py-2 bg-white rounded-lg border-gray-200 mx-2 mb-2 shadow-sm">
                             <div className="col-span-1"></div>
 
-                           
+
                             {/* Totals Display */}
                             <div className="col-span-3 grid grid-cols-2 gap-4 w-60">
                               <div>

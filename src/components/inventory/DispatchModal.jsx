@@ -137,12 +137,13 @@ const DispatchModal = ({
       Item_ID: detail.Item_ID,
       Qty_in_SO: detail.uom1_qty || detail.Stock_out_UOM_Qty || 0,
       Uom_SO: detail.item?.uom1?.uom || 'Pcs',
-      QTY_Dispatched: 0,
-      UOM_Dispatched: detail.item?.uom1?.uom || 'Pcs',
-      uom1_qty: 0,
-      uom2_qty: 0,
-      uom3_qty: 0,
-      sale_unit: detail.sale_unit || 'uom1',
+      // Initialize dispatched qty according to the sale_unit from the sales order
+      uom1_qty: detail.uom1_qty?.toString() || detail.Stock_out_UOM_Qty?.toString() || '0.000',
+      uom2_qty: detail.uom2_qty?.toString() || detail.Stock_out_SKU_UOM_Qty?.toString() || '1.000',
+      uom3_qty: detail.uom3_qty?.toString() || detail.Stock_out_UOM3_Qty?.toString() || '0.000',
+      sale_unit: detail.sale_unit || 'uomTwo',
+      QTY_Dispatched: (detail.sale_unit === 'uomTwo') ? parseFloat(detail.uom2_qty || detail.Stock_out_SKU_UOM_Qty || 0) : (detail.sale_unit === 'uomThree') ? parseFloat(detail.uom3_qty || detail.Stock_out_UOM3_Qty || 0) : parseFloat(detail.uom1_qty || detail.Stock_out_UOM_Qty || 0),
+      UOM_Dispatched: detail.sale_unit === 'uomTwo' ? detail.item?.uomTwo?.uom : detail.sale_unit === 'uomThree' ? detail.item?.uomThree?.uom : detail.item?.uom1?.uom || 'Pcs',
       Stock_Price: parseFloat(detail.Price) || 0,
       isOriginalRow: true,
       item: detail.item,
@@ -322,7 +323,13 @@ const DispatchModal = ({
     const updated = [...dispatchItems];
     const item = updated[index];
 
-    const requestedQty = parseFloat(values.uom1_qty) || 0;
+    // Determine requested quantity based on selected sale unit
+    const requestedQty = parseFloat(
+      values.sale_unit === 'uomTwo' ? values.uom2_qty :
+      values.sale_unit === 'uomThree' ? values.uom3_qty :
+      values.uom1_qty
+    ) || 0;
+
     const availableStock = getAvailableStock(item.Item_ID, item.Batch_Number);
 
     if (mode !== 'edit' && item.Batch_Number && requestedQty > availableStock && availableStock > 0) {
@@ -341,7 +348,7 @@ const DispatchModal = ({
       uom1_qty: values.uom1_qty || 0,
       uom2_qty: values.uom2_qty || 0,
       uom3_qty: values.uom3_qty || 0,
-      QTY_Dispatched: values.uom1_qty || 0,
+      QTY_Dispatched: requestedQty,
       sale_unit: values.sale_unit || 'uom1',
       UOM_Dispatched: values.sale_unit === 'uomTwo' ? updated[index].item?.uomTwo?.uom :
         values.sale_unit === 'uomThree' ? updated[index].item?.uomThree?.uom :
@@ -1058,7 +1065,7 @@ const handleSubmit = async (e) => {
                   {mode === 'fromOrder' && (
                     <>
                       <th className="px-3 py-2 text-center bg-blue-200">SO Qty</th>
-                      <th className="px-3 py-2 text-center bg-blue-200">UOM</th>
+                      {/* <th className="px-3 py-2 text-center bg-blue-200">UOM</th> */}
                     </>
                   )}
                   <th className="px-3 py-2 text-center bg-orange-100">Available</th>
@@ -1118,8 +1125,24 @@ const handleSubmit = async (e) => {
 
                     {mode === 'fromOrder' && (
                       <>
-                        <td className="px-3 py-2 text-center bg-blue-50">{item.isOriginalRow ? item.Qty_in_SO : '-'}</td>
-                        <td className="px-3 py-2 text-center bg-blue-50">{item.isOriginalRow ? item.Uom_SO : '-'}</td>
+                        <td className="px-3 py-2 text-center bg-blue-50">
+                          {item.isOriginalRow ? (
+                            <>
+                              {
+                                item.sale_unit === 'uom1' ? (item.uom1_qty || '0.000') :
+                                item.sale_unit === 'uomTwo' ? (item.uom2_qty || '0.000') :
+                                item.sale_unit === 'uomThree' ? (item.uom3_qty || '0.000') :
+                                (item.uom1_qty || '0.000')
+                              } {
+                                item.sale_unit === 'uom1' ? item.item?.uom1?.uom :
+                                item.sale_unit === 'uomTwo' ? item.item?.uomTwo?.uom :
+                                item.sale_unit === 'uomThree' ? item.item?.uomThree?.uom :
+                                item.Uom_SO
+                              }
+                            </>
+                          ) : '-'}
+                        </td>
+                        {/* <td className="px-3 py-2 text-center bg-blue-50">{item.isOriginalRow ? item.Uom_SO : '-'}</td> */}
                       </>
                     )}
 
@@ -1127,6 +1150,28 @@ const handleSubmit = async (e) => {
                       <div className={`font-bold ${getAvailableStock(item.Item_ID, item.Batch_Number) > 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {item.Batch_Number ? getAvailableStock(item.Item_ID, item.Batch_Number) : '-'}
                       </div>
+                      { /* show selected qty + uom from the passed order detail */ }
+                      {item.sale_unit && (
+                        <div className="text-xs text-gray-600 mt-1">
+                          Selected: {
+                            item.sale_unit === 'uom1'
+                              ? (item.uom1_qty || '0.000')
+                              : item.sale_unit === 'uomTwo'
+                              ? (item.uom2_qty || '0.000')
+                              : item.sale_unit === 'uomThree'
+                              ? (item.uom3_qty || '0.000')
+                              : '-'
+                          } {
+                            item.sale_unit === 'uom1'
+                              ? item.item?.uom1?.uom
+                              : item.sale_unit === 'uomTwo'
+                              ? item.item?.uomTwo?.uom
+                              : item.sale_unit === 'uomThree'
+                              ? item.item?.uomThree?.uom
+                              : ''
+                          }
+                        </div>
+                      )}
                     </td>
 
                     <td className="px-3 py-2 bg-green-50">
@@ -1134,10 +1179,10 @@ const handleSubmit = async (e) => {
                         itemId={item.Item_ID}
                         onChange={(values) => handleUomChange(index, values)}
                         initialValues={{
-                          uom1_qty: item.uom1_qty?.toString() || '',
-                          uom2_qty: item.uom2_qty?.toString() || '',
-                          uom3_qty: item.uom3_qty?.toString() || '',
-                          sale_unit: item.sale_unit || 'uom1'
+                          uom1_qty: item.uom1_qty?.toString() || '0.000',
+                          uom2_qty: item.uom2_qty?.toString() || '1.000',
+                          uom3_qty: item.uom3_qty?.toString() || '0.000',
+                          sale_unit: item.sale_unit || 'uomTwo'
                         }}
                         isPurchase={false}
                       />

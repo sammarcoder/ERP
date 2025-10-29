@@ -101,7 +101,7 @@ export class OrderLogic {
       Item_ID: selectedItem.id,
       Price: price,
       sale_unit: 'uomTwo', // ✅ FORCE UOM2 ALWAYS
-      uom2_qty: 1,         // ✅ Default quantity ALWAYS
+      uom2_qty: 0,         // ✅ Default quantity ALWAYS
       uom1_qty: 0,
       uom3_qty: 0,
       Discount_A: selectedAccount?.discountA || 0,
@@ -145,7 +145,7 @@ export class OrderLogic {
         Stock_out_SKU_UOM_Qty: 0,
         Stock_out_UOM3_Qty: 0,
         uom1_qty: 0,
-        uom2_qty: 1, // ✅ FORCE UOM2 for ALL including first
+        uom2_qty: 0, // ✅ FORCE UOM2 for ALL including first
         uom3_qty: 0,
         sale_unit: 'uomTwo', // ✅ FORCE UOM2 for ALL including first
         Discount_A: selectedAccount?.discountA ? parseFloat(selectedAccount.discountA) : 0,
