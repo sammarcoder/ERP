@@ -135,8 +135,17 @@ const DispatchModal = ({
       Batch_Number: '',
       Item: detail.item?.itemName || '',
       Item_ID: detail.Item_ID,
-      Qty_in_SO: detail.uom1_qty || detail.Stock_out_UOM_Qty || 0,
-      Uom_SO: detail.item?.uom1?.uom || 'Pcs',
+      // Show SO quantity/unit according to the sale_unit from the sales order
+      Qty_in_SO: (
+        detail.sale_unit === 'uomTwo' ? (detail.uom2_qty || detail.Stock_out_SKU_UOM_Qty || '0.000') :
+        detail.sale_unit === 'uomThree' ? (detail.uom3_qty || detail.Stock_out_UOM3_Qty || '0.000') :
+        (detail.uom1_qty || detail.Stock_out_UOM_Qty || '0.000')
+      ),
+      Uom_SO: (
+        detail.sale_unit === 'uomTwo' ? detail.item?.uomTwo?.uom :
+        detail.sale_unit === 'uomThree' ? detail.item?.uomThree?.uom :
+        detail.item?.uom1?.uom || 'Pcs'
+      ),
       // Initialize dispatched qty according to the sale_unit from the sales order
       uom1_qty: detail.uom1_qty?.toString() || detail.Stock_out_UOM_Qty?.toString() || '0.000',
       uom2_qty: detail.uom2_qty?.toString() || detail.Stock_out_SKU_UOM_Qty?.toString() || '1.000',
@@ -1070,8 +1079,6 @@ const handleSubmit = async (e) => {
                   )}
                   <th className="px-3 py-2 text-center bg-orange-100">Available</th>
                   <th className="px-3 py-2 text-center bg-green-100">Quantity</th>
-                  <th className="px-3 py-2 text-center bg-green-100">Price</th>
-                  <th className="px-3 py-2 text-center bg-green-100">Total</th>
                   <th className="px-3 py-2 text-center">Actions</th>
                 </tr>
               </thead>
@@ -1128,21 +1135,11 @@ const handleSubmit = async (e) => {
                         <td className="px-3 py-2 text-center bg-blue-50">
                           {item.isOriginalRow ? (
                             <>
-                              {
-                                item.sale_unit === 'uom1' ? (item.uom1_qty || '0.000') :
-                                item.sale_unit === 'uomTwo' ? (item.uom2_qty || '0.000') :
-                                item.sale_unit === 'uomThree' ? (item.uom3_qty || '0.000') :
-                                (item.uom1_qty || '0.000')
-                              } {
-                                item.sale_unit === 'uom1' ? item.item?.uom1?.uom :
-                                item.sale_unit === 'uomTwo' ? item.item?.uomTwo?.uom :
-                                item.sale_unit === 'uomThree' ? item.item?.uomThree?.uom :
-                                item.Uom_SO
-                              }
+                              {item.Qty_in_SO || '0.000'} {item.Uom_SO || '-'}
                             </>
                           ) : '-'}
                         </td>
-                        {/* <td className="px-3 py-2 text-center bg-blue-50">{item.isOriginalRow ? item.Uom_SO : '-'}</td> */}
+                        {/* keep UOM column hidden since SO qty now includes unit */}
                       </>
                     )}
 
@@ -1188,19 +1185,7 @@ const handleSubmit = async (e) => {
                       />
                     </td>
 
-                    <td className="px-3 py-2 bg-green-50">
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={item.Stock_Price || ''}
-                        onChange={(e) => updateDispatchItem(index, 'Stock_Price', e.target.value)}
-                        className="w-20 px-2 py-1 border rounded text-center"
-                      />
-                    </td>
-
-                    <td className="px-3 py-2 text-center bg-green-50 font-bold">
-                      {calculateTotal(item)}
-                    </td>
+                    {/* Price and Total columns removed per request */}
 
                     <td className="px-3 py-2 text-center">
                       <div className="flex flex-col space-y-1">
@@ -1218,7 +1203,7 @@ const handleSubmit = async (e) => {
                         {(
                           (mode === 'create' && dispatchItems.length > 1) ||
                           (mode === 'edit' && dispatchItems.length > 1) ||
-                          (mode === 'fromOrder' && item.isAdditionalBatch) ||
+                          mode === 'fromOrder' ||
                           item.isAdditionalBatch
                         ) && (
                             <button
