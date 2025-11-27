@@ -1,12 +1,19 @@
 // import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 // import { Currency, CreateCurrencyRequest, UpdateCurrencyRequest } from '@/types/currency'
 
-// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || `http://localhost:4000/api/z-currency`
+// // ✅ Dynamic base URL (LAN + localhost safe, like journalVoucherApi)
+// const getApiBaseUrl = () => {
+//   if (typeof window !== 'undefined') {
+//     return `http://${window.location.hostname}:4000/api/z-currency`
+//   } else {
+//     return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/z-currency'
+//   }
+// }
 
 // export const currencyApi = createApi({
 //   reducerPath: 'currencyApi',
 //   baseQuery: fetchBaseQuery({
-//     baseUrl: API_BASE_URL,
+//     baseUrl: getApiBaseUrl(),
 //     prepareHeaders: (headers) => {
 //       headers.set('Content-Type', 'application/json')
 //       return headers
@@ -60,6 +67,7 @@
 //   }),
 // })
 
+// // ✅ Export hooks for usage in components
 // export const {
 //   useGetCurrenciesQuery,
 //   useGetCurrencyByIdQuery,
@@ -95,58 +103,43 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Currency, CreateCurrencyRequest, UpdateCurrencyRequest } from '@/types/currency'
 
-// ✅ Dynamic base URL (LAN + localhost safe, like journalVoucherApi)
-const getApiBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    return `http://${window.location.hostname}:4000/api/z-currency`
-  } else {
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/z-currency'
-  }
-}
+// ✅ Base query with Auth0 authentication
+const baseQueryWithAuth = fetchBaseQuery({
+  baseUrl: (() => {
+    if (typeof window !== 'undefined') {
+      return `http://${window.location.hostname}:4000/api/z-currency`
+    } else {
+      return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/z-currency'
+    }
+  })(),
+  prepareHeaders: async (headers) => {
+    try {
+      // Get access token from Auth0
+      const response = await fetch('/auth/access-token');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.token) {
+          headers.set('authorization', `Bearer ${data.token}`);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to get access token:', error);
+    }
+    
+    headers.set('Content-Type', 'application/json');
+    return headers;
+  },
+});
 
 export const currencyApi = createApi({
   reducerPath: 'currencyApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: getApiBaseUrl(),
-    prepareHeaders: (headers) => {
-      headers.set('Content-Type', 'application/json')
-      return headers
-    },
-  }),
+  baseQuery: baseQueryWithAuth,
   tagTypes: ['Currency'],
   endpoints: (builder) => ({
-    // 📥 GET /api/z-currency/get - Get all currencies
+    // GET /api/z-currency/get - Requires: currency:read
     getCurrencies: builder.query<Currency[], void>({
       query: () => '/get',
       providesTags: ['Currency'],
@@ -155,13 +148,13 @@ export const currencyApi = createApi({
       },
     }),
 
-    // 📄 GET /api/z-currency/get/:id - Get currency by ID
+    // GET /api/z-currency/get/:id - Requires: currency:read
     getCurrencyById: builder.query<Currency, number>({
       query: (id) => `/get/${id}`,
       providesTags: (result, error, id) => [{ type: 'Currency', id }],
     }),
 
-    // ✅ POST /api/z-currency/create - Create currency
+    // POST /api/z-currency/create - Requires: currency:write
     createCurrency: builder.mutation<{ success: boolean; data: Currency }, CreateCurrencyRequest>({
       query: (newCurrency) => ({
         url: '/create',
@@ -171,7 +164,7 @@ export const currencyApi = createApi({
       invalidatesTags: ['Currency'],
     }),
 
-    // ✏️ PUT /api/z-currency/put/:id - Update currency
+    // PUT /api/z-currency/put/:id - Requires: currency:write
     updateCurrency: builder.mutation<{ success: boolean; data: Currency }, UpdateCurrencyRequest>({
       query: ({ id, ...patch }) => ({
         url: `/put/${id}`,
@@ -181,7 +174,7 @@ export const currencyApi = createApi({
       invalidatesTags: (result, error, { id }) => [{ type: 'Currency', id }],
     }),
 
-    // ❌ DELETE /api/z-currency/delete/:id - Delete currency
+    // DELETE /api/z-currency/delete/:id - Requires: currency:delete
     deleteCurrency: builder.mutation<{ success: boolean; message: string }, number>({
       query: (id) => ({
         url: `/delete/${id}`,
@@ -192,7 +185,6 @@ export const currencyApi = createApi({
   }),
 })
 
-// ✅ Export hooks for usage in components
 export const {
   useGetCurrenciesQuery,
   useGetCurrencyByIdQuery,

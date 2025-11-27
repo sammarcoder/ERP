@@ -398,7 +398,8 @@ const createJournalEntries = async (stockMain, stockMainId, transaction) => {
     stk_Main_ID: stockMainId,
     voucherTypeId: voucherTypeId,
     voucherNo: stockMain.Number,
-    status: false // UnPost = false, Post = true
+    status: false, // UnPost = false, Post = true
+    isOpening: false // Default to false
   }, { transaction });
 
   console.log(`✅ Created JournalMaster ID: ${journalMaster.id} with UnPost status`);

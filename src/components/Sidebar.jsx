@@ -110,11 +110,11 @@ const Sidebar = () => {
                     title: 'Reports A/C',
                     path: null,
                     subItems: [
-                        { id: 'ledger-by-head', title: 'Ledger by Head', path: '/reports/ac/ledger-head' },
-                        { id: 'ledger-forex-1', title: 'Ledger by Forex 1', path: '/reports/ac/ledger-forex-1' },
+                        { id: 'ledger-by-head', title: 'Ledger by Head', path: '/journalmaster' },
+                        { id: 'ledger-forex-1', title: 'Ledger by Forex 1', path: '/reports/ledger-by-forex-1' },
                         { id: 'ledger-forex-2', title: 'Ledger by Forex 2', path: '/reports/ac/ledger-forex-2' },
-                        { id: 'trial-balance-6', title: 'Trial Balance Cal-6', path: '/reports/ac/trial-balance-6' },
-                        { id: 'trial-balance-4', title: 'Trial Balance Cal-4', path: '/reports/ac/trial-balance-4' },
+                        { id: 'trial-balance-6', title: 'Trial Balance Cal-6', path: '/reports/journalmaster/trialbalance-6' },
+                        { id: 'trial-balance-4', title: 'Trial Balance Cal-4', path: '/reports/journalmaster/trialbalance-4' },
                         { id: 'aging-report', title: 'Aging Report', path: '/reports/ac/aging' },
                         { id: 'cash-book', title: 'Cash Book', path: '/reports/ac/cash-book' }
                     ]
@@ -124,7 +124,7 @@ const Sidebar = () => {
                     title: 'Voucher Reports',
                     path: null,
                     subItems: [
-                        { id: 'journal-voucher-report', title: 'Journal Voucher Report', path: '/reports/voucher/journal' },
+                        { id: 'journal-voucher-report', title: 'Journal Voucher Report', path: '/reports/vouchers/journalvoucher' },
                         { id: 'petty-voucher-report', title: 'Petty Voucher Report', path: '/reports/voucher/petty' },
                         { id: 'purchase-voucher-report', title: 'Purchase Voucher Report', path: '/reports/voucher/purchase' },
                         { id: 'lc-voucher-report', title: 'LC Voucher Report', path: '/reports/voucher/lc' },

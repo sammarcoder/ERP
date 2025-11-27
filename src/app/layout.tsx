@@ -28,7 +28,7 @@
 //       <body
 //         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 //       >
-        
+
 
 //         <div className="flex min-h-screen ">
 //           <Sidebar/>
@@ -75,6 +75,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { Providers } from "./providers";  // ← ADD THIS IMPORT
+import { Auth0Provider } from "@auth0/nextjs-auth0";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -102,18 +103,21 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* ← WRAP EVERYTHING WITH REDUX PROVIDER */}
-        <Providers>
-          <div className="flex min-h-screen">
-            <Sidebar/>
+        <Auth0Provider>
+          <Providers>
+            <div className="flex min-h-screen">
+              <Sidebar />
 
-            {/* Main Content Area */}
-            <main className="flex-1 lg:ml-14 p-6 transition-all duration-300">
-              <div className="max-w-7xl mx-auto">
-                {children}
-              </div>
-            </main>
-          </div>
-        </Providers>
+              {/* Main Content Area */}
+              <main className="flex-1 lg:ml-14 p-6 transition-all duration-300">
+                <div className="max-w-7xl mx-auto">
+                  {children}
+                </div>
+              </main>
+            </div>
+          </Providers>
+        </Auth0Provider>
+
         {/* ← END REDUX PROVIDER WRAPPER */}
       </body>
     </html>

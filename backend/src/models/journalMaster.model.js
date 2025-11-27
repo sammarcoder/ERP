@@ -29,7 +29,12 @@ const JournalMaster = sequelize.define('JournalMaster', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
-    }
+    },
+    isOpening: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+    },
 }
 ,
  {
