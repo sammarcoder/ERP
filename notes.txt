@@ -1,0 +1,4224 @@
+#Question 1, What was my requirements
+#Question 2, what i told to you about about keep the things simple and straight forward
+#Question 3, what i told if there any things which compilicated and not best than advice to me replace 
+# Now your funtionaily is full of shit i recomend you to create to modify the input if the type is date than input date works normal just a little bit change just in the format i want so you have to createa  div or span 
+and give position abosolute and when enter amount round off function and this input works like pure ui compoent means all the input buitl in or custom function used in the parent component so what pure ui compenet means 
+no logic and i think just like you should if this better use   const variants = {
+    primary: 'bg-[#509ee3] text-white hover:bg-[#4990d6] focus:ring-blue-500 shadow-sm hover:shadow-md',
+    secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 border border-gray-300',
+    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-sm',
+    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm',
+    warning: 'bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-500 shadow-sm',
+    ghost: 'text-gray-600 hover:bg-gray-100 focus:ring-gray-500'
+  }
+  
+  const sizes = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base'
+  }
+
+
+
+
+
+
+
+so the search and fitler funtionaily use as it is working in he existing component user will select the items like let say user selct the 10 items so you have to fetch the 
+  "id": 65,
+            "itemName": "Pin no 23/24",
+             "skuUOM": 4,
+            "uom1_qyt": 1,
+            "uom2": 2,
+            "uom2_qty": "10.00",
+            "uom3": 6,
+            "uom3_qty": "100.00",
+             "sellingPrice": "2700.00",
+            "purchasePricePKR": "0.00",
+             "uom1": {
+                "id": 4,
+                "uom": "Pkt"
+            },
+            "uomTwo": {
+                "id": 2,
+                "uom": "Box"
+            },
+            "uomThree": {
+                "id": 6,
+                "uom": "Crt"
+            } nams also 
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string
+  error?: string
+  helperText?: string
+  icon?: React.ReactNode
+  status?: 'default' | 'error' | 'success'
+}
+
+export const Input: React.FC<InputProps> = ({
+  label,
+  error,
+  helperText,
+  icon,
+  status = 'default',
+  className,
+  ...props
+}) => {
+  const [isFocused, setIsFocused] = useState(false)
+
+  const currentStatus = error ? 'error' : status
+
+  return (
+    <div className="space-y-1">
+      {label && (
+        <label className="block text-sm font-medium text-gray-700">
+          {label}
+          {props.required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+      )}
+      
+      <div className="relative">
+        {icon && (
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className={clsx(
+              'transition-colors duration-200',
+              isFocused ? 'text-[#509ee3]' : 'text-gray-400'
+            )}>
+              {icon}
+            </div>
+          </div>
+        )}
+
+        <motion.input
+          initial={{ scale: 1 }}
+          whileFocus={{ scale: 1.01 }}
+          className={clsx(
+            'block w-full px-3 py-2 border rounded-lg shadow-sm transition-colors duration-200',
+            'placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#509ee3] focus:border-[#509ee3]',
+            currentStatus === 'error' && 'border-red-300 focus:ring-red-500 focus:border-red-500',
+            currentStatus === 'success' && 'border-green-300 focus:ring-green-500 focus:border-green-500',
+            currentStatus === 'default' && 'border-gray-300',
+            icon && 'pl-10',
+            className
+          )}
+          onFocus={(e) => {
+            setIsFocused(true)
+            props.onFocus?.(e)
+          }}
+          onBlur={(e) => {
+            setIsFocused(false)
+            props.onBlur?.(e)
+          }}
+          {...props}
+        />
+
+        {currentStatus !== 'default' && (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+            {currentStatus === 'error' && <AlertCircle className="w-4 h-4 text-red-500" />}
+            {currentStatus === 'success' && <CheckCircle className="w-4 h-4 text-green-500" />}
+          </div>
+        )}
+      </div>
+      
+      {error && (
+        <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-red-600 flex items-center"
+        >
+          <AlertCircle className="w-4 h-4 mr-1" />
+          {error}
+        </motion.p>
+      )}
+      
+      {helperText && !error && (
+        <p className="text-sm text-gray-500">{helperText}</p>
+      )}
+    </div>
+  )
+}
+
+
+
+
+
+# My requirements keep everthing simple ans straight forward, professional, if anything not possible or very hardthe way i am think of it should be, just tell and guide me best way.
+# developed like we are combining the pieces of puzzel and step by developed, pure ui compoents, custom hooks and redux r;ucide reeact and other availbe libraray to reduce and maage the time 
+
+
+
+
+order main is link with coa and transportert if you remeber do you remrbe? so that means first we have to fetch the transpoter and and coa_Id from the that table menas used and used in 
+derachable input 
+so i a=gave you the coa path also create the rtk get query of coa and tranposter than used in the serachbel for bothe tranposter and coa compoent and than compoent in order header 
+
+http://localhost:4000/api/z-coa/get this iss coa get all path 
+by the way these all my all coa api path const express = require('express');
+const router = express.Router();
+const {
+    ZCoaCreate,
+    ZCoaGetAll,
+    ZCoaGetById,
+    ZCoaUpdate,
+    ZCoaDelete,
+    ZCoaGetByCoaTypes,
+    ZCoaGetByCoaTypesCarriage,
+    ZCoaGetByCoaTypesCustomer,
+    ZCoaGetByCoaTypesSupplier
+} = require('../controllers/zCoa.controller');
+
+// Create route
+router.post('/create', ZCoaCreate);
+
+// Get all route
+router.get('/get', ZCoaGetAll);
+
+// Get by ID route
+router.get('/get/:id', ZCoaGetById);
+
+// Update route
+router.put('/update/:id', ZCoaUpdate);
+
+// Delete route
+router.delete('/delete/:id', ZCoaDelete);
+// Get by Coa Types route
+router.get('/by-coa-types', ZCoaGetByCoaTypes);
+
+router.get('/by-coa-type-carriage',ZCoaGetByCoaTypesCarriage);
+
+router.get('/by-coa-type-customer',ZCoaGetByCoaTypesCustomer)
+router.get('/by-coa-type-supplier',ZCoaGetByCoaTypesSupplier)
+module.exports = router;
+
+
+if you easy you can create the all the rtk query 
+#
+// GET /api/transporter - Get all transporters with pagination & search
+router.get('/', getAllTransporters);
+
+// GET /api/transporter/:id - Get single transporter
+router.get('/:id', getTransporter);
+
+// POST /api/transporter - Create new transporter
+router.post('/', createTransporter);
+
+// PUT /api/transporter/:id - Update transporter
+router.put('/:id', updateTransporter);
+
+// DELETE /api/transporter/:id - Delete/Deactivate transporter
+router.delete('/:id', deleteTransporter);
+
+// PATCH /api/transporter/:id/restore - Restore transporter
+router.patch('/:id/restore', restoreTransporter);
+ 
+ this is transporter path 
+
+# first tell me waht do you understand than when i say start writing and stating fomr the base so first create the rtk query  for coa and tansporeter and than used the searchable and similar for the coa 
+# both sales and purchase are mange i one table so i jsut differ based on the sotck_ID
+  Stock_Type_ID: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: '11=Purchase Order, 12=Sales Order'
+  }, so for the coa apply filter if sales by get all coa and filter only customer than used this router.get('/by-coa-type-customer',ZCoaGetByCoaTypesCustomer) and if purchse order than 
+  router.get('/by-coa-type-supplier',ZCoaGetByCoaTypesSupplier) first dearchable tranposter and the coa with fiter than order hearder 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// components/UomConverter.tsx
+'use client'
+import React, { useEffect, useState } from 'react';
+
+type UomType = { id?: number; uom?: string } | null;
+type InitialValuesType = {
+  uom1_qty?: string;
+  uom2_qty?: string;
+  uom3_qty?: string;
+  sale_unit?: string;
+};
+
+interface UomConverterProps {
+  itemId: number | null | undefined;
+  onChange?: (data: any) => void;
+  initialValues?: InitialValuesType;
+  isPurchase?: boolean;
+}
+
+const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false }: UomConverterProps) => {
+  const [saleUnit, setSaleUnit] = useState<string>(initialValues.sale_unit || '');
+  const [uom1Val, setUom1Val] = useState<string>(initialValues.uom1_qty || '');
+  const [uom2Val, setUom2Val] = useState<string>(initialValues.uom2_qty || '');
+  const [uom3Val, setUom3Val] = useState<string>(initialValues.uom3_qty || '');
+  const [data, setData] = useState<{
+    uom1: UomType;
+    uom2_qty: number;
+    uom3_qty: number;
+    uomTwo: UomType;
+    uomThree: UomType;
+  }>({
+    uom1: null,
+    uom2_qty: 12,
+    uom3_qty: 144,
+    uomTwo: null,
+    uomThree: null
+  });
+  const [loading, setLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Update local state when initialValues change (for edit mode)
+  useEffect(() => {
+    if (initialValues && !isInitialized) {
+      setUom1Val(initialValues.uom1_qty || '');
+      setUom2Val(initialValues.uom2_qty || '');
+      setUom3Val(initialValues.uom3_qty || '');
+      setSaleUnit(initialValues.sale_unit || '');
+      setIsInitialized(true);
+    }
+  }, [initialValues, isInitialized]);
+
+  useEffect(() => {
+   
+
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const response = await fetch(`http://${window.location.hostname}:4000/api/z-items/items/${itemId}`);
+        const result = await response.json();
+        if (result.success && result.data) {
+          const itemData = result.data;
+          setData({
+            uom1: itemData.uom1 || { id: 1, uom: 'PCS' },
+            uom2_qty: parseFloat(itemData.uom2_qty) || 12,
+            uom3_qty: parseFloat(itemData.uom3_qty) || 144,
+            uomTwo: itemData.uomTwo || { id: 2, uom: 'DOZ' },
+            uomThree: itemData.uomThree || { id: 3, uom: 'BOX' }
+          });
+
+          // If we have initial values and haven't initialized yet, use them
+          if (initialValues && !isInitialized) {
+            setUom1Val(initialValues.uom1_qty || '');
+            setUom2Val(initialValues.uom2_qty || '');
+            setUom3Val(initialValues.uom3_qty || '');
+            setSaleUnit(initialValues.sale_unit || '');
+          }
+          setIsInitialized(true);
+        }
+        console.log('Fetched UOM data:', result);
+      } catch (error) {
+        console.error('Error fetching UOM data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [itemId]);
+
+  const notifyParent = (uom1: string, uom2: string, uom3: string, selectedSaleUnit: string) => {
+    if (onChange) {
+      onChange({
+        uom1_qty: parseFloat(uom1) || 0,
+        uom2_qty: parseFloat(uom2) || 0,
+        uom3_qty: parseFloat(uom3) || 0,
+        sale_unit: selectedSaleUnit
+      });
+    }
+  };
+
+  const handleUom1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUom1Val(value);
+    if (value && !isNaN(Number(value)) && data.uom2_qty && data.uom3_qty) {
+      const numValue = parseFloat(value);
+      const uom2 = (numValue / data.uom2_qty).toFixed(6);
+      const uom3 = (numValue / data.uom3_qty).toFixed(6);
+      setUom2Val(uom2);
+      setUom3Val(uom3);
+      notifyParent(value, uom2, uom3, saleUnit);
+    } else {
+      setUom2Val('');
+      setUom3Val('');
+      notifyParent(value || '0', '0', '0', saleUnit);
+    }
+  };
+
+  const handleUom2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUom2Val(value);
+    if (value && !isNaN(Number(value)) && data.uom2_qty && data.uom3_qty) {
+      const numValue = parseFloat(value);
+      const uom1 = (numValue * data.uom2_qty).toFixed(2);
+      const uom3 = (numValue * data.uom2_qty / data.uom3_qty).toFixed(6);
+      setUom1Val(uom1);
+      setUom3Val(uom3);
+      notifyParent(uom1, value, uom3, saleUnit);
+    } else {
+      setUom1Val('');
+      setUom3Val('');
+      notifyParent('0', value || '0', '0', saleUnit);
+    }
+  };
+
+  const handleUom3Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUom3Val(value);
+    if (value && !isNaN(Number(value)) && data.uom2_qty && data.uom3_qty) {
+      const numValue = parseFloat(value);
+      const uom1 = (numValue * data.uom3_qty).toFixed(2);
+      const uom2 = (numValue * data.uom3_qty / data.uom2_qty).toFixed(2);
+      setUom1Val(uom1);
+      setUom2Val(uom2);
+      notifyParent(uom1, uom2, value, saleUnit);
+    } else {
+      setUom1Val('');
+      setUom2Val('');
+      notifyParent('0', '0', value || '0', saleUnit);
+    }
+  };
+
+  const handleSaleUnitChange = (unit: string) => {
+    setSaleUnit(unit);
+    notifyParent(uom1Val, uom2Val, uom3Val, unit);
+  };
+
+  // FIXED: Change the condition to be more specific
+  if (!itemId || itemId === null || itemId === undefined) {
+    return <div className="text-gray-400 text-xs px-2">Select item first</div>;
+  }
+
+  return (
+    <div className="flex items-start space-x-2">
+      {loading && (
+        <div className="flex items-center mr-2">
+          <div className="animate-spin h-4 w-4 border-b-2 border-blue-500 mr-1"></div>
+          <span className="text-[10px] text-gray-500">Loading UOM...</span>
+        </div>
+      )}
+
+      {/* UOM 3 (Boxes) */}
+      <div className="flex flex-col">
+        <label className="text-xs text-gray-600 mb-0.5 font-medium">
+          {!isPurchase && (
+
+            <input
+              type="radio"
+              name={`sale_unit_${itemId}`}
+              value="uomThree"
+              checked={saleUnit === 'uomThree'}
+              onChange={() => handleSaleUnitChange('uomThree')}
+              className="mr-1 w-3 h-3"
+            />
+
+          )}
+          {data.uomThree?.uom || 'BOX'}
+        </label>
+        <input
+          type="text"
+          // step="0.01"
+          value={uom3Val}
+          onChange={handleUom3Change}
+          placeholder="0"
+          className={`border rounded-md px-1 py-0.5 w-22 h-10 text-sm focus:ring-1 transition-all ${saleUnit === 'uomThree' && !isPurchase
+            ? 'border-green-400 bg-green-50 focus:ring-green-500'
+            : 'border-gray-300 focus:ring-purple-500'
+            }`}
+        />
+
+      </div>
+
+      {/* UOM 2 (Dozens) */}
+      <div className="flex flex-col">
+        <label className="text-xs text-gray-600 mb-0.5 font-medium">
+          {!isPurchase && (
+            <input
+              type="radio"
+              name={`sale_unit_${itemId}`}
+              value="uomTwo"
+              checked={saleUnit === 'uomTwo'}
+              onChange={() => handleSaleUnitChange('uomTwo')}
+              className="mr-1 w-3 h-3"
+            />
+          )}
+          {data.uomTwo?.uom || 'DOZ'}
+        </label>
+        <input
+          type="text"
+          step="0.01"
+          value={uom2Val}
+          onChange={handleUom2Change}
+          placeholder="0"
+          className={`border rounded-md px-1 py-0.5 w-22 h-10 text-sm focus:ring-1 transition-all ${saleUnit === 'uomTwo' && !isPurchase
+            ? 'border-green-400 bg-green-50 focus:ring-green-500'
+            : 'border-gray-300 focus:ring-blue-500'
+            }`}
+        />
+
+      </div>
+
+      {/* UOM 1 (Pieces) */}
+      <div className="flex flex-col">
+        <label className="text-xs text-gray-600 mb-0.5 font-medium flex items-center ">
+          {!isPurchase && (
+            <input
+              type="radio"
+              name={`sale_unit_${itemId}`}
+              value="uom1"
+              checked={saleUnit === 'uom1'}
+              onChange={() => handleSaleUnitChange('uom1')}
+              className="mr-1 w-3 h-3"
+            />
+          )}
+          {data.uom1?.uom || 'PCS'}
+        </label>
+        <input
+          type="text"
+          step="0.01"
+          value={uom1Val}
+          onChange={handleUom1Change}
+          placeholder="0"
+          className={`border rounded-md px-1 py-0.5 w-22 h-10 text-sm focus:ring-1 transition-all ${saleUnit === 'uom1' && !isPurchase
+            ? 'border-green-400 bg-green-50 focus:ring-green-500'
+            : 'border-gray-300 focus:ring-blue-500'
+            }`}
+        />
+
+      </div>
+    </div>
+  );
+};
+
+export default UomConverter;
+ 
+#this is uom converter compoenet 
+# so as you can see before it was when select item id send from the parent to  <UomConverter
+                                key={`uom-${detail.Item_ID || 'empty'}-${index}`}
+                                itemId={detail.Item_ID}
+                                onChange={(values) => handleUomChange(index, values)}
+                                initialValues={{
+                                  uom1_qty: detail.uom1_qty?.toString() || '',
+                                  uom2_qty: detail.uom2_qty?.toString() || '',
+                                  uom3_qty: detail.uom3_qty?.toString() || '',
+                                  sale_unit: detail.sale_unit || ''
+                                }}
+                                isPurchase={isPurchase}
+                              /> 
+
+
+
+than again fetch the items uoms quantites and name which was long
+but in multitiem slectable we get this 
+(2) [{…}, {…}]
+0
+: 
+id
+: 
+66
+itemName
+: 
+"fine liner tip"
+originalItem
+: 
+{id: 66, itemName: 'fine liner tip', itemClass1: 1, itemClass2: 3, itemClass3: 5, …}
+purchasePricePKR
+: 
+0
+rawUomData
+: 
+skuUOM
+: 
+1
+uom1_qty
+: 
+1
+uom2
+: 
+2
+uom2_qty
+: 
+"10000.00"
+uom3
+: 
+6
+uom3_qty
+: 
+"500000.00"
+[[Prototype]]
+: 
+Object
+sellingPrice
+: 
+0
+uomData
+: 
+primary
+: 
+{id: 1, name: 'Pcs', qty: 1}
+secondary
+: 
+{id: 2, name: 'Box', qty: 10000}
+tertiary
+: 
+{id: 6, name: 'Crt', qty: 500000}..........
+
+
+so this time use this data 
+primary
+: 
+{id: 1, name: 'Pcs', qty: 1}
+secondary
+: 
+{id: 2, name: 'Box', qty: 10000}
+tertiary
+: 
+{id: 6, name: 'Crt', qty: 500000}   and the remaining functionailty will be the same 
+and there three radio button in all uom 
+
+
+# now i am going to explain how this will work
+
+Order_Detail.init(
+  {
+    ID: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    Order_Main_Id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Order_Main',
+        key: 'ID'
+      }
+    },
+    Line_Id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    Item_ID: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'zitems',
+        key: 'id'
+      }
+    },
+    Price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0
+    },
+    Stock_In_UOM: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    Stock_In_UOM_Qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    Stock_SKU_Price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      defaultValue: 0
+    },
+    Stock_In_SKU_UOM: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    Stock_In_SKU_UOM_Qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    Stock_out_UOM: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    Stock_out_UOM_Qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    Stock_out_SKU_UOM: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    Stock_out_SKU_UOM_Qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    uom1_qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    uom2_qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    uom3_qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    sale_unit: {
+      type: DataTypes.STRING(16),
+      allowNull: true,
+      comment: 'Selected UOM for sale: uom1, uomTwo, uomThree'
+    },
+    Discount_A: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true,
+      defaultValue: 0
+    },
+    Discount_B: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true,
+      defaultValue: 0
+    },
+    Discount_C: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true,
+      defaultValue: 0
+    },
+    Goods: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    Remarks: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    trade:{
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false
+    },
+    Uom_Id:{
+      type: DataTypes.INTEGER,
+      allowNull: true
+    }
+
+  }, 
+
+#this is order detail model, we already work on the order header or you can say order main if you remeber 
+so let say user selet the 4 items fomr the multislecttable and it send data to the parent compoent mean order detail and order detail we used the uomConverter componet and this data
+is beign sent to uomConverter primary
+: 
+{id: 1 , name: 'Pcs', qty: 1}
+secondary
+: 
+{id: 2, name: 'Box', qty: 10000}
+tertiary
+: 
+{id: 6, name: 'Crt', qty: 500000} 
+
+
+and than we user enter  the value and Uom converter calclaute as it is alredy working not need to chang in the functionailt but one thing there are three radio button by default the last one means three 
+is selected means by default  sale_unit = 3 and Uom_Id = 6, and if der select the uom 2 than sale_unit = 2 and Uom_Id= 2 and if one than sale_unit = 1 Uom_Id = 1 
+
+and the item id = Item_ID  Discount_A: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true,
+      defaultValue: 0
+    },
+    Discount_B: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true,
+      defaultValue: 0
+    },
+    Discount_C: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true,
+      defaultValue: 0
+    },
+
+if you remeber we fetch the fomr the coa when create the order header auto populate discouts but changeable and these  uom1_qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    uom2_qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+    uom3_qty: {
+      type: DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      defaultValue: 0
+    },
+
+fields are equal to the these  const [uom1Val, setUom1Val] = useState<string>(initialValues.uom1_qty || '');
+  const [uom2Val, setUom2Val] = useState<string>(initialValues.uom2_qty || '');
+  const [uom3Val, setUom3Val] = useState<string>(initialValues.uom3_qty || '');
+
+
+
+
+
+
+# You know About Order main and order details tables, so there are similar two more tables stockMain and stock detail and some of the fiedls are same to the orders table logics 
+and that's mean the aoi and ui similar but with little logic changes and and ui changes 
+How this is going to work first there need to create purchase order and based on the purchse we create the grn and stock in than we create the sales order and create the gdn and stock out,
+stock in and out manages in same tables stock main and detail 
+
+# i added one more fields in the order approved so now there are three fields in the order based on this we have to give permission to the user to create grn or gdn 
+let say user create the order than admin check and admin and can approved or rejecct so by defautl apprived value = 0 and adin can apprived than apprived valeu become 1 when arrpoved= 1 than grn or gdn can be generated  
+
+
+
+so total three based on this system decide grn can generated or 
+
+
+// models/Stk_main.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../config/database');
+
+const Stk_main = sequelize.define('Stk_main', {
+    ID: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        comment: 'Prime Key'
+    },
+    Stock_Type_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        comment: '11=GRN, 12=Dispatch'
+    },
+    COA_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        // comment: 'Foreign key to ZCOA (Supplier/Customer)'
+    },
+    Date: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    Number: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        comment: 'Auto generated GRN/Dispatch number'
+    },
+    Status: {
+        type: DataTypes.ENUM('Post', 'UnPost'),
+        defaultValue: 'UnPost'
+    },
+    Purchase_Type: {
+        type: DataTypes.ENUM('Local', 'Foreign', 'Mfg', 'Local selling'),
+        // comment: 'Local/Foreign/Mfg/ Local selling'
+    },
+    // Purchase_Batchno: {
+    //     type: DataTypes.INTEGER,
+    //     comment: 'Foreign key to ZCOA for batch reference'
+    // },
+    Status_Account_Entry: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        comment: 'True/False for accounting entry status'
+    },
+    Carriage_ID: {
+        type: DataTypes.INTEGER,
+        comment: 'Foreign key to ZCOA for carriage account'
+    },
+    Carriage_Amount: {
+        type: DataTypes.DECIMAL(10, 2),
+        comment: 'Numeric field for carriage amount'
+    },
+
+    Order_Main_ID: {
+        type: DataTypes.INTEGER,
+        comment: 'Reference to original PO/SO - Need to update Order_main table',
+        onDelete: 'RESTRICT',
+    },
+    is_Voucher_Generated: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    Transporter_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    freight_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    labour_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    bility_expense: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    other_expense: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    booked_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    remarks: {
+        type: DataTypes.STRING,
+        allowNull: true
+    }
+
+}, {
+    tableName: 'Stk_main',
+    timestamps: true
+});
+
+// Define associations following your pattern
+Stk_main.associate = function (models) {
+    // Stk_main has many Stk_Detail
+    Stk_main.hasMany(models.Stk_Detail, {
+        foreignKey: 'STK_Main_ID',
+        as: 'details'
+    });
+
+    // Stk_main belongs to ZvoucherType (stock type)
+    Stk_main.belongsTo(models.ZvoucherType, {
+        foreignKey: 'Stock_Type_ID',
+        as: 'Carriage_account'
+    });
+
+    // Stk_main belongs to ZCOA (supplier/customer)
+    Stk_main.belongsTo(models.ZCoa, {
+        foreignKey: 'COA_ID',
+        as: 'account'
+    });
+
+    // Stk_main belongs to ZCOA for batch reference
+    //   Stk_main.belongsTo(models.ZCOA, {
+    //     foreignKey: 'Purchase_Batchno',
+    //     as: 'batchAccount'
+    //   });
+
+    // Stk_main belongs to ZCOA for carriage cost
+    Stk_main.belongsTo(models.ZCoa, {
+        foreignKey: 'Carriage_ID',
+        as: 'carriage_Account'
+    });
+
+    // Stk_main belongs to Ztransporter
+    Stk_main.belongsTo(models.Ztransporter, {
+        foreignKey: 'Transporter_ID',
+        as: 'transporter'
+    });
+
+    // Stk_main belongs to Order_Main (original order)
+    Stk_main.belongsTo(models.Order_Main, {
+        foreignKey: 'Order_Main_ID',
+        as: 'order'
+    });
+    Stk_main.hasMany(models.JournalMaster, {
+        foreignKey: 'stk_Main_ID',
+        as: 'Journal_master'
+    });
+};
+
+module.exports = Stk_main;
+ 
+
+# this is order main tables ad nit has realtion with the stk_main 
+
+what i want if user delete the the fomr the stk_main than ordermain next status = incompelte and is_note_generated= 0 
+so i ahve to create the migration i think if i am right and 
+if apprived =1 and next_status = incompelte and is_note_generated =0 than user can generate the grn or dspatch note
+
+
+
+now in these three fiedls, approved only mange by user and others two status next and is_note_generated will manage by system 
+so first update the status approved in orders/sales
+
+<div className="w-32">
+                                <select
+                                    className="text-xs bg-red-100 text-red-800 border border-red-200 rounded px-2 py-1 cursor-pointer"
+                                    value={order.Next_Status || 'Incomplete'}
+                                    onChange={(e) => console.log('Update status to:', e.target.value)}
+                                >
+                                    <option value="Incomplete">Incomplete</option>
+                                    <option value="Complete">Complete</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div> 
+
+
+change this into apprived or reject approved mean 1 and reject mean 0 
+
+
+
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate status
+    if (!['Incomplete', 'Complete', 'Partial'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status. Use: Incomplete, Complete, or Partial'
+      });
+    }
+
+    // Check if order exists
+    const order = await Order_Main.findByPk(id);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // Update status
+    const [updatedRows] = await Order_Main.update(
+      { Next_Status: status },
+      { where: { ID: id } }
+    );
+
+    if (updatedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Failed to update order status'
+      });
+    }
+
+    // Return updated order
+    const updatedOrder = await Order_Main.findByPk(id, {
+      include: [
+        { model: ZCoa, as: 'account', attributes: ['id', 'acName'] }
+      ]
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Order status updated to ${status}`,
+      data: updatedOrder
+    });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update order status',
+      error: error.message
+    });
+  }
+};
+ create api than only handle the apprived or reject similar to this 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'use strict';
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    const tableName = 'order_main';
+
+    // --- CLEANUP: Remove redundant FOREIGN KEY constraints ---
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_1\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_3\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_5\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_7\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_9\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_11\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_13\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_2\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_4\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_6\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_8\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_10\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_12\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`order_main_ibfk_14\`;`);
+
+    // --- CLEANUP: Remove redundant UNIQUE KEY constraints for 'Number' column ---
+    // Note: We leave the first 'Number' index intact as it is the original primary constraint, 
+    //       but we can also drop it and re-add it for maximum cleanliness.
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP INDEX \`Number\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP INDEX \`Number_2\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP INDEX \`Number_3\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP INDEX \`Number_4\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP INDEX \`Number_5\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP INDEX \`Number_6\`;`);
+    await queryInterface.sequelize.query(`ALTER TABLE \`${tableName}\` DROP INDEX \`Number_7\`;`);
+
+    // --- ADD: A single, correct UNIQUE constraint for 'Number' column ---
+    await queryInterface.addConstraint(tableName, {
+        fields: ['Number'],
+        type: 'unique',
+        name: 'unique_order_main_number' 
+    });
+
+    // --- ADD: A single, correct Stock_Type_ID constraint with ON DELETE RESTRICT ---
+    await queryInterface.addConstraint(tableName, {
+      fields: ['Stock_Type_ID'],
+      type: 'foreign key',
+      references: { table: 'zvouchertype', field: 'ID' },
+      onUpdate: 'CASCADE',
+      onDelete: 'RESTRICT', 
+      name: 'fk_order_main_stock_type_restrict' 
+    });
+
+    // --- ADD: A single, correct COA_ID constraint ---
+    await queryInterface.addConstraint(tableName, {
+        fields: ['COA_ID'],
+        type: 'foreign key',
+        references: { table: 'zcoas', field: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT', // MySQL default
+        name: 'fk_order_main_coa_id_restrict' 
+    });
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    // down function intentionally omitted
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE `order_main` (
+   `ID` int NOT NULL AUTO_INCREMENT,
+   `Stock_Type_ID` int NOT NULL COMMENT '1=Purchase, 2=Sales',
+   `Date` datetime NOT NULL,
+   `Number` varchar(255) NOT NULL,
+   `COA_ID` int NOT NULL,
+   `Next_Status` enum('Incomplete','Complete','Partial') DEFAULT 'Incomplete',
+   `GRN_Status` enum('Pending','Partial','Complete') DEFAULT 'Pending' COMMENT 'Status of goods receiving for PO',
+   `Dispatch_Status` enum('Pending','Partial','Complete') DEFAULT 'Pending' COMMENT 'Status of dispatch for SO',
+   `createdAt` datetime NOT NULL,
+   `updatedAt` datetime NOT NULL,
+   `Transporter_ID` int DEFAULT NULL,
+   `freight_crt` decimal(10,2) DEFAULT '0.00',
+   `labour_crt` decimal(10,2) DEFAULT '0.00',
+   `bility_expense` decimal(10,2) DEFAULT '0.00',
+   `other_expense` decimal(10,2) DEFAULT '0.00',
+   `foreign_currency` varchar(255) DEFAULT NULL,
+   `sub_customer` varchar(255) DEFAULT NULL,
+   `sub_city` varchar(255) DEFAULT NULL,
+   `str` int DEFAULT NULL,
+   `is_Note_generated` tinyint(1) DEFAULT '0',
+   `approved` tinyint(1) DEFAULT '0',
+   PRIMARY KEY (`ID`),
+   UNIQUE KEY `unique_order_main_number` (`Number`),
+   KEY `Stock_Type_ID` (`Stock_Type_ID`),
+   KEY `COA_ID` (`COA_ID`),
+   KEY `Order_Main_Transporter_ID_foreign_idx` (`Transporter_ID`),
+   CONSTRAINT `fk_order_main_coa_id_restrict` FOREIGN KEY (`COA_ID`) REFERENCES `zcoas` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `fk_order_main_stock_type_restrict` FOREIGN KEY (`Stock_Type_ID`) REFERENCES `zvouchertype` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `fk_order_main_transporter_id_restrict` FOREIGN KEY (`Transporter_ID`) REFERENCES `ztransporter` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+ ) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE `stk_main` (
+   `ID` int NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+   `Stock_Type_ID` int NOT NULL COMMENT '11=GRN, 12=Dispatch',
+   `COA_ID` int NOT NULL,
+   `Date` datetime NOT NULL,
+   `Number` varchar(255) NOT NULL COMMENT 'Auto generated GRN/Dispatch number',
+   `Status` enum('Post','UnPost') DEFAULT 'UnPost',
+   `Purchase_Type` enum('Local','Foreign','Mfg','Local selling') DEFAULT NULL,
+   `Status_Account_Entry` tinyint(1) DEFAULT '0' COMMENT 'True/False for accounting entry status',
+   `Carriage_ID` int DEFAULT NULL,
+   `Carriage_Amount` decimal(10,2) DEFAULT NULL,
+   `Order_Main_ID` int DEFAULT NULL,
+   `is_Voucher_Generated` tinyint(1) DEFAULT '0',
+   `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   `Transporter_ID` int DEFAULT NULL,
+   `freight_crt` decimal(10,2) DEFAULT '0.00',
+   `labour_crt` decimal(10,2) DEFAULT '0.00',
+   `bility_expense` decimal(10,2) DEFAULT '0.00',
+   `other_expense` decimal(10,2) DEFAULT '0.00',
+   `booked_crt` decimal(10,2) DEFAULT '0.00',
+   `remarks` varchar(255) DEFAULT NULL,
+   PRIMARY KEY (`ID`),
+   UNIQUE KEY `Number` (`Number`),
+   KEY `Stock_Type_ID` (`Stock_Type_ID`),
+   KEY `COA_ID` (`COA_ID`),
+   KEY `Carriage_ID` (`Carriage_ID`),
+   KEY `Order_Main_ID` (`Order_Main_ID`),
+   KEY `Stk_main_Transporter_ID_foreign_idx` (`Transporter_ID`),
+   CONSTRAINT `fk_stk_main_carrige_id_restrict` FOREIGN KEY (`Carriage_ID`) REFERENCES `zcoas` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `fk_stk_main_coa_id_restrict` FOREIGN KEY (`COA_ID`) REFERENCES `zcoas` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `fk_stk_main_order_id_restrict` FOREIGN KEY (`Order_Main_ID`) REFERENCES `order_main` (`ID`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `fk_stk_main_sotck_id_restrict` FOREIGN KEY (`Stock_Type_ID`) REFERENCES `zvouchertype` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `fk_stk_main_transporter_id_restrict` FOREIGN KEY (`Transporter_ID`) REFERENCES `ztransporter` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+ ) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE `stk_detail` (
+   `ID` int NOT NULL AUTO_INCREMENT,
+   `STK_Main_ID` int NOT NULL,
+   `Line_Id` int NOT NULL,
+   `Item_ID` int DEFAULT NULL,
+   `batchno` int DEFAULT NULL,
+   `Stock_Price` decimal(10,2) DEFAULT NULL,
+   `Stock_SKU_Price` decimal(10,2) DEFAULT NULL,
+   `Stock_In_UOM` int DEFAULT NULL,
+   `Stock_In_UOM_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_out_UOM` int DEFAULT NULL,
+   `Stock_out_UOM_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_In_SKU_UOM` int DEFAULT NULL,
+   `Stock_In_SKU_UOM_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_out_SKU_UOM` int DEFAULT NULL,
+   `Stock_out_SKU_UOM_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_In_UOM3_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_out_UOM3_Qty` decimal(10,3) DEFAULT NULL,
+   `Sale_Unit` varchar(255) DEFAULT NULL,
+   `Discount_A` decimal(5,2) DEFAULT '0.00',
+   `Discount_B` decimal(5,2) DEFAULT '0.00',
+   `Discount_C` decimal(5,2) DEFAULT '0.00',
+   `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `sale_Uom` int DEFAULT '0',
+   `uom1_qty` decimal(10,3) DEFAULT '0.000',
+   `uom2_qty` decimal(10,3) DEFAULT '0.000',
+   `uom3_qty` decimal(10,3) DEFAULT '0.000',
+   PRIMARY KEY (`ID`),
+   UNIQUE KEY `stk_detail_main_line_unique` (`STK_Main_ID`,`Line_Id`),
+   KEY `Item_ID` (`Item_ID`),
+   KEY `fk_stkdetail_batchno_zcoa` (`batchno`),
+   CONSTRAINT `fk_stk_main_batch_id_restrict` FOREIGN KEY (`batchno`) REFERENCES `zcoas` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `fk_stk_main_items_id_restrict` FOREIGN KEY (`Item_ID`) REFERENCES `zitems` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `stk_detail_ibfk_1` FOREIGN KEY (`STK_Main_ID`) REFERENCES `stk_main` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+ ) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+So we need to works on the many things ans we work on step by step not once 
+
+
+Now move to the add items when creating the gdn or when edit  but now just focus on the when creating  if you remember multiselectable and what mutilselectable was doing we select the items and click to add and than close  to close it so ite fetches items names and uomqtys with name 
+so let sya i click to to add more items other than i have in the order data multiselectable popup select the with uom and than item hits agian to get aviable batches getAvailableBatchesForItem 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE `stk_detail` (
+   `ID` int NOT NULL AUTO_INCREMENT,
+   `STK_Main_ID` int NOT NULL,
+   `Line_Id` int NOT NULL,
+   `Item_ID` int DEFAULT NULL,
+   `batchno` int DEFAULT NULL,
+   `Stock_Price` decimal(10,2) DEFAULT NULL,
+   `Stock_SKU_Price` decimal(10,2) DEFAULT NULL,
+   `Stock_In_UOM` int DEFAULT NULL,
+   `Stock_In_UOM_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_out_UOM` int DEFAULT NULL,
+   `Stock_out_UOM_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_In_SKU_UOM` int DEFAULT NULL,
+   `Stock_In_SKU_UOM_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_out_SKU_UOM` int DEFAULT NULL,
+   `Stock_out_SKU_UOM_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_In_UOM3_Qty` decimal(10,3) DEFAULT NULL,
+   `Stock_out_UOM3_Qty` decimal(10,3) DEFAULT NULL,
+   `Sale_Unit` varchar(255) DEFAULT NULL,
+   `Discount_A` decimal(5,2) DEFAULT '0.00',
+   `Discount_B` decimal(5,2) DEFAULT '0.00',
+   `Discount_C` decimal(5,2) DEFAULT '0.00',
+   `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `sale_Uom` int DEFAULT '0',
+   `uom1_qty` decimal(10,3) DEFAULT '0.000',
+   `uom2_qty` decimal(10,3) DEFAULT '0.000',
+   `uom3_qty` decimal(10,3) DEFAULT '0.000',
+   PRIMARY KEY (`ID`),
+   UNIQUE KEY `stk_detail_main_line_unique` (`STK_Main_ID`,`Line_Id`),
+   KEY `Item_ID` (`Item_ID`),
+   KEY `fk_stkdetail_batchno_zcoa` (`batchno`),
+   CONSTRAINT `fk_stk_main_batch_id_restrict` FOREIGN KEY (`batchno`) REFERENCES `zcoas` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `fk_stk_main_items_id_restrict` FOREIGN KEY (`Item_ID`) REFERENCES `zitems` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+   CONSTRAINT `stk_detail_ibfk_1` FOREIGN KEY (`STK_Main_ID`) REFERENCES `stk_main` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+ ) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+
+
+
+
+
+
+
+
+
+
+
+[
+  {
+    "id": 66,
+    "itemName": "fine liner tip",
+    "sellingPrice": null,
+    "purchasePricePKR": null,
+    "barCode": 0,
+    "uom1": 1,
+    "uom1_name": "Pcs",
+    "qyt_1": 1,
+    "uom2": 2,
+    "uom2_name": "Box",
+    "qty_2": "10000.00",
+    "uom3": 6,
+    "uom3_name": "Crt",
+    "qty_3": "500000.00",
+    "dvidier": " fitlered items data here",
+    "uom1_qty": "",
+    "uom2_qty": "",
+    "uom3_qty": "",
+    "sale_unit": "",
+    "Uom_Id": ""
+  },
+  {
+    "id": 65,
+    "itemName": "Pin no 23/24",
+    "sellingPrice": "2700.00",
+    "purchasePricePKR": "0.00",
+    "barCode": 0,
+    "uom1": 4,
+    "uom1_name": "Pkt",
+    "qyt_1": 1,
+    "uom2": 2,
+    "uom2_name": "Box",
+    "qty_2": "10.00",
+    "uom3": 6,
+    "uom3_name": "Crt",
+    "qty_3": "100.00",
+    "dvidier": " fitlered items data here",
+    "uom1_qty": "",
+    "uom2_qty": "",
+    "uom3_qty": "",
+    "sale_unit": "",
+    "Uom_Id": ""
+  },
+  {
+    "id": 26,
+    "itemName": "5012",
+    "sellingPrice": "330.00",
+    "purchasePricePKR": "0.00",
+    "barCode": 0,
+    "uom1": 1,
+    "uom1_name": "Pcs",
+    "qyt_1": 1,
+    "uom2": 2,
+    "uom2_name": "Box",
+    "qty_2": "50.00",
+    "uom3": 6,
+    "uom3_name": "Crt",
+    "qty_3": "2700.00",
+    "dvidier": " fitlered items data here",
+    "uom1_qty": "2700.000",
+    "uom2_qty": "54.000",
+    "uom3_qty": "1.000",
+    "sale_unit": "3",
+    "Uom_Id": 6
+  },
+  {
+    "id": 25,
+    "itemName": "5555",
+    "sellingPrice": "400.00",
+    "purchasePricePKR": "0.00",
+    "barCode": 0,
+    "uom1": 1,
+    "uom1_name": "Pcs",
+    "qyt_1": 1,
+    "uom2": 2,
+    "uom2_name": "Box",
+    "qty_2": "60.00",
+    "uom3": 6,
+    "uom3_name": "Crt",
+    "qty_3": "3600.00",
+    "dvidier": " fitlered items data here",
+    "uom1_qty": "3600.000",
+    "uom2_qty": "60.000",
+    "uom3_qty": "1.000",
+    "sale_unit": "3",
+    "Uom_Id": 6
+  },
+  {
+    "id": 4,
+    "itemName": "P-50T Blue",
+    "sellingPrice": "165.00",
+    "purchasePricePKR": "0.00",
+    "barCode": 0,
+    "uom1": 1,
+    "uom1_name": "Pcs",
+    "qyt_1": 1,
+    "uom2": 2,
+    "uom2_name": "Box",
+    "qty_2": "10.00",
+    "uom3": 6,
+    "uom3_name": "Crt",
+    "qty_3": "1500.00",
+    "dvidier": " fitlered items data here",
+    "uom1_qty": "750.000",
+    "uom2_qty": "75.000",
+    "uom3_qty": "0.500",
+    "sale_unit": "2",
+    "Uom_Id": 2
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//@compenets/inventoryy/testing/GDNForm.tsx
+'use client'
+import { Loader2 } from 'lucide-react'
+import { useGetOrderByIdQuery } from '@/store/slice/orderApi'
+import Stk_Header from './Stk_Header'
+import Stk_Detail from './Stk_Detail'
+
+export default function GDNForm({ orderId }: { orderId: string }) {
+    const { data, isLoading, error } = useGetOrderByIdQuery(orderId)
+
+    if (isLoading) return <div><Loader2 className="animate-spin" /> Loading...</div>
+    if (error) return <div>Error loading order</div>
+    if (!data?.data) return <div>No order found</div>
+
+    const { details, ...header } = data.data
+
+    return (
+        <div>
+            <Stk_Header data={header} />
+            <Stk_Detail data={details} />
+        </div>
+    )
+}
+
+// components/inventoryy/inventoryy/Stk_Header.tsx
+export default function Stk_Header({ data }: { data: any }) {
+  const extractHeader = () => ({
+    ID: data.ID,
+    Date: data.Date,
+    Number: data.Number,
+    COA_ID: data.COA_ID,
+    approved: data.approved,
+    Transporter_ID: data.Transporter_ID,
+    freight_crt: data.freight_crt,
+    labour_crt: data.labour_crt,
+    bility_expense: data.bility_expense,
+    other_expense: data.other_expense,
+    sub_customer: data.sub_customer,
+    sub_city: data.sub_city,
+    is_Note_generated: data.is_Note_generated,
+    account: data.account
+  })
+
+  return (
+    <div>
+      <h2>Header Data</h2>
+      <pre>{JSON.stringify(extractHeader(), null, 2)}</pre>
+    </div>
+  )
+}
+
+import { useMemo, useState } from 'react'
+import { Plus, X } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
+import { MultiSelectItemTable } from '@/components/inventoryy/testing/multiSelectable'
+import Stk_details_data from './Stk_details_data'
+
+export default function Stk_Detail({ data }: { data: any[] }) {
+  const [selectedItems, setSelectedItems] = useState<any[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalSelectedItems, setModalSelectedItems] = useState<any[]>([])
+  // Track IDs removed by the user so we don't show them again as pre-selected
+  const [removedPreselectedIds, setRemovedPreselectedIds] = useState<number[]>([])
+
+  const extractDetail = (item: any) => ({
+    ID: item.ID,
+    Item_ID: item.Item_ID,
+    Price: item.Price,
+    uom1_qty: item.uom1_qty,
+    uom2_qty: item.uom2_qty,
+    uom3_qty: item.uom3_qty,
+    sale_unit: item.sale_unit,
+    Discount_A: item.Discount_A,
+    Discount_B: item.Discount_B,
+    Discount_C: item.Discount_C,
+    Goods: item.Goods,
+    Remarks: item.Remarks,
+    Uom_Id: item.Uom_Id,
+    itemName: item.item?.itemName,
+    skuUOM: item.item?.skuUOM,
+    uomOne_qyt: item.item?.uom1_qyt,
+    uom2: item.item?.uom2,
+    uomTwo_qty: item.item?.uom2_qty,
+    uom3: item.item?.uom3,
+    uomThree_qty: item.item?.uom3_qty,
+    uom1: item.item?.uom1,
+    uomTwo: item.item?.uomTwo,
+    uomThree: item.item?.uomThree
+  })
+
+  const extractedDetails = useMemo(() => data?.map(extractDetail), [data])
+  const itemIds = useMemo(() => extractedDetails.map(item => item.Item_ID), [extractedDetails])
+
+  // active pre-selected ids = original itemIds minus any that the user removed
+  const activeItemIds = useMemo(() => (itemIds || []).filter(id => !removedPreselectedIds.includes(id)), [itemIds, removedPreselectedIds])
+
+  const modalInitialIds = useMemo(() => {
+    const addedIds = selectedItems.map((it: any) => it.id).filter(Boolean)
+    return Array.from(new Set([...(activeItemIds || []), ...addedIds]))
+  }, [activeItemIds, selectedItems])
+
+
+  const filterItemDetails = (extractedDetails) => {
+    return extractedDetails.map(item => ({
+      Item_ID: item.Item_ID,
+      Price: item.Price,
+      uom1_qty: item.uom1_qty,
+      uom2_qty: item.uom2_qty,
+      uom3_qty: item.uom3_qty,
+      sale_unit: item.sale_unit,
+      Uom_Id: item.Uom_Id,
+    }))
+  }
+
+
+  const filteredDetails = filterItemDetails(extractedDetails)
+  console.log('these are the fitlered items', filteredDetails)
+
+
+  const normalizeSelectedItems = (selectedItems = [], orderDetails = []) => {
+    return selectedItems.map(item => {
+      const order = orderDetails.find(
+        o => o.Item_ID === item.id
+      )
+
+      // return {
+
+      //   ...item,
+
+      //   dvidier: ' fitlered items data here',
+      //   uom1_qty: order?.uom1_qty ?? "",
+      //   uom2_qty: order?.uom2_qty ?? "",
+      //   uom3_qty: order?.uom3_qty ?? "",
+      //   sale_unit: order?.sale_unit ?? "",
+      //   Uom_Id: order?.Uom_Id ?? "",
+
+      // }
+
+
+
+      return {
+
+        ...item,
+
+        dvidier: ' fitlered items data here',
+        uom: {
+          uom1_qty: order?.uom1_qty ?? "",
+          uom2_qty: order?.uom2_qty ?? "",
+          uom3_qty: order?.uom3_qty ?? "",
+          sale_unit: order?.sale_unit ?? "",
+          Uom_Id: order?.Uom_Id ?? "",
+
+          uom1: item.uom1,
+          uom1_name: item.uom1_name,
+          qyt_1: item.qyt_1,
+          uom2: item.uom2,
+          uom2_name: item.uom2_name,
+          qty_2: item.qty_2,
+          
+          uom3: item.uom3,
+          uom3_name: item.uom3_name,
+          qty_3: item.qty_3,
+
+        }
+
+
+      }
+
+
+
+
+    })
+  }
+
+
+  const finalItems = normalizeSelectedItems(selectedItems, filteredDetails)
+  //   console.log('these are the finals items', finalItems)
+
+
+
+  console.log('Extracted Details:', extractedDetails)
+  console.log('Item IDs:', itemIds)
+  console.log('Modal initial IDs:', modalInitialIds)
+  console.log('Selected Items from MultiSelect:', selectedItems)
+
+  return (
+    <div>
+      <h2>Order Details ({extractedDetails.length} items)</h2>
+
+      {/* {extractedDetails.map((item, i) => (
+        <pre key={i}>{JSON.stringify(item, null, 2)}</pre>
+      ))}  */}
+      {/* 
+       <pre style={{ background: '#f4f4f4', padding: '1rem', overflow: 'auto' }}>
+                {JSON.stringify(data, null, 2)}
+             </pre> */}
+
+      {/* <pre>
+        {JSON.stringify(filteredDetails, null, 2)}
+      </pre> */}
+      <div className='mt-10 bg-gray-200 rounded-lg p-6'>
+        Final Item:
+        <pre>
+          {JSON.stringify(finalItems, null, 2)}
+        </pre>
+      </div>
+
+
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-medium">Select Additional Items</h3>
+          <Button onClick={() => { setModalSelectedItems(selectedItems); setIsModalOpen(true) }} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Add Items
+          </Button>
+        </div>
+
+        {/* inline, read-only view of pre-selected items (also populate parent selectedItems) */}
+        <MultiSelectItemTable
+          isPurchase={false}
+          preSelectedIds={activeItemIds}
+          onSelectionChange={(items) => { console.log('Inline selection sent to parent:', items); setSelectedItems(items) }}
+          editable={false}
+        />
+
+        {/* show items added via modal */}
+        {selectedItems.length > 0 && (
+          <div className="mt-4">
+            <h4 className="font-medium">Added Items ({selectedItems.length})</h4>
+            <pre className="bg-gray-100 p-3 rounded mt-2 overflow-auto text-sm">{JSON.stringify(selectedItems, null, 2)}</pre>
+          </div>
+        )}
+
+        {/* Modal for adding/removing items */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-xl">
+              <div className="flex justify-between items-center p-4 border-b">
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <Plus className="w-5 h-5" /> Select Items (Pre-loaded: {itemIds.length})
+                </h2>
+                <button onClick={() => setIsModalOpen(false)} className="hover:bg-gray-100 rounded-full p-1">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-auto p-4">
+                <MultiSelectItemTable
+                  isPurchase={false}
+                  preSelectedIds={modalInitialIds}
+                  onSelectionChange={setModalSelectedItems}
+                  editable={true}
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 p-4 border-t bg-gray-50 rounded-b-xl">
+                <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Close</Button>
+                <Button onClick={() => {
+                  // Apply modal selection to parent
+                  setSelectedItems(modalSelectedItems)
+                  // compute which of original itemIds the user removed and remember them
+                  const removed = itemIds.filter(id => !modalSelectedItems.some((it: any) => it.id === id))
+                  setRemovedPreselectedIds(removed)
+                  setIsModalOpen(false)
+                }}>Add Selected</Button>
+              </div>
+            </div>
+          </div>
+        )}
+        <Stk_details_data data={finalItems} />
+      </div>
+    </div>
+  )
+}
+
+import React, { useState, useMemo, useEffect } from 'react'
+import { Search, Trash2 } from 'lucide-react'
+import { Input } from '@/components/ui/Input'
+import { useGetAllItemsQuery } from '@/store/slice/itemsApi'
+
+interface Props {
+  isPurchase?: boolean
+  preSelectedIds?: number[]
+  onSelectionChange?: (selected: any[]) => void
+  editable?: boolean // when false, selection cannot be changed (read-only mode)
+}
+
+export const MultiSelectItemTable: React.FC<Props> = ({
+  isPurchase = false,
+  preSelectedIds = [],
+  onSelectionChange,
+  editable = true
+}) => {
+  // Start empty and map incoming preSelectedIds to internal ids after items load
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set())
+  const [searchTerm, setSearchTerm] = useState('')
+  // start empty so first-time preSelectedIds mapping runs when items load
+  const appliedPreSelectedKeyRef = React.useRef<string>('')
+  const lastSentRef = React.useRef<string>('') // remember last sent selection to avoid loops
+  console.log('📥 Received preSelectedIds:', preSelectedIds)
+
+  const queryArg = useMemo(() => ({ limit: 1000 }), [])
+  const { data: itemsResponse, isLoading } = useGetAllItemsQuery(queryArg)
+  const allItems: any[] = itemsResponse?.data || []
+
+  // ✅ Extract only required fields
+  // const extractItemData = (item: any) => ({
+  //   id: item.id,
+  //   itemName: item.itemName,
+  //   sellingPrice: item.sellingPrice,
+  //   purchasePricePKR: item.purchasePricePKR,
+  //   barCode: item.barCode,
+  //   uom1: item.uom1,
+  //   uom2: item.uom2,
+  //   uom2_qty: item.uom2_qty,
+  //   uomTwo: item.uomTwo,
+  //   uom3: item.uom3,
+  //   uom3_qty: item.uom3_qty,
+  //   uomThree: item.uomThree,
+  //   skuUOM: item.skuUOM,
+  //   itemClass1: item.itemClass1,
+  //   itemClass2: item.itemClass2,
+  //   itemClass3: item.itemClass3,
+  //   itemClass4: item.itemClass4
+  // })
+
+
+
+
+
+
+
+ const extractItemData = (item: any) => ({
+    id: item.id,
+    itemName: item.itemName,
+    sellingPrice: item.sellingPrice,
+    purchasePricePKR: item.purchasePricePKR,
+    barCode: item.barCode,
+    uom1: item.skuUOM,
+    uom1_name: item.uom1.uom,
+    qyt_1: item.uom1_qyt,
+    uom2: item.uom2,
+    uom2_name:item.uomTwo.uom,
+    qty_2: item.uom2_qty,
+    // uomTwo: item.uomTwo,
+    uom3: item.uom3,
+    uom3_name: item.uomThree.uom,
+    qty_3: item.uom3_qty,
+    
+    // skuUOM: item.skuUOM,
+    // itemClass1: item.itemClass1,
+    // itemClass2: item.itemClass2,
+    // itemClass3: item.itemClass3,
+    // itemClass4: item.itemClass4
+  }) 
+
+  // ✅ Manage preSelectedIds only when they change, and notify parent on selection updates
+  useEffect(() => {
+    // Wait for items to load
+    if (allItems.length === 0) {
+      console.log('⏳ Waiting for items to load...')
+      return
+    }
+
+    // Apply new preSelectedIds only when their value actually changes (parent intent)
+    const preKey = JSON.stringify(preSelectedIds || [])
+    if (preKey !== appliedPreSelectedKeyRef.current) {
+      appliedPreSelectedKeyRef.current = preKey
+      // Map incoming IDs (might be external Item_IDs, barcodes, or internal ids) to internal item.id
+      const mapped = new Set<number>()
+      ;(preSelectedIds || []).forEach((pre) => {
+        // try matching by different known fields
+        const found = allItems.find(it =>
+          String(it.id) === String(pre) ||
+          String(it.Item_ID) === String(pre) ||
+          (it.barCode !== undefined && String(it.barCode) === String(pre))
+        )
+        if (found) mapped.add(found.id)
+      })
+      console.log('🔀 Mapped preSelectedIds -> internal ids', preSelectedIds, Array.from(mapped))
+      // Only update state if it actually changed to avoid extra renders
+      const currentArray = Array.from(selectedIds).sort()
+      const mappedArray = Array.from(mapped).sort()
+      const isEqual = currentArray.length === mappedArray.length && currentArray.every((v, i) => v === mappedArray[i])
+      if (!isEqual) {
+        setSelectedIds(mapped)
+        // avoid notifying parent with the old (likely empty) selection in the same effect run
+        return
+      }
+    }
+
+    // Notify parent about current selection (derived only from selectedIds)
+    const selectedArray = Array.from(selectedIds)
+    const extracted = allItems
+      .filter(item => selectedArray.includes(item.id))
+      .map(extractItemData)
+
+    // Only notify if selection actually changed (prevents parent-child loops)
+    const extractedKey = JSON.stringify(extracted.map(i => i.id).sort())
+    if (extractedKey !== lastSentRef.current) {
+      lastSentRef.current = extractedKey
+      console.log('📤 Sending to parent:', extracted.length, 'items')
+      onSelectionChange?.(extracted)
+    } else {
+      console.log('✋ Skipping notify, selection unchanged')
+    }
+  // include selectedIds snapshot so effect runs whenever selection changes
+  }, [allItems.length, Array.from(selectedIds).join(','), preSelectedIds, onSelectionChange, editable])
+
+  // Filtered items
+  const filteredItems = useMemo(() => {
+    if (!searchTerm) return allItems
+    const search = searchTerm.toLowerCase()
+    return allItems.filter(item =>
+      item.itemName?.toLowerCase().includes(search) ||
+      item.barCode?.toString().includes(search) ||
+      item.id.toString().includes(search)
+    )
+  }, [allItems, searchTerm])
+
+  // When editable changes (e.g., modal opens), force re-apply mapping on next effect run
+  useEffect(() => {
+    if (editable) {
+      appliedPreSelectedKeyRef.current = ''
+    }
+  }, [editable])
+
+  // Selected items for display
+  const selectedItemsList = allItems.filter(item => selectedIds.has(item.id))
+
+  const handleSelect = (id: number) => {
+    if (!editable) return
+    setSelectedIds(prev => {
+      const s = new Set(prev)
+      s.add(id)
+      return s
+    })
+  }
+
+  const handleRemove = (id: number) => {
+    if (!editable) return
+    setSelectedIds(prev => {
+      const s = new Set(prev)
+      s.delete(id)
+      return s
+    })
+  }
+
+  const chipColor = isPurchase
+    ? 'bg-green-100 text-green-700 border-green-300'
+    : 'bg-blue-100 text-blue-700 border-blue-300'
+
+  if (isLoading) {
+    return <div className="text-center py-8 text-gray-500">Loading items...</div>
+  }
+
+  return (
+    <div>
+      {/* Selected Chips */}
+      {selectedItemsList.length > 0 && (
+        <div className="mb-4">
+          <div className="font-medium mb-2">Selected ({selectedItemsList.length}):</div>
+          <div className="flex flex-wrap gap-2">
+            {selectedItemsList.map(item => (
+              <div key={item.id} className={`flex items-center px-3 py-1 rounded-full border ${chipColor} gap-2`}>
+                <span className="text-sm">{item.itemName}</span>
+                {editable ? (
+                  <button onClick={() => handleRemove(item.id)} className="hover:bg-red-100 rounded-full p-1">
+                    <Trash2 className="w-3 h-3 text-red-500" />
+                  </button>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Search and table: only show when editable (modal) */}
+      {editable ? (
+        <>
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Search items..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <div className="overflow-auto max-h-[50vh] border rounded">
+            <table className="w-full">
+              <thead className="bg-gray-100 sticky top-0">
+                <tr>
+                  <th className="w-12 px-4 py-3"></th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">ID</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">Name</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">UOM</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredItems.map(item => {
+                  const isSelected = selectedIds.has(item.id)
+                  return (
+                    <tr
+                      key={item.id}
+                      onClick={() => (isSelected ? handleRemove(item.id) : handleSelect(item.id))}
+                      className={`cursor-pointer ${isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                    >
+                      <td className="px-4 py-3">
+                        {isSelected ? (
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Added</span>
+                        ) : (
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              e.stopPropagation()
+                              isSelected ? handleRemove(item.id) : handleSelect(item.id)
+                            }}
+                            onClick={e => e.stopPropagation()}
+                          />
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm">{item.id}</td>
+                      <td className="px-4 py-3 text-sm font-medium">{item.itemName}</td>
+                      <td className="px-4 py-3 text-sm">{item.uom1?.uom || '-'}</td>
+                      <td className="px-4 py-3 text-sm">{isPurchase ? item.purchasePricePKR : item.sellingPrice}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        // compact read-only summary only
+        selectedItemsList.length === 0 ? (
+          <div className="text-sm text-gray-500">No pre-selected items</div>
+        ) : null
+      )}
+    </div>
+  )
+}
+
+
+const generateGRNNumber = async () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+
+  const lastGRN = await Stk_main.findOne({
+    where: {
+      Stock_Type_ID: 11,
+      Number: { [Op.like]: `GRN-${year}${month}%` }
+    },
+    order: [['Number', 'DESC']]
+  });
+
+  let sequence = 1;
+  if (lastGRN) {
+    const lastSequence = parseInt(lastGRN.Number.split('-')[2]);
+    sequence = lastSequence + 1;
+  }
+
+  return `GRN-${year}${month}-${String(sequence).padStart(4, '0')}`;
+};
+
+ok convert this this number jsut simple the last record and icnrmemt by ont everytime 
+
+router.post('/', async (req, res) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const { stockMain, stockDetails } = req.body;
+
+    const grnNumber = await generateGRNNumber();
+    
+    const grn = await Stk_main.create({
+      ...stockMain,
+      Number: grnNumber,
+      Stock_Type_ID: 11 // ✅ ENSURE GRN uses correct stock type
+    }, { transaction });
+
+    const grnDetails = stockDetails.map((detail, index) => ({
+      ...detail,
+      STK_Main_ID: grn.ID,
+      Line_Id: index + 1,
+      batchno: stockMain.batchno
+    }));
+
+    await Stk_Detail.bulkCreate(grnDetails, { transaction });
+
+    // ✅ UPDATED: Set order status properly
+    if (stockMain.Order_Main_ID) {
+      await Order_Main.update(
+        { 
+          Next_Status: 'Partial',
+          is_Note_generated: true  // ✅ CRITICAL: Mark note as generated
+        },
+        { where: { ID: stockMain.Order_Main_ID }, transaction }
+      );
+    }
+
+    await transaction.commit();
+
+    res.status(201).json({
+      success: true,
+      message: 'GRN created successfully',
+      data: { ...grn.toJSON(), details: grnDetails, grnNumber }
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error creating GRN:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+
+const Stk_Detail = sequelize.define('Stk_Detail', {
+  ID: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  STK_Main_ID: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  Line_Id: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  Item_ID: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+
+  // Batch number field
+  batchno: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Batch number for this item'
+  },
+
+  // Price fields
+  Stock_Price: { type: DataTypes.DECIMAL(10, 2) },
+  Stock_SKU_Price: { type: DataTypes.DECIMAL(10, 2) },
+
+  // UOM1 fields
+  Stock_In_UOM: { type: DataTypes.INTEGER },
+  Stock_In_UOM_Qty: { type: DataTypes.DECIMAL(10, 3) },
+  Stock_out_UOM: { type: DataTypes.INTEGER },
+  Stock_out_UOM_Qty: { type: DataTypes.DECIMAL(10, 3) },
+
+  // UOM2 fields
+  Stock_In_SKU_UOM: { type: DataTypes.INTEGER },
+  Stock_In_SKU_UOM_Qty: { type: DataTypes.DECIMAL(10, 3) },
+  Stock_out_SKU_UOM: { type: DataTypes.INTEGER },
+  Stock_out_SKU_UOM_Qty: { type: DataTypes.DECIMAL(10, 3) },
+
+  // UOM3 fields
+  Stock_In_UOM3_Qty: { type: DataTypes.DECIMAL(10, 3) },
+  Stock_out_UOM3_Qty: { type: DataTypes.DECIMAL(10, 3) },
+
+  // Sale Unit
+  Sale_Unit: { type: DataTypes.STRING() },
+  sale_Uom :{ type: DataTypes.INTEGER() },
+  uom1_qty: { type: DataTypes.DECIMAL(10, 3) },
+  uom2_qty: { type: DataTypes.DECIMAL(10, 3) },
+  uom3_qty: { type: DataTypes.DECIMAL(10, 3) },
+
+
+  Discount_A: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: true,
+    defaultValue: 0
+  },
+  Discount_B: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: true,
+    defaultValue: 0
+  },
+  Discount_C: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: true,
+    defaultValue: 0
+  },
+ 
+}, {
+  tableName: 'Stk_Detail',
+  timestamps: true
+});
+
+
+const Stk_main = sequelize.define('Stk_main', {
+    ID: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        comment: 'Prime Key'
+    },
+    Stock_Type_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        comment: '11=GRN, 12=Dispatch'
+    },
+    COA_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        // comment: 'Foreign key to ZCOA (Supplier/Customer)'
+    },
+    Date: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    Number: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        comment: 'Auto generated GRN/Dispatch number'
+    },
+    Status: {
+        type: DataTypes.ENUM('Post', 'UnPost'),
+        defaultValue: 'UnPost'
+    },
+    Purchase_Type: {
+        type: DataTypes.ENUM('Local', 'Foreign', 'Mfg', 'Local selling'),
+        // comment: 'Local/Foreign/Mfg/ Local selling'
+    },
+    // Purchase_Batchno: {
+    //     type: DataTypes.INTEGER,
+    //     comment: 'Foreign key to ZCOA for batch reference'
+    // },
+    Status_Account_Entry: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        comment: 'True/False for accounting entry status'
+    },
+    Carriage_ID: {
+        type: DataTypes.INTEGER,
+        comment: 'Foreign key to ZCOA for carriage account'
+    },
+    Carriage_Amount: {
+        type: DataTypes.DECIMAL(10, 2),
+        comment: 'Numeric field for carriage amount'
+    },
+
+    Order_Main_ID: {
+        type: DataTypes.INTEGER,
+        comment: 'Reference to original PO/SO - Need to update Order_main table',
+        onDelete: 'RESTRICT',
+    },
+    is_Voucher_Generated: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    Transporter_ID: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    freight_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    labour_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    bility_expense: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    other_expense: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    booked_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    remarks: {
+        type: DataTypes.STRING,
+        allowNull: true
+    }
+
+}, {
+    tableName: 'Stk_main',
+    timestamps: true,
+
+
+
+    hooks: {
+        // ✅ ADD THIS: Reset order status when stock record is deleted
+        afterDestroy: async (stkRecord, options) => {
+            try {
+                const { Order_Main } = require('./Order_main');
+                const orderId = stkRecord.Order_Main_ID;
+
+                // Check if there are any other stock records for this order
+                const remainingStockRecords = await Stk_main.count({
+                    where: { Order_Main_ID: orderId }
+                });
+
+                // If no more stock records exist, reset the order status
+                if (remainingStockRecords === 0) {
+                    await Order_Main.update({
+                        Next_Status: 'Incomplete',
+                        is_Note_generated: false
+                    }, {
+                        where: { ID: orderId }
+                    });
+
+                    console.log(`✅ Order ${orderId} status reset: Next_Status='Incomplete', is_Note_generated=false`);
+                }
+            } catch (error) {
+                console.error('❌ Error resetting order status after stock deletion:', error);
+                throw error;
+            }
+        }
+    }
+});
+
+
+
+
+// store/slice/grnApi.ts - GRN API SLICE
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+
+const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    return `http://${window.location.hostname}:4000/api`
+  } else {
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+  }
+}
+
+export const grnApi = createApi({
+  reducerPath: 'grnApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: `${getApiBaseUrl()}/grn`,
+  }),
+  tagTypes: ['GRN', 'Order'],
+  endpoints: (builder) => ({
+    // ✅ GET all GRNs
+    getAllGRNs: builder.query<any, {
+      status?: string
+      dateFrom?: string
+      dateTo?: string
+      supplierId?: string
+      page?: number
+      limit?: number
+    }>({
+      query: (params = {}) => {
+        const queryParams = new URLSearchParams()
+        
+        if (params.status && params.status !== 'all') queryParams.append('status', params.status)
+        if (params.dateFrom) queryParams.append('dateFrom', params.dateFrom)
+        if (params.dateTo) queryParams.append('dateTo', params.dateTo)
+        if (params.supplierId) queryParams.append('supplierId', params.supplierId)
+        if (params.page) queryParams.append('page', params.page.toString())
+        if (params.limit) queryParams.append('limit', params.limit.toString())
+        
+        return `/?${queryParams}`
+      },
+      providesTags: ['GRN'],
+    }),
+
+    // ✅ GET single GRN by ID
+    getGRNById: builder.query<any, string | number>({
+      query: (id) => `/${id}`,
+      providesTags: (result, error, id) => [{ type: 'GRN', id }],
+    }),
+
+    // ✅ CREATE new GRN
+    createGRN: builder.mutation<any, { stockMain: any; stockDetails: any[] }>({
+      query: (grnData) => ({
+        url: '/',
+        method: 'POST',
+        body: grnData,
+      }),
+      invalidatesTags: ['GRN', 'Order'], // ✅ Invalidate both GRN and Order cache
+    }),
+
+    // ✅ UPDATE existing GRN
+    updateGRN: builder.mutation<any, { id: string | number; stockMain: any; stockDetails: any[] }>({
+      query: ({ id, ...grnData }) => ({
+        url: `/${id}`,
+        method: 'PUT',
+        body: grnData,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'GRN', id },
+        { type: 'GRN', id: 'LIST' },
+        'Order'
+      ],
+    }),
+
+    // ✅ DELETE GRN
+    deleteGRN: builder.mutation<any, string | number>({
+      query: (id) => ({
+        url: `/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['GRN', 'Order'], // ✅ Invalidate both after deletion
+    }),
+  }),
+})
+
+export const {
+  useGetAllGRNsQuery,
+  useGetGRNByIdQuery,
+  useCreateGRNMutation,
+  useUpdateGRNMutation,
+  useDeleteGRNMutation,
+} = grnApi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Now in GDN (Goods Delivery Note), things are a little different:
+
+For example, we search the sales order data. The header data goes into the header, so no issue there.
+
+But for the detail, the item ID goes into the stock-in table.
+
+For that, I created an API called getAvailableBatch.
+
+Example:
+
+Suppose I have a batch with 1000 stock-in.
+
+Then I add a RO (Release Order) of 500 stock-out.
+
+Based on the same item ID and batch number, the API handles this.
+
+I’ll provide you with that API so you get the idea.
+I’ll also share my old code, but it has many issues that you’ll need to fix.
+
+Additionally, while creating GDN, we can add extra items. I’ll provide you with the code, and you’ll need to update it according to my current logic.
+
+
+
+I’ll provide you with that API so you get the idea.
+I’ll also share my old code, but it has many issues that you’ll need to fix.
+
+Additionally, while creating GDN, we can add extra items. I’ll provide you with the code, and you’ll need to update it according to my current logic.
+
+
+
+the blow i ahve gdn data but you have to your wokr wokr you have done on the GRN
+sop Now help me build GDN
+# so i am giving you my old another stk_header and details the flow and this functionailty and the  flow odf the data is approximatly same but you avhe to use the latest  one 
+// components/inventory/StockHeader.tsx - COMPLETE WITH SUB CUSTOMER & SUB CITY
+'use client'
+import React from 'react'
+import { Input } from '@/components/ui/Input'
+import { TransporterSearchableInput } from '@/components/common/transpoter/TransporterSearchableInput'
+import { 
+  Calendar, 
+  FileText, 
+  DollarSign, 
+  Package, 
+  User, 
+  MapPin, 
+  Truck, 
+  Building2,
+  CreditCard,
+  MessageSquare,
+  BarChart3
+} from 'lucide-react'
+
+const StockHeader = ({ 
+  headerData, 
+  onHeaderChange, 
+  mode = 'create',
+  sourceOrder = null,
+  customers = [],
+  isFromOrder = false 
+}) => {
+
+  // ✅ Calculate total additional costs
+  const totalAdditionalCosts = (
+    parseFloat(headerData.labour_crt || 0) + 
+    parseFloat(headerData.freight_crt || 0) + 
+    parseFloat(headerData.other_expense || 0)
+  )
+
+  return (
+    <div className="bg-gradient-to-br from-blue-50 via-white to-green-50 p-6 rounded-xl border border-blue-200 shadow-lg">
+      {/* ✅ Header Title */}
+      <div className="flex items-center gap-3 mb-6">
+       
+      </div>
+
+      {/* ✅ FIRST ROW - MAIN IDENTIFICATION FIELDS */}
+      <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+        <Input
+          type="text"
+          label="Sales Order"
+          value={headerData.Sales_Order_Number || (mode === 'create' ? 'Standalone Dispatch' : 'N/A')}
+          readOnly
+          icon={<FileText className="w-4 h-4" />}
+          className="bg-gray-50"
+        />
+
+    
+
+        <Input
+          type="text"
+          label="Customer *"
+          value={headerData.Name_of_Customer || ''}
+          readOnly={isFromOrder}
+          icon={<User className="w-4 h-4" />}
+          className={isFromOrder ? "bg-gray-50" : ""}
+          placeholder={isFromOrder ? "Auto-populated" : "Select customer from dropdown"}
+        />
+
+        <Input
+          type="date"
+          label="Dispatch Date *"
+          value={headerData.Date}
+          onChange={(e) => onHeaderChange('Date', e.target.value)}
+          icon={<Calendar className="w-4 h-4" />}
+          required
+        />
+      {/* </div> */}
+
+      {/* ✅ SECOND ROW - SUB CUSTOMER & SUB CITY (MISSING UTILITY FIELDS) */}
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"> */}
+        <Input
+          type="text"
+          label="Sub Customer"
+          value={sourceOrder?.sub_customer || headerData.sub_customer || ''}
+          onChange={(e) => onHeaderChange('sub_customer', e.target.value)}
+          icon={<Building2 className="w-4 h-4" />}
+          placeholder="Enter sub customer name..."
+          className="bg-white"
+        />
+
+        <Input
+          type="text"
+          label="Sub City"
+          value={sourceOrder?.sub_city || headerData.sub_city || ''}
+          onChange={(e) => onHeaderChange('sub_city', e.target.value)}
+          icon={<MapPin className="w-4 h-4" />}
+          placeholder="Enter sub city name..."
+          className="bg-white"
+        />
+
+       
+
+        {/* ✅ Status with Icon */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <BarChart3 className="w-4 h-4" />
+            Status
+          </label>
+          <select
+            value={headerData.Status || 'UnPost'}
+            onChange={(e) => onHeaderChange('Status', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          >
+            <option value="UnPost">UnPost</option>
+            <option value="Post">Post</option>
+          </select>
+        </div>
+      </div>
+
+      {/* ✅ THIRD ROW - COST BREAKDOWN */}
+      <div className="bg-white rounded-lg  p-2 mb-6">
+       
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+           <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <Truck className="w-4 h-4" />
+            Transporter
+          </label>
+          <TransporterSearchableInput
+            value={headerData.Transporter_ID?.toString() || ''}
+            onChange={(transporterId, transporter) => {
+              onHeaderChange('Transporter_ID', transporterId)
+              onHeaderChange('Transporter_Name', transporter?.name || '')
+            }}
+            placeholder="Select transporter..."
+            className="w-full"
+          />
+        </div>
+          <Input
+            type="number"
+            label="Labor Cost"
+            value={headerData.labour_crt || ''}
+            onChange={(e) => onHeaderChange('labour_crt', e.target.value)}
+            placeholder="0.00"
+            step="0.01"
+            icon={<User className="w-4 h-4" />}
+          />
+
+          <Input
+            type="number"
+            label="Freight Cost"
+            value={headerData.freight_crt || ''}
+            onChange={(e) => onHeaderChange('freight_crt', e.target.value)}
+            placeholder="0.00"
+            step="0.01"
+            icon={<Truck className="w-4 h-4" />}
+          />
+
+          <Input
+            type="number"
+            label="Other Expense"
+            value={headerData.other_expense || ''}
+            onChange={(e) => onHeaderChange('other_expense', e.target.value)}
+            placeholder="0.00"
+            step="0.01"
+            icon={<CreditCard className="w-4 h-4" />}
+          />
+        </div>
+
+        
+      </div>
+
+      {/* ✅ FOURTH ROW - REMARKS & DISPATCH TYPE */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      
+        <Input
+          type="text"
+          label="Remarks"
+          value={headerData.remarks || ''}
+          onChange={(e) => onHeaderChange('remarks', e.target.value)}
+          placeholder="Enter dispatch remarks..."
+          icon={<MessageSquare className="w-4 h-4" />}
+        />
+      </div>
+
+      {/* ✅ SOURCE ORDER INFORMATION PANEL (if from order) */}
+      {sourceOrder && (
+        <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 border border-blue-200">
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-blue-800 mb-3">
+            <FileText className="w-4 h-4" />
+            Source Order Information
+          </h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="bg-white p-3 rounded border">
+              <div className="text-xs text-gray-600 mb-1">Order Number</div>
+              <div className="font-semibold text-blue-800">{sourceOrder.Number}</div>
+            </div>
+            <div className="bg-white p-3 rounded border">
+              <div className="text-xs text-gray-600 mb-1">Order Date</div>
+              <div className="font-semibold">{new Date(sourceOrder.Date).toLocaleDateString()}</div>
+            </div>
+            <div className="bg-white p-3 rounded border">
+              <div className="text-xs text-gray-600 mb-1">Items Count</div>
+              <div className="font-semibold text-green-600">{sourceOrder.details?.length || 0}</div>
+            </div>
+            <div className="bg-white p-3 rounded border">
+              <div className="text-xs text-gray-600 mb-1">Customer</div>
+              <div className="font-semibold text-xs truncate">{sourceOrder.account?.acName || 'N/A'}</div>
+            </div>
+          </div>
+          
+          {/* Additional Order Details */}
+          {(sourceOrder.sub_customer || sourceOrder.sub_city) && (
+            <div className="mt-3 pt-3 border-t border-blue-200">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                {sourceOrder.sub_customer && (
+                  <div className="bg-white p-2 rounded border">
+                    <div className="text-xs text-gray-600">Sub Customer</div>
+                    <div className="font-medium">{sourceOrder.sub_customer}</div>
+                  </div>
+                )}
+                {sourceOrder.sub_city && (
+                  <div className="bg-white p-2 rounded border">
+                    <div className="text-xs text-gray-600">Sub City</div>
+                    <div className="font-medium">{sourceOrder.sub_city}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default StockHeader
+ this is old header but you have to use the new 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  'use client'
+  import React, { useState, useEffect } from 'react'
+  import UomConverter from '@/components/common/items/UomConverter'
+  import { MultiSelectItemTable } from '@/components/common/items/MultiSelectItemTable'
+  import { Button } from '@/components/ui/Button'
+  import { Plus, Trash2 } from 'lucide-react'
+
+  const StockDetail = ({
+    detailItems: initialItems = [],
+    onDetailChange,
+    mode = 'create',
+    isFromOrder = false
+  }) => {
+
+    const [detailItems, setDetailItems] = useState([])
+    const [availableBatches, setAvailableBatches] = useState({})
+    const [allCOAs, setAllCOAs] = useState([])
+    const [message, setMessage] = useState('')
+    const [showItemModal, setShowItemModal] = useState(false)
+
+    // ✅ Your existing logic (unchanged)
+    useEffect(() => {
+      if (initialItems.length > 0) {
+        const processedItems = initialItems.map((item, index) => ({
+          Line_Id: index + 1,
+          Batch_Number: '',
+          Item: item.item?.itemName || 'Unknown',
+          Item_ID: item.Item_ID,
+          Qty_in_SO: parseFloat(
+            item.sale_unit === '3' ? item.uom3_qty :
+            item.sale_unit === '2' ? item.uom2_qty :
+            item.uom1_qty || 0
+          ),
+          Uom_SO: item.uom?.uom || 'Unknown',
+          uom1_qty: 0,
+          uom2_qty: 0,
+          uom3_qty: 0,
+          sale_unit: parseInt(item.sale_unit) || 3,
+          Uom_Id: item.Uom_Id || 0,
+          QTY_Dispatched: 0,
+          Stock_Price: parseFloat(item.item?.sellingPrice || 0),
+          item: item.item
+        }))
+        setDetailItems(processedItems)
+      }
+    }, [initialItems])
+
+    useEffect(() => {
+      onDetailChange(detailItems)
+    }, [detailItems])
+
+    // ✅ Your yellow material logic (unchanged)
+    const getTotalUsedByOthers = (itemId, batchNumber, excludeIndex = -1) => {
+      let totalUsedPcs = 0
+      detailItems.forEach((row, index) => {
+        if (index === excludeIndex || row.Item_ID !== itemId || row.Batch_Number !== batchNumber) return
+        const itemData = row.item
+        let usedPcs = 0
+        if (row.sale_unit === 1 && row.uom1_qty > 0) {
+          usedPcs = parseFloat(row.uom1_qty)
+        } else if (row.sale_unit === 2 && row.uom2_qty > 0 && itemData?.uom2_qty) {
+          usedPcs = parseFloat(row.uom2_qty) * parseFloat(itemData.uom2_qty)
+        } else if (row.sale_unit === 3 && row.uom3_qty > 0 && itemData?.uom3_qty) {
+          usedPcs = parseFloat(row.uom3_qty) * parseFloat(itemData.uom3_qty)
+        }
+        totalUsedPcs += usedPcs
+      })
+      return totalUsedPcs
+    }
+
+    const getAvailableBefore = (itemId, batchNumber, displayUom, itemData, currentIndex = -1) => {
+      if (!itemId || !batchNumber || !itemData) return 0
+      const batches = availableBatches[itemId] || []
+      const batch = batches.find(b => b.batchno.toString() === batchNumber.toString())
+      if (!batch) return 0
+      const batchTotalPcs = parseFloat(batch.available_qty_uom1) || 0
+      const usedByOthers = getTotalUsedByOthers(itemId, batchNumber, currentIndex)
+      const availableForThisRowPcs = Math.max(0, batchTotalPcs - usedByOthers)
+      let conversionFactor = 1
+      if (displayUom === 2 && itemData.uom2_qty) {
+        conversionFactor = parseFloat(itemData.uom2_qty)
+      } else if (displayUom === 3 && itemData.uom3_qty) {
+        conversionFactor = parseFloat(itemData.uom3_qty)
+      }
+      return availableForThisRowPcs / conversionFactor
+    }
+
+    const getCurrentRowUsageInPcs = (item) => {
+      if (!item.QTY_Dispatched || item.QTY_Dispatched <= 0) return 0
+      const itemData = item.item
+      let currentUsagePcs = 0
+      if (item.sale_unit === 1) {
+        currentUsagePcs = parseFloat(item.uom1_qty || 0)
+      } else if (item.sale_unit === 2 && itemData?.uom2_qty) {
+        currentUsagePcs = parseFloat(item.uom2_qty || 0) * parseFloat(itemData.uom2_qty)
+      } else if (item.sale_unit === 3 && itemData?.uom3_qty) {
+        currentUsagePcs = parseFloat(item.uom3_qty || 0) * parseFloat(itemData.uom3_qty)
+      }
+      return currentUsagePcs
+    }
+
+    const getAvailableAfter = (item, currentIndex) => {
+      if (!item.Batch_Number || !item.item) return 0
+      const batchTotalPcs = availableBatches[item.Item_ID]?.find(b => 
+        b.batchno.toString() === item.Batch_Number.toString()
+      )?.available_qty_uom1 || 0
+      const usedByOthers = getTotalUsedByOthers(item.Item_ID, item.Batch_Number, currentIndex)
+      const usedByCurrentRow = getCurrentRowUsageInPcs(item)
+      const totalUsed = usedByOthers + usedByCurrentRow
+      const remainingAfterPcs = Math.max(0, parseFloat(batchTotalPcs) - totalUsed)
+      let conversionFactor = 1
+      if (item.sale_unit === 2 && item.item.uom2_qty) {
+        conversionFactor = parseFloat(item.item.uom2_qty)
+      } else if (item.sale_unit === 3 && item.item.uom3_qty) {
+        conversionFactor = parseFloat(item.item.uom3_qty)
+      }
+      return remainingAfterPcs / conversionFactor
+    }
+
+    // ✅ Your existing fetch functions (unchanged)
+    const fetchBatches = async () => {
+      const batchData = {}
+      for (const item of detailItems) {
+        if (item.Item_ID) {
+          const response = await fetch(`http://${window.location.hostname}:4000/api/dispatch/available-batches/${item.Item_ID}`)
+          const result = await response.json()
+          if (result.success && result.data) {
+            batchData[item.Item_ID] = result.data
+          }
+        }
+      }
+      setAvailableBatches(batchData)
+    }
+
+    const fetchCOAs = async () => {
+      const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/get`)
+      const result = await response.json()
+      if (result.success && result.zCoaRecords) {
+        setAllCOAs(Array.isArray(result.zCoaRecords) ? result.zCoaRecords : [result.zCoaRecords])
+      }
+    }
+
+    useEffect(() => {
+      fetchCOAs()
+      if (detailItems.length > 0) {
+        fetchBatches()
+      }
+    }, [detailItems.length])
+
+    const getCoaName = (coaId) => {
+      const coa = allCOAs.find(c => c.id === parseInt(coaId))
+      return coa ? coa.acName : `COA-${coaId}`
+    }
+
+    const handleUomChange = (rowIndex, values) => {
+      const saleUnit = parseInt(values.sale_unit) || 1
+      const requestedQty = parseFloat(
+        saleUnit === 2 ? values.uom2_qty :
+        saleUnit === 3 ? values.uom3_qty :
+        values.uom1_qty
+      ) || 0
+
+      const updated = [...detailItems]
+      updated[rowIndex] = {
+        ...updated[rowIndex],
+        uom1_qty: parseFloat(values.uom1_qty) || 0,
+        uom2_qty: parseFloat(values.uom2_qty) || 0,
+        uom3_qty: parseFloat(values.uom3_qty) || 0,
+        sale_unit: saleUnit,
+        QTY_Dispatched: requestedQty
+      }
+      setDetailItems(updated)
+    }
+
+    const handleOpenModal = () => setShowItemModal(true)
+    const handleCloseModal = () => setShowItemModal(false)
+
+    return (
+      <div className="bg-white border border-gray-300 rounded-lg shadow-md">
+        {/* ✅ YOUR EXACT HEADER DESIGN */}
+        <div className="flex justify-end p-3">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="primary"
+              onClick={handleOpenModal}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              {mode === 'edit' ? 'Add More Items' : 'Add Items'}
+            </Button>
+          </div>
+        </div>
+
+        {/* ✅ YOUR EXACT TABLE LAYOUT */}
+        <div className="bg-white overflow-hidden">
+          {/* Table Header */}
+          <div className="max-w-7xl bg-gray-100 border-b border-gray-300">
+            <div className="flex justify-between px-2 py-3 text-sm font-medium text-gray-700">
+              <div className="text-center w-[5%]">LINE</div>
+              <div className="text-center w-[12%]">BATCH</div>
+              <div className="text-center w-[15%]">ITEM</div>
+              <div className="text-center w-[8%]">SO QTY</div>
+              <div className="text-center w-[8%]">AVAILABLE</div>
+              <div className="text-center w-[25%]">DISPATCH QTY</div>
+              <div className="text-center w-[8%]">AFTER</div>
+              <div className="text-center w-[5%]">ACTION</div>
+            </div>
+          </div>
+
+          {/* ✅ YOUR EXACT EMPTY STATE OR TABLE BODY */}
+          {detailItems.length === 0 ? (
+            <div className="p-12 text-center text-gray-500">
+              <p className="text-lg">
+                {mode === 'edit' ? 'No items in this dispatch' : 'No items added yet'}
+              </p>
+              <p className="text-sm mt-2">
+                {mode === 'edit'
+                  ? 'Add items to this dispatch using "Add More Items"'
+                  : 'Click "Add Items" to select products'
+                }
+              </p>
+            </div>
+          ) : (
+            <div>
+              {detailItems.map((item, index) => {
+                const itemData = item.item || {}
+                const availableBefore = getAvailableBefore(item.Item_ID, item.Batch_Number, item.sale_unit, itemData, index)
+                const availableAfter = getAvailableAfter(item, index)
+                
+                const uomData = {
+                  primary: {
+                    id: itemData.uom1?.id || 1,
+                    name: itemData.uom1?.uom || 'Pcs',
+                    qty: 1
+                  },
+                  secondary: itemData.uomTwo ? {
+                    id: itemData.uomTwo.id,
+                    name: itemData.uomTwo.uom,
+                    qty: parseFloat(itemData.uom2_qty) || 10
+                  } : undefined,
+                  tertiary: itemData.uomThree ? {
+                    id: itemData.uomThree.id,
+                    name: itemData.uomThree.uom,
+                    qty: parseFloat(itemData.uom3_qty) || 100
+                  } : undefined
+                }
+
+                const currentUomName = item.sale_unit === 1 ? 'Pcs' : 
+                                      item.sale_unit === 2 ? 'Box' : 
+                                      'Crt'
+
+                return (
+                  <div
+                    key={`line-${item.Line_Id}`}
+                    className={`flex items-start justify-between px-2 py-3 ${
+                      index % 2 === 0 ? 'bg-gray-0' : 'bg-gray-200'
+                    }`}
+                  >
+                    {/* Line Number */}
+                    <div className='w-[5%]'>
+                      <div className="bg-green-100 text-green-800 rounded-xl flex items-center justify-center w-8 h-8 mx-auto">
+                        {index + 1}
+                      </div>
+                    </div>
+
+                    {/* Batch Selection */}
+                    <div className="w-[12%]">
+                      <select
+                        value={item.Batch_Number || ''}
+                        onChange={(e) => {
+                          const updated = [...detailItems]
+                          updated[index] = {
+                            ...updated[index],
+                            Batch_Number: e.target.value
+                          }
+                          setDetailItems(updated)
+                        }}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm h-8"
+                      >
+                        <option value="">Select Batch</option>
+                        {(availableBatches[item.Item_ID] || []).map((batch, bIdx) => {
+                          const usedFromBatch = getTotalUsedByOthers(item.Item_ID, batch.batchno, index)
+                          const batchTotalPcs = parseFloat(batch.available_qty_uom1)
+                          const remainingPcs = batchTotalPcs - usedFromBatch
+                          const remainingCrt = itemData.uom3_qty ? 
+                            remainingPcs / parseFloat(itemData.uom3_qty) : 
+                            remainingPcs / 3600
+                          
+                          return (
+                            <option key={bIdx} value={batch.batchno}>
+                              {getCoaName(batch.batchno)} - {Math.max(0, remainingCrt).toFixed(1)} Crt
+                            </option>
+                          )
+                        })}
+                      </select>
+                    </div>
+
+                    {/* Item Name */}
+                    <div className="w-[15%]">
+                      <span className="text-gray-900 text-center font-normal text-sm truncate block">
+                        {item.Item}
+                      </span>
+                      <div className="text-xs text-gray-500 text-center">ID: {item.Item_ID}</div>
+                    </div>
+
+                    {/* SO Quantity */}
+                    <div className="w-[8%]">
+                      <div className="text-center">
+                        <div className="text-sm font-normal text-blue-800">
+                          {item.Qty_in_SO}
+                        </div>
+                        <div className="text-xs text-blue-600">
+                          {item.Uom_SO}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Available Stock */}
+                    <div className="w-[8%]">
+                      <div className="text-center">
+                        <div className="text-sm font-bold text-green-600">
+                          {item.Batch_Number ? availableBefore.toFixed(3) : '-'}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {currentUomName}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ✅ DISPATCH QTY: UOM Selection with your design pattern */}
+                    <div className="w-[25%]">
+                      <div>
+                        {item.Batch_Number && itemData.uom1 ? (
+                          <UomConverter
+                            key={`uom-${item.Item_ID}-${index}`}
+                            uomData={uomData}
+                            lineIndex={index}
+                            onChange={(values) => handleUomChange(index, values)}
+                            initialValues={{
+                              uom1_qty: item.uom1_qty === '' ? '' : item.uom1_qty.toString(),
+                              uom2_qty: item.uom2_qty === '' ? '' : item.uom2_qty.toString(),
+                              uom3_qty: item.uom3_qty === '' ? '' : item.uom3_qty.toString(),
+                              sale_unit: item.sale_unit.toString()
+                            }}
+                            isPurchase={false}
+                            tableMode={true}
+                          />
+                        ) : (
+                          <div className="text-center text-gray-500 py-2 text-sm">
+                            Select batch first
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* ✅ AVAILABLE AFTER: Shows remaining after current allocation */}
+                    <div className="w-[8%]">
+                      <div className="text-center">
+                        <div className={`text-sm font-bold ${
+                          availableAfter >= 0 ? 'text-purple-600' : 'text-red-600'
+                        }`}>
+                          {item.Batch_Number && item.QTY_Dispatched > 0 ? availableAfter.toFixed(3) : '-'}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {currentUomName} Left
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="w-[5%]">
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={() => {
+                            const newRow = {
+                              ...item,
+                              Line_Id: detailItems.length + 1,
+                              Batch_Number: '',
+                              Qty_in_SO: 0,
+                              Uom_SO: '-',
+                              uom1_qty: 0,
+                              uom2_qty: 0,
+                              uom3_qty: 0,
+                              sale_unit: 2,
+                              QTY_Dispatched: 0
+                            }
+                            
+                            const updated = [...detailItems, newRow]
+                            const resequenced = updated.map((itm, idx) => ({
+                              ...itm,
+                              Line_Id: idx + 1
+                            }))
+                            
+                            setDetailItems(resequenced)
+                          }}
+                          className="p-1 hover:bg-green-100 rounded text-green-600"
+                          title="Add batch"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                        
+                        {detailItems.length > 1 && (
+                          <button
+                            onClick={() => {
+                              const filtered = detailItems.filter((_, i) => i !== index)
+                              const resequenced = filtered.map((itm, idx) => ({
+                                ...itm,
+                                Line_Id: idx + 1
+                              }))
+                              setDetailItems(resequenced)
+                            }}
+                            className="p-1 hover:bg-red-100 rounded text-red-600"
+                            title="Delete line"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* ✅ YOUR EXACT SUMMARY FOOTER */}
+        {detailItems.length > 0 && (
+          <div className="flex items-center justify-end p-2 bg-green-50 border-t">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="text-center w-30">
+                  <div className="font-semibold text-blue-600">
+                    {detailItems.filter(item => item.Batch_Number).length} Batched
+                  </div>
+                </div>
+                
+                <div className="text-center w-30">
+                  <div className="font-semibold text-orange-600">
+                    {detailItems.filter(item => item.QTY_Dispatched > 0).length} With Qty
+                  </div>
+                </div>
+
+                <div className="text-center w-30">
+                  <div className="font-semibold text-green-800 px-4 py-2 rounded-lg">
+                    {detailItems.filter(item => item.Batch_Number && item.QTY_Dispatched > 0).length} Ready
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ✅ YOUR EXACT MODAL */}
+        {showItemModal && (
+          <MultiSelectItemTable
+            onSelectionComplete={(selectedItems) => {
+              const newItems = selectedItems.map((item, index) => ({
+                Line_Id: detailItems.length + index + 1,
+                Batch_Number: '',
+                Item: item.itemName,
+                Item_ID: item.id,
+                Qty_in_SO: 0,
+                Uom_SO: '-',
+                uom1_qty: 0,
+                uom2_qty: 0,
+                uom3_qty: 0,
+                sale_unit: 1,
+                QTY_Dispatched: 0,
+                Stock_Price: item.sellingPrice || 0,
+                item: item.originalItem
+              }))
+              
+              setDetailItems([...detailItems, ...newItems])
+              setShowItemModal(false)
+            }}
+            onCancel={handleCloseModal}
+            isPurchase={false}
+            alreadyAddedItemIds={detailItems.map(item => item.Item_ID)}
+          />
+        )}
+      </div>
+    )
+  }
+
+  export default StockDetail
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+// components/inventoryy/gdn/GDNForm.tsx - FIXED DATA FLOW TO STOCKDETAIL
+'use client'
+import React, { useState, useEffect } from 'react'
+import StockHeader from '@/components/inventoryy/gdn/StockHeader'
+import StockDetail from '@/components/inventoryy/gdn/StockDetail'
+import { useRouter } from 'next/navigation'
+import { useGetOrderByIdQuery } from '@/store/slice/orderApi'
+import { useCreateGDNMutation } from '@/store/slice/gdnApi'
+
+export default function GDNForm({ orderId }: { orderId: string }) {
+  const router = useRouter()
+
+  const [headerData, setHeaderData] = useState({
+    Sales_Order_Number: '',
+    Name_of_Customer: '',
+    COA_ID: '',
+    Date: new Date().toISOString().split('T')[0],
+    Status: 'UnPost',
+    Dispatch_Type: 'Local selling',
+    sub_customer: '',
+    sub_city: '',
+    Transporter_ID: '',
+    labour_crt: '',
+    freight_crt: '',
+    other_expense: '',
+    remarks: ''
+  })
+
+  const [detailItemsForStockDetail, setDetailItemsForStockDetail] = useState([]) // ✅ Specific state for StockDetail
+  const [finalDetailItems, setFinalDetailItems] = useState([]) // ✅ Final items with batches
+  const [customers, setCustomers] = useState([])
+
+  const { data: sourceOrder, isLoading, error } = useGetOrderByIdQuery(orderId, { skip: !orderId })
+  const [createGDN, { isLoading: isCreating }] = useCreateGDNMutation()
+
+  console.log('🔍 GDNForm Full Debug:', {
+    orderId,
+    hasSourceOrder: !!sourceOrder,
+    hasOrderData: !!sourceOrder?.data,
+    orderNumber: sourceOrder?.data?.Number,
+    orderDetailsCount: sourceOrder?.data?.details?.length,
+    orderDetails: sourceOrder?.data?.details,
+    detailItemsForStockDetail: detailItemsForStockDetail.length,
+    finalDetailItems: finalDetailItems.length
+  })
+
+  // ✅ Fetch customers
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/get`)
+        const result = await response.json()
+        if (result.success && result.zCoaRecords) {
+          const coaRecords = Array.isArray(result.zCoaRecords) ? result.zCoaRecords : [result.zCoaRecords]
+          setCustomers(coaRecords.filter((coa: any) => coa.coaTypeId === 2))
+        }
+        
+      } catch (error) {
+        console.error('Error fetching customers:', error)
+      }
+    }
+    fetchCustomers()
+  }, [])
+
+
+  // console.log('these are the full customers',customers)
+  // ✅ FIXED: Process order data and set for StockDetail
+  useEffect(() => {
+    if (sourceOrder?.data) {
+      const order = sourceOrder.data
+      console.log('🚀 Processing order for GDN:', order.Number)
+      console.log('📋 Order details to process:', order.details)
+
+      // ✅ Set header data
+      setHeaderData({
+        Sales_Order_Number: order.Number || '',
+        Name_of_Customer: order.account?.acName || '',
+        COA_ID: order.COA_ID?.toString() || '',
+        Date: new Date().toISOString().split('T')[0],
+        sub_customer: order.sub_customer || '',
+        sub_city: order.sub_city || '',
+        Transporter_ID: order.Transporter_ID?.toString() || '',
+        labour_crt: order.labour_crt?.toString() || '',
+        freight_crt: order.freight_crt?.toString() || '',
+        other_expense: order.other_expense?.toString() || '',
+        Status: 'UnPost',
+        Dispatch_Type: 'Local selling',
+        remarks: ''
+      })
+
+      // ✅ CRITICAL: Process order details for StockDetail
+      if (order.details && Array.isArray(order.details) && order.details.length > 0) {
+        console.log('📦 Processing order details for StockDetail...')
+        
+        const processedDetails = order.details.map((detail, index) => {
+          console.log(`Processing detail ${index + 1}:`, {
+            ID: detail.ID,
+            Item_ID: detail.Item_ID,
+            itemName: detail.item?.itemName,
+            quantities: {
+              uom1_qty: detail.uom1_qty,
+              uom2_qty: detail.uom2_qty,
+              uom3_qty: detail.uom3_qty,
+              sale_unit: detail.sale_unit
+            }
+          })
+
+          return {
+            Line_Id: index + 1,
+            Batch_Number: '',
+            Item: detail.item?.itemName || 'Unknown Item',
+            Item_ID: detail.Item_ID,
+            Qty_in_SO: parseFloat(
+              detail.sale_unit === '3' ? detail.uom3_qty :
+              detail.sale_unit === '2' ? detail.uom2_qty :
+              detail.uom1_qty || 0
+            ),
+            Uom_SO: detail.uom?.uom || 'Unknown',
+            uom1_qty: 0, // User will set dispatch quantities
+            uom2_qty: 0,
+            uom3_qty: 0,
+            sale_unit: parseInt(detail.sale_unit) || 3,
+            Uom_Id: detail.Uom_Id || 0,
+            QTY_Dispatched: 0,
+            Stock_Price: parseFloat(detail.item?.sellingPrice || 0),
+            item: detail.item // ✅ Complete item data with UOMs
+          }
+        })
+        
+        console.log('✅ Processed details for StockDetail:', processedDetails)
+        setDetailItemsForStockDetail(processedDetails) // ✅ This will flow to StockDetail
+      } else {
+        console.warn('⚠️ No order details found')
+        setDetailItemsForStockDetail([])
+      }
+    }
+  }, [sourceOrder?.data]) // ✅ React to order data changes
+
+  const handleSubmitGDN = async () => {
+    try {
+      if (!headerData.COA_ID) {
+        alert('Select customer first!')
+        return
+      }
+
+      const validItems = finalDetailItems.filter(item => 
+        item.Item_ID && item.Batch_Number && item.QTY_Dispatched > 0
+      )
+
+      if (validItems.length === 0) {
+        alert('Add items with batches and quantities!')
+        return
+      }
+
+      const stockMain = {
+        Stock_Type_ID: 12,
+        Date: headerData.Date,
+        COA_ID: parseInt(headerData.COA_ID),
+        Status: headerData.Status,
+        Purchase_Type: headerData.Dispatch_Type,
+        Order_Main_ID: orderId ? parseInt(orderId) : null,
+        Transporter_ID: headerData.Transporter_ID ? parseInt(headerData.Transporter_ID) : null,
+        labour_crt: parseFloat(headerData.labour_crt) || 0,
+        freight_crt: parseFloat(headerData.freight_crt) || 0,
+        other_expense: parseFloat(headerData.other_expense) || 0,
+        sub_customer: headerData.sub_customer || null,
+        sub_city: headerData.sub_city || null,
+        remarks: headerData.remarks || null
+      }
+
+      const stockDetails = validItems.map(item => ({
+        Item_ID: item.Item_ID,
+        Line_Id: item.Line_Id,
+        batchno: item.Batch_Number,
+        uom1_qty: parseFloat(item.uom1_qty) || 0,
+        uom2_qty: parseFloat(item.uom2_qty) || 0,
+        uom3_qty: parseFloat(item.uom3_qty) || 0,
+        sale_unit: item.sale_unit,
+        Uom_Id: item.Uom_Id || 0
+      }))
+
+      const response = await createGDN({ stockMain, stockDetails }).unwrap()
+      alert(`✅ GDN created: ${response.data?.dispatchNumber}`)
+      router.push('/inventoryy/gdn')
+
+    } catch (error: any) {
+      alert(`❌ Error: ${error?.data?.error || error.message}`)
+    }
+  }
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading order {orderId}...</div>
+  }
+
+  if (error) {
+    return <div className="p-8 text-center text-red-600">Error loading order: {error.message}</div>
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto p-8">
+      {/* ✅ DEBUG: Show what GDNForm has */}
+      <div className="bg-green-100 p-4 rounded mb-4 text-sm border">
+        <strong>🔧 GDNForm Debug:</strong>
+        <div>Order ID: {orderId}</div>
+        <div>Source Order: {sourceOrder?.data?.Number || 'Not loaded'}</div>
+        <div>Order Details Count: {sourceOrder?.data?.details?.length || 0}</div>
+        <div>Processed for StockDetail: {detailItemsForStockDetail.length} items</div>
+        <div>Final Items (with batches): {finalDetailItems.length} items</div>
+        <div>Customer: {headerData.Name_of_Customer}</div>
+      </div>
+
+      <h1 className="text-2xl font-bold mb-6">Create GDN - Order {orderId}</h1>
+      
+      <div className="space-y-6">
+        <StockHeader
+          headerData={headerData}
+          onHeaderChange={(field, value) => {
+            setHeaderData(prev => ({ ...prev, [field]: value }))
+          }}
+          customers={customers}
+          isFromOrder={true}
+        />
+
+        {/* ✅ CRITICAL: Pass processed order details to StockDetail */}
+        <StockDetail
+          detailItems={detailItemsForStockDetail} // ✅ Pass processed order details
+          onDetailChange={(items) => {
+            console.log('📤 StockDetail sent back:', items.length, 'items')
+            setFinalDetailItems(items) // ✅ Store final items with batches for submit
+          }}
+          mode="fromOrder"
+          isFromOrder={true}
+        />
+
+        <div className="flex justify-end">
+          <button
+            onClick={handleSubmitGDN}
+            disabled={!headerData.COA_ID || finalDetailItems.length === 0}
+            className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded disabled:opacity-50"
+          >
+            Create GDN ({finalDetailItems.filter(item => item.Batch_Number && item.QTY_Dispatched > 0).length} ready)
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+} 
+
+
+const getAvailableBatchesForEdit = async (req, res) => {
+  try {
+    const itemId = req.params.itemId;
+    const dispatchId = req.params.dispatchId;
+
+    console.log(`🔍 EDIT MODE: Item_ID: ${itemId}, Dispatch_ID: ${dispatchId}`);
+
+    if (!itemId || !dispatchId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Item ID and Dispatch ID are required for edit mode'
+      });
+    }
+
+    // FIXED: SQL for edit mode - excludes current dispatch
+    const batches = await sequelize.query(`
+      SELECT 
+        sd.batchno,
+        sd.Item_ID,
+        zi.itemName,
+        
+        -- Total received from GRN
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_received_uom1,
+        
+        -- Other dispatches (excluding current dispatch)
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 AND sm.ID != :dispatchId 
+          THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_other_dispatched_uom1,
+        
+        -- Current dispatch being edited
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 AND sm.ID = :dispatchId 
+          THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END) as current_dispatch_uom1,
+        
+        -- Available = Received - Other Dispatches (excludes current)
+        (SUM(CASE 
+          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          ELSE 0 
+        END) - 
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 AND sm.ID != :dispatchId 
+          THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END)) as available_qty_uom1
+        
+      FROM stk_detail sd
+      INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+      INNER JOIN zitems zi ON sd.Item_ID = zi.id
+      WHERE sd.Item_ID = :itemId 
+        AND sd.batchno IS NOT NULL 
+        AND sd.batchno != ''
+      GROUP BY sd.batchno, sd.Item_ID, zi.itemName
+      ORDER BY sd.batchno ASC
+    `, {
+      replacements: { itemId, dispatchId },
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    const processedBatches = batches.map(batch => ({
+      batchno: batch.batchno,
+      item_id: batch.Item_ID,
+      item_name: batch.itemName,
+      total_received_uom1: parseFloat(batch.total_received_uom1) || 0,
+      total_other_dispatched_uom1: parseFloat(batch.total_other_dispatched_uom1) || 0,
+      current_dispatch_uom1: parseFloat(batch.current_dispatch_uom1) || 0,
+      available_qty_uom1: parseFloat(batch.available_qty_uom1) || 0,
+      edit_mode: true
+    }));
+
+    console.log(`✅ EDIT MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
+
+    res.json({
+      success: true,
+      data: processedBatches,
+      mode: 'edit'
+    });
+
+  } catch (error) {
+    console.error(`❌ EDIT API ERROR:`, error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+// EXISTING: Keep your current function for create/fromOrder (modify HAVING clause)
+const getAvailableBatchesForItem = async (req, res) => {
+  try {
+    const itemId = req.params.itemId;
+
+    console.log(`🔍 CREATE/FROM_ORDER MODE: Item_ID: ${itemId}`);
+
+    if (!itemId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Item ID is required'
+      });
+    }
+
+    // FIXED: Remove HAVING clause to show ALL batches (let frontend decide)
+    const availableBatches = await sequelize.query(`
+      SELECT 
+        sd.batchno,
+        sd.Item_ID,
+        zi.itemName,
+        
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_received_uom1,
+        
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_dispatched_uom1,
+        
+        (SUM(CASE 
+          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          ELSE 0 
+        END) - 
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          ELSE 0 
+        END)) as available_qty_uom1
+        
+      FROM stk_detail sd
+      INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+      INNER JOIN zitems zi ON sd.Item_ID = zi.id
+      WHERE sd.Item_ID = :itemId 
+        AND sd.batchno IS NOT NULL 
+        AND sd.batchno != ''
+      GROUP BY sd.batchno, sd.Item_ID, zi.itemName
+      -- FIXED: No HAVING clause - show all batches
+      ORDER BY sd.batchno ASC
+    `, {
+      replacements: { itemId },
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    const processedBatches = availableBatches.map(batch => ({
+      batchno: batch.batchno,
+      item_id: batch.Item_ID,
+      item_name: batch.itemName,
+      total_received_uom1: parseFloat(batch.total_received_uom1) || 0,
+      total_dispatched_uom1: parseFloat(batch.total_dispatched_uom1) || 0,
+      available_qty_uom1: parseFloat(batch.available_qty_uom1) || 0,
+      edit_mode: false
+    }));
+
+    // console.log(`✅ CREATE MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
+    console.log(  `Batches:`, processedBatches);
+
+    res.json({
+      success: true,
+      data: processedBatches,
+      mode: 'create'
+    });
+
+  } catch (error) {
+    console.error(`❌ CREATE API ERROR:`, error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}; these two are the api i was talking about 
+
+const createDispatch = async (req, res) => {
+  const { stockMain, stockDetails, updateOrderStatus, selectedOrderStatus } = req.body;
+
+  console.log('📥 === CREATING DISPATCH ===');
+  console.log('Stock Main:', stockMain);
+  console.log('Stock Details:', stockDetails);
+  console.log('Update Order Status:', updateOrderStatus);
+  console.log('Selected Order Status:', selectedOrderStatus);
+
+  if (!stockMain || !stockDetails || stockDetails.length === 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'Stock issue'
+    });
+  }
+
+  const transaction = await sequelize.transaction();
+
+  try {
+    // Generate dispatch number
+    const dispatchNumber = await generateDispatchNumber();
+    console.log(`🔢 Generated dispatch number: ${dispatchNumber}`);
+
+    // Create stock main with proper Stock_Type_ID
+    const stockMainData = await Stk_main.create({
+      Stock_Type_ID: 12, // Dispatch type
+      COA_ID: stockMain.COA_ID,
+      Date: stockMain.Date,
+      Status: stockMain.Status || 'UnPost',
+      Purchase_Type: stockMain.Purchase_Type || 'Local selling',
+      Order_Main_ID: stockMain.Order_Main_ID,
+      Transporter_ID: stockMain.Transporter_ID,
+      labour_crt: stockMain.labour_crt || 0,
+      freight_crt: stockMain.freight_crt || 0,
+      other_expense: stockMain.other_expense || 0,
+      Number: dispatchNumber,
+      remarks: stockMain.remarks || ''
+    }, { transaction });
+
+    console.log(`✅ Created Stk_main record with ID: ${stockMainData.ID}`);
+
+    // Validate batch availability before creating details
+    for (const detail of stockDetails) {
+      if (!detail.batchno) {
+        throw new Error(`Batch number is required for Item_ID ${detail.Item_ID}`);
+      }
+
+      // Check if batch has enough stock
+      const batchCheck = await sequelize.query(`
+        SELECT 
+          (SUM(CASE WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) ELSE 0 END) - 
+           SUM(CASE WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) ELSE 0 END)) as available
+        FROM stk_detail sd
+        INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+        WHERE sd.Item_ID = :itemId AND sd.batchno = :batchno
+        GROUP BY sd.Item_ID, sd.batchno
+      `, {
+        replacements: { itemId: detail.Item_ID, batchno: detail.batchno },
+        type: sequelize.QueryTypes.SELECT,
+        transaction
+      });
+
+      const availableStock = batchCheck[0]?.available || 0;
+      
+      // ✅ FIXED: Calculate requested quantity based on sale_unit
+      let requestedQty = 0;
+      if (detail.sale_unit === 1) {
+        requestedQty = parseFloat(detail.uom1_qty) || 0;
+      } else if (detail.sale_unit === 2) {
+        requestedQty = parseFloat(detail.uom2_qty) || 0;
+      } else if (detail.sale_unit === 3) {
+        requestedQty = parseFloat(detail.uom3_qty) || 0;
+      }
+
+      console.log(`🔍 Stock check for Item ${detail.Item_ID}, Batch ${detail.batchno}:`, {
+        available: availableStock,
+        requested: requestedQty,
+        sale_unit: detail.sale_unit
+      });
+
+      if (requestedQty > availableStock) {
+        throw new Error(`Insufficient stock for Item_ID ${detail.Item_ID} in batch ${detail.batchno}. Available: ${availableStock}, Requested: ${requestedQty}`);
+      }
+    }
+
+    // ✅ FIXED: Create stock details with proper field mapping
+    const stockDetailsWithMainId = stockDetails.map((detail, index) => {
+      console.log(`📊 Processing detail ${index + 1}:`, {
+        Item_ID: detail.Item_ID,
+        batchno: detail.batchno,
+        sale_unit: detail.sale_unit,
+        uom1_qty: detail.uom1_qty,
+        uom2_qty: detail.uom2_qty,
+        uom3_qty: detail.uom3_qty
+      });
+
+      // ✅ Calculate Stock_out_UOM_Qty based on selected sale_unit
+      let stockOutQty = 0;
+      if (detail.sale_unit === 1) {
+        stockOutQty = parseFloat(detail.uom1_qty) || 0;
+      } else if (detail.sale_unit === 2) {
+        stockOutQty = parseFloat(detail.uom2_qty) || 0;
+      } else if (detail.sale_unit === 3) {
+        stockOutQty = parseFloat(detail.uom3_qty) || 0;
+      }
+
+      return {
+        STK_Main_ID: stockMainData.ID,
+        Line_Id: detail.Line_Id || (index + 1),
+        Item_ID: detail.Item_ID,
+        batchno: detail.batchno,
+        Uom_Id: detail.Uom_Id || 0,
+        
+        // ✅ FIXED: Map quantities properly
+        uom1_qty: parseFloat(detail.uom1_qty) || 0,
+        uom2_qty: parseFloat(detail.uom2_qty) || 0,
+        uom3_qty: parseFloat(detail.uom3_qty) || 0,
+        sale_unit: detail.sale_unit || 1,
+        
+        // ✅ Set stock out quantity
+        Stock_out_UOM_Qty: stockOutQty,
+        Stock_out_SKU_UOM_Qty: 0,
+        
+        // Set Stock_In quantities to 0 for dispatch
+        Stock_In_UOM_Qty: 0,
+        Stock_In_SKU_UOM_Qty: 0,
+        
+        Stock_Price: parseFloat(detail.Stock_Price) || 0,
+        Discount_A: parseFloat(detail.Discount_A) || 0,
+        Discount_B: parseFloat(detail.Discount_B) || 0,
+        Discount_C: parseFloat(detail.Discount_C) || 0,
+        Remarks: detail.Remarks || ''
+      };
+    });
+
+    const createdDetails = await Stk_Detail.bulkCreate(stockDetailsWithMainId, {
+      transaction,
+      validate: true
+    });
+
+    console.log(`✅ Created ${createdDetails.length} Stk_Detail records`);
+
+    // ✅ NEW: Update source order status if Order_Main_ID exists
+    if (stockMain.Order_Main_ID) {
+      console.log(`🔄 Updating source order ${stockMain.Order_Main_ID}...`);
+      
+      try {
+        const orderUpdateData = {
+          is_Note_generated: true, // ✅ CRITICAL: Set to true when dispatch is created
+          updatedAt: new Date()
+        };
+
+        // ✅ Also update Next_Status if requested
+        if (updateOrderStatus && selectedOrderStatus) {
+          orderUpdateData.Next_Status = selectedOrderStatus; // 'Partial' or 'Complete'
+          console.log(`📊 Setting order status to: ${selectedOrderStatus}`);
+        }
+
+        const [updatedRows] = await sequelize.query(`
+          UPDATE order_main 
+          SET is_Note_generated = :is_Note_generated, 
+              Next_Status = COALESCE(:Next_Status, Next_Status),
+              updatedAt = :updatedAt
+          WHERE ID = :orderId
+        `, {
+          replacements: {
+            is_Note_generated: true,
+            Next_Status: selectedOrderStatus || null,
+            updatedAt: new Date(),
+            orderId: stockMain.Order_Main_ID
+          },
+          type: sequelize.QueryTypes.UPDATE,
+          transaction
+        });
+
+        console.log(`✅ Updated source order ${stockMain.Order_Main_ID}:`, {
+          is_Note_generated: true,
+          Next_Status: selectedOrderStatus || 'unchanged',
+          rowsAffected: updatedRows
+        });
+
+        // ✅ Verify the update worked
+        const verifyOrder = await sequelize.query(`
+          SELECT ID, Number, is_Note_generated, Next_Status 
+          FROM order_main 
+          WHERE ID = :orderId
+        `, {
+          replacements: { orderId: stockMain.Order_Main_ID },
+          type: sequelize.QueryTypes.SELECT,
+          transaction
+        });
+
+        console.log(`🔍 Order verification after update:`, verifyOrder[0]);
+
+      } catch (orderUpdateError) {
+        console.error(`❌ Error updating source order ${stockMain.Order_Main_ID}:`, orderUpdateError);
+        throw new Error(`Failed to update source order: ${orderUpdateError.message}`);
+      }
+    } else {
+      console.log(`ℹ️ No source order to update (standalone dispatch)`);
+    }
+
+    await transaction.commit();
+    console.log(`✅ Transaction committed successfully`);
+
+    // Fetch complete dispatch with associations for response
+    const completeDispatch = await Stk_main.findByPk(stockMainData.ID, {
+      include: [
+        {
+          model: Stk_Detail,
+          as: 'details',
+          include: [
+            {
+              model: ZItems,
+              as: 'item',
+              include: [
+                { model: Uom, as: 'uom1', attributes: ['id', 'uom'] },
+                { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
+                { model: Uom, as: 'uomThree', attributes: ['id', 'uom'] }
+              ]
+            }
+          ]
+        },
+        { model: ZCoa, as: 'account' }
+      ]
+    });
+
+    console.log(`🎉 === DISPATCH CREATED SUCCESSFULLY ===`);
+    console.log(`Dispatch Number: ${dispatchNumber}`);
+    console.log(`Dispatch ID: ${stockMainData.ID}`);
+    console.log(`Total Items Dispatched: ${createdDetails.length}`);
+    console.log(`Source Order Updated: ${stockMain.Order_Main_ID ? 'Yes' : 'No'}`);
+
+    res.json({
+      success: true,
+      message: 'Dispatch created successfully',
+      data: {
+        dispatchId: stockMainData.ID,
+        dispatchNumber: dispatchNumber,
+        dispatch: completeDispatch,
+        itemsDispatched: createdDetails.length,
+        orderUpdated: !!stockMain.Order_Main_ID,
+        orderStatus: {
+          is_Note_generated: true,
+          Next_Status: selectedOrderStatus || 'unchanged'
+        }
+      }
+    });
+
+  } catch (error) {
+    await transaction.rollback();
+    console.error('❌ === DISPATCH CREATION ERROR ===', error);
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+}; this crate dispathc you have reduce the size there is too much code 
+
+
+and similar edit and delte and 
+
+
+ok one more thing 
+so instead of using the stokc in and out you have to use the uom1_qyt 2 and 3 based on stcock type and 11 means grn and 12 means gdn
+
+# so waht do you understand thare are some logical issue  when click to like 
+ 
+and also you have to create edit and inventorry/page/tsx 
+this is old gdn fomr 

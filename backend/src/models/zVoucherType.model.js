@@ -28,19 +28,24 @@ ZvoucherType.associate = function (models) {
     // Existing associations
     ZvoucherType.hasMany(models.JournalMaster, {
         foreignKey: 'voucherTypeId',
-        as: 'journalMasters'
+        as: 'journalMasters',
+        onDelete: 'RESTRICT'
     });
 
     // ADDED: Stock type associations
     ZvoucherType.hasMany(models.Stk_main, {
         foreignKey: 'Stock_Type_ID',
-        as: 'stockTransactions'
+        as: 'stockTransactions',
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE'
     });
 
     // ADDED: Order type associations
     ZvoucherType.hasMany(models.Order_Main, {
         foreignKey: 'Stock_Type_ID',
-        as: 'orders'
+        as: 'orders',
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE'
     });
 };
 

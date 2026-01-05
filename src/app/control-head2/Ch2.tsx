@@ -33,33 +33,6 @@ export default function Ch2() {
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [message, setMessage] = useState<MessageState>({ type: '', text: '' });
 
-    // Fetch Control Head 1 values on component mount
-    // useEffect(() => {
-    //     const fetchControlHead1 = async () => {
-    //         try {
-    //             setLoading(true);
-    //             const response = await fetch(`http://${window.location.hostname}:4000/api/z-control-head1/`);
-
-    //             if (!response.ok) {
-    //                 throw new Error(`Failed to fetch data: ${response.status}`);
-    //             }
-
-    //             const data = await response.json();
-    //             setControlHead1List(data);
-    //         } catch (error) {
-    //             console.error('Error fetching control head 1:', error);
-    //             setMessage({
-    //                 type: 'error',
-    //                 text: 'Failed to load Control Head 1 data. Please try again.'
-    //             });
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     fetchControlHead1();
-    // }, []);
-
 
 useEffect(() => {
     const fetchControlHead1 = async () => {
@@ -215,33 +188,6 @@ useEffect(() => {
                             {submitting ? 'Creating...' : 'Create Control Head 2'}
                         </button>
                     </form>
-
-                    {/* Display existing Control Head 1 values */}
-                    {/* <div className="mt-8">
-                        <h2 className="text-lg font-semibold mb-2">Available Control Head 1 Values</h2>
-                        {controlHead1List.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full bg-white">
-                                    <thead>
-                                        <tr>
-                                            <th className="px-4 py-2 border">ID</th>
-                                            <th className="px-4 py-2 border">Control Head 1</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {controlHead1List.map(head1 => (
-                                            <tr key={head1.id}>
-                                                <td className="px-4 py-2 border">{head1.id}</td>
-                                                <td className="px-4 py-2 border">{head1.zHead1}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <p className="text-gray-500">No Control Head 1 values available.</p>
-                        )}
-                    </div> */}
                 </div>
             )}
         </div>

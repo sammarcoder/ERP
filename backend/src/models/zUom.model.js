@@ -49,6 +49,12 @@ class Uom extends Model {
       foreignKey: 'Sale_Unit',
       as: 'stockSaleUnit'
     });
+
+    this.hasMany(models.Order_Detail, {
+      foreignKey: 'Uom_Id',
+      as: 'Sale_Uom',
+      onDelete: 'RESTRICT'
+    });
   }
 }
 

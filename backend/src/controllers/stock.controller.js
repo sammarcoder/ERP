@@ -1,495 +1,3 @@
-// const db = require('../models');
-// const { StockMain, StockDetail, ZItems, Uom, ZCoa, ZvoucherType, Stk_Detail } = db;
-// const sequelize = db.sequelize;
-
-// // Generate Stock Number
-// const generateStockNumber = async (stockTypeId) => {
-//   const prefix = stockTypeId === 1 ? 'STK-IN' : 'STK-OUT';
-//   const year = new Date().getFullYear();
-//   const month = String(new Date().getMonth() + 1).padStart(2, '0');
-
-//   const lastStock = await StockMain.findOne({
-//     where: { stockTypeId: stockTypeId }, // Fixed: was Stock_Type_ID
-//     order: [['createdAt', 'DESC']]
-//   });
-
-//   let sequence = 1;
-//   if (lastStock && lastStock.number) { // Fixed: was Number
-//     const lastSequence = parseInt(lastStock.number.split('-').pop());
-//     sequence = lastSequence + 1;
-//   }
-
-//   return `${prefix}-${year}${month}-${String(sequence).padStart(4, '0')}`;
-// };
-
-// const createCompleteStock = async (req, res) => {
-//   const { master, details } = req.body;
-
-//   if (!master || !details || details.length === 0) {
-//     return res.status(400).json({ 
-//       success: false, 
-//       message: 'Master and details are required' 
-//     });
-//   }
-
-//   const transaction = await sequelize.transaction();
-
-//   try {
-//     // Check if the stockTypeId exists - REMOVE THIS CHECK if you don't want it
-//     const voucherType = await ZvoucherType.findByPk(master.stockTypeId);
-//     if (!voucherType) {
-//       // First, let's create the voucher types if they don't exist
-//       await ZvoucherType.bulkCreate([
-//         { id: 1, vType: 'Stock In', createdAt: new Date(), updatedAt: new Date() },
-//         { id: 2, vType: 'Stock Out', createdAt: new Date(), updatedAt: new Date() }
-//       ], { ignoreDuplicates: true });
-//     }
-
-//     // Generate stock number
-//     const stockNumber = await generateStockNumber(master.stockTypeId);
-
-//     // Create master with generated number
-//     const stockMaster = await StockMain.create({
-//       ...master,
-//       number: stockNumber // Fixed: was Number
-//     }, { transaction });
-
-//     // Add master ID to details and ensure lineId is sequential
-//     const stockDetails = details.map((detail, index) => ({
-//       ...detail,
-//       stkMainId: stockMaster.id, // Fixed: was STK_Main_ID and ID
-//       lineId: index + 1 // Fixed: was Line_Id
-//     }));
-
-//     // Create details
-//     const createdDetails = await StockDetail.bulkCreate(stockDetails, { 
-//       transaction,
-//       validate: true 
-//     });
-
-//     await transaction.commit();
-
-//     // Fetch complete stock with associations
-//     const completeStock = await StockMain.findByPk(stockMaster.id, { // Fixed: was ID
-//       include: [
-//         {
-//           model: StockDetail,
-//           as: 'stockDetails',
-//           include: [
-//             { model: ZItems, as: 'stock_item' }
-//           ]
-//         },
-//         { model: ZCoa, as: 'mainAccount' }
-//       ]
-//     });
-
-//     return res.status(201).json({
-//       success: true,
-//       message: 'Stock created successfully',
-//       data: completeStock
-//     });
-
-//   } catch (error) {
-//     await transaction.rollback();
-
-//     if (error.name === 'SequelizeForeignKeyConstraintError') {
-//       return res.status(400).json({
-//         success: false,
-//         message: `Invalid reference: ${error.message}`
-//       });
-//     }
-
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Failed to create stock',
-//       error: error.message
-//     });
-//   }
-// };
-
-
-
-
-
-// const getAllStock = async (req, res) => {
-//   try {
-//     const { stockTypeId, page = 1, limit = 10 } = req.query;
-//     const offset = (page - 1) * limit;
-
-//     const whereClause = {};
-//     if (stockTypeId) whereClause.stockTypeId = stockTypeId; // Fixed: was Stock_Type_ID
-
-//     const { count, rows } = await StockMain.findAndCountAll({
-//       where: whereClause,
-//       include: [
-//         { model: ZCoa, as: 'account', attributes: ['id', 'acName'] }
-//       ],
-//       limit: parseInt(limit),
-//       offset: parseInt(offset),
-//       order: [['createdAt', 'DESC']]
-//     });
-
-//     return res.status(200).json({
-//       success: true,
-//       data: rows,
-//       pagination: {
-//         total: count,
-//         page: parseInt(page),
-//         limit: parseInt(limit),
-//         totalPages: Math.ceil(count / limit)
-//       }
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Failed to fetch stock',
-//       error: error.message
-//     });
-//   }
-// };
-
-// const getStockById = async (req, res) => {
-//   const { id } = req.params;
-
-//   try {
-//     const stock = await StockMain.findByPk(id, {
-//       include: [
-//         {
-//           model: StockDetail,
-//           as: 'stockDetails',
-//           include: [
-//             { model: ZItems, as: 'stock_item' }
-//           ]
-//         },
-//         { model: ZCoa, as: 'mainAccount' }
-//       ]
-//     });
-
-//     if (!stock) {
-//       return res.status(404).json({
-//         success: false,
-//         message: 'Stock not found'
-//       });
-//     }
-
-//     return res.status(200).json({
-//       success: true,
-//       data: stock
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Failed to fetch stock',
-//       error: error.message
-//     });
-//   }
-// };
-
-// const updateCompleteStock = async (req, res) => {
-//   const { id } = req.params;
-//   const { master, details } = req.body;
-
-//   const transaction = await sequelize.transaction();
-
-//   try {
-//     // Check if stock exists
-//     const existingStock = await StockMain.findByPk(id);
-//     if (!existingStock) {
-//       await transaction.rollback();
-//       return res.status(404).json({
-//         success: false,
-//         message: 'Stock not found'
-//       });
-//     }
-
-//     // Update master
-//     await StockMain.update(master, {
-//       where: { id: id }, // Fixed: was ID
-//       transaction
-//     });
-
-//     // Delete old details
-//     await StockDetail.destroy({
-//       where: { stkMainId: id }, // Fixed: was STK_Main_ID
-//       transaction
-//     });
-
-//     // Create new details
-//     const stockDetails = details.map((detail, index) => ({
-//       ...detail,
-//       stkMainId: id, // Fixed: was STK_Main_ID
-//       lineId: index + 1 // Fixed: was Line_Id
-//     }));
-
-//     await StockDetail.bulkCreate(stockDetails, { 
-//       transaction,
-//       validate: true 
-//     });
-
-//     await transaction.commit();
-
-//     return res.status(200).json({
-//       success: true,
-//       message: 'Stock updated successfully'
-//     });
-//   } catch (error) {
-//     await transaction.rollback();
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Failed to update stock',
-//       error: error.message
-//     });
-//   }
-// };
-
-// const deleteCompleteStock = async (req, res) => {
-//   const { id } = req.params;
-
-//   const transaction = await sequelize.transaction();
-
-//   try {
-//     // Check if stock exists
-//     const existingStock = await StockMain.findByPk(id);
-//     if (!existingStock) {
-//       await transaction.rollback();
-//       return res.status(404).json({
-//         success: false,
-//         message: 'Stock not found'
-//       });
-//     }
-
-//     // Delete details first (due to foreign key)
-//     await StockDetail.destroy({
-//       where: { stkMainId: id }, // Fixed: was STK_Main_ID
-//       transaction
-//     });
-
-//     // Delete master
-//     await StockMain.destroy({
-//       where: { id: id }, // Fixed: was ID
-//       transaction
-//     });
-
-//     await transaction.commit();
-
-//     return res.status(200).json({
-//       success: true,
-//       message: 'Stock deleted successfully'
-//     });
-//   } catch (error) {
-//     await transaction.rollback();
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Failed to delete stock',
-//       error: error.message
-//     });
-//   }
-// };
-
-
-
-
-
-
-
-
-
-
-
-// // const updateStockDetail = async (req, res) => {
-// //   const { id } = req.params;
-// //   const updateData = req.body;
-
-// //   try {
-// //     const updated = await Stk_Detail.update(updateData, {
-// //       where: { ID: id }
-// //     });
-
-// //     if (updated[0] > 0) {
-// //       res.json({
-// //         success: true,
-// //         message: 'Stock detail updated successfully'
-// //       });
-// //     } else {
-// //       res.status(404).json({
-// //         success: false,
-// //         error: 'Stock detail not found'
-// //       });
-// //     }
-// //   } catch (error) {
-// //     res.status(500).json({
-// //       success: false,
-// //       error: error.message
-// //     });
-// //   }
-// // };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const updateStockDetail = async (req, res) => {
-//   const { id } = req.params;
-//   const {
-//     Stock_Price,
-//     Stock_out_UOM_Qty,
-//     Stock_out_SKU_UOM_Qty,
-//     Stock_out_UOM3_Qty,
-//     Stock_In_UOM_Qty,      // ADD for purchase vouchers
-//     Stock_In_SKU_UOM_Qty,  // ADD for purchase vouchers
-//     Stock_In_UOM3_Qty,     // ADD for purchase vouchers
-//     Sale_Unit,
-//     Discount_A,
-//     Discount_B,
-//     Discount_C,
-//     is_Voucher_Generated
-//   } = req.body;
-
-//   try {
-//     // Build update object dynamically (only include provided fields)
-//     const updateFields = {};
-
-//     if (Stock_Price !== undefined) updateFields.Stock_Price = Stock_Price;
-//     if (Stock_out_UOM_Qty !== undefined) updateFields.Stock_out_UOM_Qty = Stock_out_UOM_Qty;
-//     if (Stock_out_SKU_UOM_Qty !== undefined) updateFields.Stock_out_SKU_UOM_Qty = Stock_out_SKU_UOM_Qty;
-//     if (Stock_out_UOM3_Qty !== undefined) updateFields.Stock_out_UOM3_Qty = Stock_out_UOM3_Qty;
-//     if (Stock_In_UOM_Qty !== undefined) updateFields.Stock_In_UOM_Qty = Stock_In_UOM_Qty;
-//     if (Stock_In_SKU_UOM_Qty !== undefined) updateFields.Stock_In_SKU_UOM_Qty = Stock_In_SKU_UOM_Qty;
-//     if (Stock_In_UOM3_Qty !== undefined) updateFields.Stock_In_UOM3_Qty = Stock_In_UOM3_Qty;
-//     if (Sale_Unit !== undefined) updateFields.Sale_Unit = Sale_Unit;
-//     if (Discount_A !== undefined) updateFields.Discount_A = Discount_A;
-//     if (Discount_B !== undefined) updateFields.Discount_B = Discount_B;
-//     if (Discount_C !== undefined) updateFields.Discount_C = Discount_C;
-//     if (is_Voucher_Generated !== undefined) updateFields.is_Voucher_Generated = is_Voucher_Generated;
-
-//     console.log(`🔄 Updating stock detail ID: ${id} with fields:`, updateFields);
-
-//     const [updated] = await Stk_Detail.update(updateFields, {
-//       where: { ID: id }
-//     });
-
-//     if (updated > 0) {
-//       console.log(`✅ Successfully updated stock detail ID: ${id}`);
-//       res.json({
-//         success: true,
-//         message: 'Stock detail updated successfully',
-//         updatedFields: updateFields
-//       });
-//     } else {
-//       console.log(`❌ Stock detail ID: ${id} not found`);
-//       res.status(404).json({
-//         success: false,
-//         error: 'Stock detail not found'
-//       });
-//     }
-//   } catch (error) {
-//     console.error(`💥 Error updating stock detail ID: ${id}:`, error);
-//     res.status(500).json({
-//       success: false,
-//       error: error.message
-//     });
-//   }
-// };
-
-
-
-// // controllers/stockController.js - FIXED API
-// const updateStockMain = async (req, res) => {
-//   const { id } = req.params;
-//   const { is_Voucher_Generated } = req.body;
-
-//   try {
-//     console.log(`🔄 Updating stock main ID: ${id} with voucher status:`, is_Voucher_Generated);
-
-//     const [updated] = await StockMain.update({
-//       is_Voucher_Generated: is_Voucher_Generated
-//     }, {
-//       where: { ID: id }
-//     });
-
-//     if (updated > 0) {
-//       console.log(`✅ Successfully updated stock main ID: ${id}`);
-//       res.json({
-//         success: true,
-//         message: 'Stock main updated successfully',
-//         is_Voucher_Generated
-//       });
-//     } else {
-//       console.log(`❌ Stock main ID: ${id} not found`);
-//       res.status(404).json({
-//         success: false,
-//         error: 'Stock main not found'
-//       });
-//     }
-//   } catch (error) {
-//     console.error(`💥 Error updating stock main ID: ${id}:`, error);
-//     res.status(500).json({
-//       success: false,
-//       error: error.message
-//     });
-//   }
-// };
-
-
-
-
-
-// module.exports = {
-//   createCompleteStock,
-//   getAllStock,
-//   getStockById,
-//   updateCompleteStock,
-//   deleteCompleteStock,
-//   updateStockDetail,
-//   updateStockMain  
-// };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const db = require('../models');
 const { Stk_main, Stk_Detail, ZItems, Uom, ZCoa, ZvoucherType } = db;  // FIXED: Use Stk_main
@@ -514,6 +22,12 @@ const generateStockNumber = async (stockTypeId) => {
 
   return `${prefix}-${year}${month}-${String(sequence).padStart(4, '0')}`;
 };
+
+
+
+
+
+
 
 const createCompleteStock = async (req, res) => {
   const { stockMain, stockDetails } = req.body;
@@ -593,6 +107,10 @@ const createCompleteStock = async (req, res) => {
   }
 };
 
+
+
+
+
 const getAllStock = async (req, res) => {
   try {
     const { stockTypeId, page = 1, limit = 10 } = req.query;
@@ -642,6 +160,10 @@ const getAllStock = async (req, res) => {
   }
 };
 
+
+
+
+
 const getStockById = async (req, res) => {
   const { id } = req.params;
 
@@ -680,6 +202,10 @@ const getStockById = async (req, res) => {
     });
   }
 };
+
+
+
+
 
 const updateCompleteStock = async (req, res) => {
   const { id } = req.params;
@@ -735,6 +261,10 @@ const updateCompleteStock = async (req, res) => {
   }
 };
 
+
+
+
+
 const deleteCompleteStock = async (req, res) => {
   const { id } = req.params;
 
@@ -776,67 +306,6 @@ const deleteCompleteStock = async (req, res) => {
     });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // FIXED: Update stock main with correct model name
-// const updateStockMain = async (req, res) => {
-//   const { id } = req.params;
-//   // const { is_Voucher_Generated } = req.body;
-//  const { 
-//     is_Voucher_Generated, 
-//     Carriage_Amount,
-//     Carriage_ID,      // ADD THIS
-//     Transporter 
-//   } = req.body;
-//   try {
-//     console.log(`🔄 Updating stock main ID: ${id} with voucher status:`, is_Voucher_Generated);
-
-//     const [updated] = await Stk_main.update({  // FIXED: Use Stk_main instead of StockMain
-//       is_Voucher_Generated: is_Voucher_Generated
-//     }, {
-//       where: { ID: id }
-//     });
-
-//     if (updated > 0) {
-//       console.log(`✅ Successfully updated stock main ID: ${id}`);
-//       res.json({
-//         success: true,
-//         message: 'Stock main updated successfully',
-//         is_Voucher_Generated
-//       });
-//     } else {
-//       console.log(`❌ Stock main ID: ${id} not found`);
-//       res.status(404).json({
-//         success: false,
-//         error: 'Stock main not found'
-//       });
-//     }
-//   } catch (error) {
-//     console.error(`💥 Error updating stock main ID: ${id}:`, error);
-//     res.status(500).json({
-//       success: false,
-//       error: error.message
-//     });
-//   }
-// };
-
-
-
-
-
-
-
 
 
 
@@ -885,6 +354,7 @@ const updateStockMain = async (req, res) => {
     });
   }
 };
+
 
 
 
@@ -950,6 +420,7 @@ const updateStockDetail = async (req, res) => {
     });
   }
 };
+
 
 
 

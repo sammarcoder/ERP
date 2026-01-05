@@ -1,5 +1,5 @@
 'use client'
-import { CurrencyManager } from '@/components/currency/CurrencyManager'
+import  {CurrencyManager}  from '@/components/currency/CurrencyManager'
 import DebugPermissions from '@/components/DebugPermissions/DebugPermissions';
 import TokenDebug from '@/components/DebugPermissions/TokenDebug';
 

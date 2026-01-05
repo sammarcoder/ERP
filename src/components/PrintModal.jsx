@@ -1,6 +1,4 @@
-// components/PrintModal.jsx
 import React, { useState, useRef, useEffect } from 'react';
-
 const PrintModal = ({ order, isPurchase, onClose, getDisplayQuantity }) => {
   const [dispatchNotes, setDispatchNotes] = useState({});
   const [transporterInfo, setTransporterInfo] = useState('');
@@ -221,7 +219,7 @@ const PrintModal = ({ order, isPurchase, onClose, getDisplayQuantity }) => {
               <span><strong>Date:</strong> ${new Date(order.Date).toLocaleDateString()}</span>
               <span><strong>:</strong> ${order.Number}</span>
               <span class="${order.Next_Status === 'Complete' ? 'status-complete' : 'status-incomplete'}">
-                <strong>Status:</strong> ${order.Next_Status}
+                <strong>Status</strong> ${order.Next_Status}
               </span>
             </div>
             <div class="divider"></div>
@@ -445,3 +443,5 @@ const PrintModal = ({ order, isPurchase, onClose, getDisplayQuantity }) => {
 };
 
 export default PrintModal;
+
+

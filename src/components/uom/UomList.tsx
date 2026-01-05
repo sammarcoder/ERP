@@ -5,7 +5,7 @@ import { Plus, Search } from 'lucide-react'
 import {
   useGetUomsQuery,
   useDeleteUomMutation
-} from '@/lib/redux/api/uomApi'
+} from '@/store/slice/uomSlice'
 import { Uom } from '@/types/uom'
 import { UomCard } from './UomCard'
 import { UomForm } from './UomForm'

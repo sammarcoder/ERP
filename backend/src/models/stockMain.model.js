@@ -55,10 +55,11 @@ const Stk_main = sequelize.define('Stk_main', {
         type: DataTypes.DECIMAL(10, 2),
         comment: 'Numeric field for carriage amount'
     },
-   
+
     Order_Main_ID: {
         type: DataTypes.INTEGER,
-        comment: 'Reference to original PO/SO - Need to update Order_main table'
+        comment: 'Reference to original PO/SO - Need to update Order_main table',
+        onDelete: 'RESTRICT',
     },
     is_Voucher_Generated: {
         type: DataTypes.BOOLEAN,
@@ -67,11 +68,72 @@ const Stk_main = sequelize.define('Stk_main', {
     Transporter_ID: {
         type: DataTypes.INTEGER,
         allowNull: true,
+    },
+    freight_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    labour_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    bility_expense: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    other_expense: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    booked_crt: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0.00
+    },
+    remarks: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 
 }, {
     tableName: 'Stk_main',
-    timestamps: true
+    timestamps: true,
+
+
+
+    hooks: {
+        // ✅ ADD THIS: Reset order status when stock record is deleted
+        afterDestroy: async (stkRecord, options) => {
+            try {
+                const { Order_Main } = require('./Order_main');
+                const orderId = stkRecord.Order_Main_ID;
+
+                // Check if there are any other stock records for this order
+                const remainingStockRecords = await Stk_main.count({
+                    where: { Order_Main_ID: orderId }
+                });
+
+                // If no more stock records exist, reset the order status
+                if (remainingStockRecords === 0) {
+                    await Order_Main.update({
+                        Next_Status: 'Incomplete',
+                        is_Note_generated: false
+                    }, {
+                        where: { ID: orderId }
+                    });
+
+                    console.log(`✅ Order ${orderId} status reset: Next_Status='Incomplete', is_Note_generated=false`);
+                }
+            } catch (error) {
+                console.error('❌ Error resetting order status after stock deletion:', error);
+                throw error;
+            }
+        }
+    }
 });
 
 // Define associations following your pattern
@@ -79,7 +141,8 @@ Stk_main.associate = function (models) {
     // Stk_main has many Stk_Detail
     Stk_main.hasMany(models.Stk_Detail, {
         foreignKey: 'STK_Main_ID',
-        as: 'details'
+        as: 'details',
+        
     });
 
     // Stk_main belongs to ZvoucherType (stock type)
@@ -93,12 +156,6 @@ Stk_main.associate = function (models) {
         foreignKey: 'COA_ID',
         as: 'account'
     });
-
-    // Stk_main belongs to ZCOA for batch reference
-    //   Stk_main.belongsTo(models.ZCOA, {
-    //     foreignKey: 'Purchase_Batchno',
-    //     as: 'batchAccount'
-    //   });
 
     // Stk_main belongs to ZCOA for carriage cost
     Stk_main.belongsTo(models.ZCoa, {

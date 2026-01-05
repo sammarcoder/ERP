@@ -50,6 +50,11 @@ const Stk_Detail = sequelize.define('Stk_Detail', {
 
   // Sale Unit
   Sale_Unit: { type: DataTypes.STRING() },
+  sale_Uom :{ type: DataTypes.INTEGER() },
+  uom1_qty: { type: DataTypes.DECIMAL(10, 3) },
+  uom2_qty: { type: DataTypes.DECIMAL(10, 3) },
+  uom3_qty: { type: DataTypes.DECIMAL(10, 3) },
+
 
   Discount_A: {
     type: DataTypes.DECIMAL(5, 2),

@@ -38,7 +38,7 @@
 
 
 'use client'
-import { ItemClassManager } from '@/components/itemsClass/ItemsClassManager'
+import { ItemClassManager } from '@/components/controlHead/ItemsClassManager'
 
 export default function ControlHead2Page() {
   return <ItemClassManager />

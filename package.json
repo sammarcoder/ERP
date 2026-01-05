@@ -28,6 +28,7 @@
     "lucide-react": "^0.541.0",
     "mysql2": "^3.14.3",
     "next": "15.4.6",
+    "next-auth": "^5.0.0-beta.30",
     "react": "19.1.0",
     "react-apexcharts": "^1.8.0",
     "react-chartjs-2": "^5.3.1",

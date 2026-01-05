@@ -767,17 +767,7 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
   }, [initialValues, isInitialized]);
 
   useEffect(() => {
-    // FIXED: Check for null, undefined, and 0 properly
-    if (!itemId || itemId === null || itemId === undefined) {
-      // Reset state when no item selected
-      setUom1Val('');
-      setUom2Val('');
-      setUom3Val('');
-      setSaleUnit('');
-      setData({ uom1: null, uom2_qty: 12, uom3_qty: 144, uomTwo: null, uomThree: null });
-      setIsInitialized(false);
-      return;
-    }
+   
 
     async function fetchData() {
       setLoading(true);
@@ -913,7 +903,7 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
         </label>
         <input
           type="text"
-          step="0.01"
+          // step="0.01"
           value={uom3Val}
           onChange={handleUom3Change}
           placeholder="0"
@@ -982,21 +972,6 @@ const UomConverter = ({ itemId, onChange, initialValues = {}, isPurchase = false
         />
 
       </div>
-
-      {/* Conversion Info */}
-      {/* <div className="text-xs text-gray-500 ml-2">
-        <div className="bg-gray-50 p-1 rounded text-[10px]">
-          <div>1 {data.uomTwo?.uom} = {data.uom2_qty} {data.uom1?.uom}</div>
-          <div>1 {data.uomThree?.uom} = {data.uom3_qty} {data.uom1?.uom}</div>
-          {!isPurchase && saleUnit && (
-            <div className="text-green-600 font-medium mt-1">
-              Sale: {saleUnit === 'uom1' ? data.uom1?.uom :
-                saleUnit === 'uomTwo' ? data.uomTwo?.uom :
-                  data.uomThree?.uom}
-            </div>
-          )}
-        </div>
-      </div> */}
     </div>
   );
 };

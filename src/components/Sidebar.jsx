@@ -71,7 +71,9 @@ const Sidebar = () => {
             path: null,
             subItems: [
                 { id: 'sales-order', title: 'Sales Order', path: '/order/sales' },
-                { id: 'purchase-order', title: 'Purchase Order', path: '/order/purchase' }
+                { id: 'purchase-order', title: 'Purchase Order', path: '/order/purchase' },
+                { id: 'sales-order-2', title: 'Sales Order 2', path: '/orders/sales' },
+                { id: 'purchase-order-2', title: 'Purchase Order 2', path: '/orders/purchase' }
             ]
         },
         {

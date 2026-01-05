@@ -158,4 +158,32 @@ export const NumberInput: React.FC<{
   );
 };
 
+
+
+
+export function formatWithMathRound(input) {
+  // Convert input to number first
+  const num = Number(input);
+
+  // Check for valid input
+  if (isNaN(num)) return "Invalid Input";
+
+  // 1. Round using standard math rule (0.5 rounds up)
+  const rounded = Math.round(num);
+
+  // 2. Format with en-US (adds commas)
+  return rounded.toLocaleString('en-US');
+}
+
+// Examples:
+console.log(formatWithMathRound(10000000.5)); // "10,000,001"
+console.log(formatWithMathRound("9999.49"));   // "9,999"
+
+
+
 export default NumberFormat;
+
+
+
+
+

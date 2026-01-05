@@ -201,19 +201,25 @@ ZCoa.associate = function (models) {
     if (models && models.Order_Main) {
         ZCoa.hasMany(models.Order_Main, {
             foreignKey: 'COA_ID',
-            as: 'orders'
+            as: 'orders',
+            onDelete: 'RESTRICT',
+            onUpdate: 'CASCADE'
         });
     }
     if (models && models.Stk_main) {
         ZCoa.hasMany(models.Stk_main, {
             foreignKey: 'COA_ID',
-            as: 'account'
+            as: 'account',
+            onDelete: 'RESTRICT',
+            onUpdate: 'CASCADE'
         });
     }
     if (models && models.Stk_main) {
         ZCoa.hasMany(models.Stk_main, {
             foreignKey: 'Carriage_ID',
-            as: 'Voucher_carriage_account'
+            as: 'Voucher_carriage_account',
+            onDelete: 'RESTRICT',
+            onUpdate: 'CASCADE'
         });
     }
     if (models && models.Ztransporter) {
@@ -225,7 +231,9 @@ ZCoa.associate = function (models) {
     if (models && models.Stk_Detail) {
         ZCoa.hasMany(models.Stk_Detail, {
             foreignKey: 'batchno',
-            as: 'stock_batch'
+            as: 'stock_batch',
+            onDelete: 'RESTRICT',
+            onUpdate: 'CASCADE'
         });
     }
     

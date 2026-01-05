@@ -1,0 +1,135 @@
+# version: '3.8'
+
+# services:
+#   mysql:
+#     image: mysql:8.0
+#     container_name: keycloak-mysql
+#     environment:
+#       MYSQL_ROOT_PASSWORD: "@mysql123"         # Your existing root password
+#       MYSQL_DATABASE: keycloak                 # Creates keycloak database
+#       MYSQL_USER: keycloak_user                # Creates this user automatically
+#       MYSQL_PASSWORD: keycloak_pass            # With this password
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+#       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+#     ports:
+#       - "3306:3306"
+#     restart: unless-stopped
+#     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+#   keycloak:
+#     image: quay.io/keycloak/keycloak:26.4.7
+#     container_name: keycloak
+#     depends_on:
+#       - mysql
+#     ports:
+#       - "127.0.0.1:8080:8080"
+#     environment:
+#       KC_BOOTSTRAP_ADMIN_USERNAME: admin
+#       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+#       KC_DB: mysql
+#       KC_DB_URL: jdbc:mysql://mysql:3306/keycloak
+#       KC_DB_USERNAME: keycloak_user            # Must match MySQL user
+#       KC_DB_PASSWORD: keycloak_pass            # Must match MySQL password
+#       KC_HTTP_ENABLED: true
+#       KC_HOSTNAME_STRICT: false
+#     command: start-dev
+#     restart: unless-stopped
+
+# volumes:
+#   mysql_data:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: keycloak-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "@mysql123"
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak_user
+      MYSQL_PASSWORD: keycloak_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "keycloak_user", "-pkeycloak_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.7
+    container_name: keycloak
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://mysql:3306/keycloak
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: keycloak_pass
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_LOG_LEVEL: INFO
+    command: start-dev
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e 'GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n' >&3;grep -q '200 OK' <&3"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+      start_period: 90s
+
+volumes:
+  mysql_data:

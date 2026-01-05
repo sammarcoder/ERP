@@ -1,10 +1,11 @@
 const db = require('../models');
-const { Order_Main, Order_Detail, ZItems, Uom, ZCoa } = db;
+const { Order_Main, Order_Detail, ZItems, Uom, ZCoa, Stk_main } = db;
 const sequelize = db.sequelize;
 
-// Generate Order Number
+
+// FIXED: Use correct Stock_Type_ID values (11 = PO, 12 = SO)
 // const generateOrderNumber = async (stockTypeId) => {
-//   const prefix = stockTypeId === 1 ? 'PO' : 'SO';
+//   const prefix = stockTypeId === 11 ? 'PO' : 'SO'; // FIXED: 11 for PO, 12 for SO
 //   const year = new Date().getFullYear();
 //   const month = String(new Date().getMonth() + 1).padStart(2, '0');
 
@@ -22,19 +23,8 @@ const sequelize = db.sequelize;
 //   return `${prefix}-${year}${month}-${String(sequence).padStart(4, '0')}`;
 // };
 
-
-
-
-
-
-
-
-
-// FIXED: Use correct Stock_Type_ID values (11 = PO, 12 = SO)
 const generateOrderNumber = async (stockTypeId) => {
-  const prefix = stockTypeId === 11 ? 'PO' : 'SO'; // FIXED: 11 for PO, 12 for SO
-  const year = new Date().getFullYear();
-  const month = String(new Date().getMonth() + 1).padStart(2, '0');
+  const prefix = stockTypeId === 11 ? 'PO' : 'SO'; // 11 = PO, 12 = SO
 
   const lastOrder = await Order_Main.findOne({
     where: { Stock_Type_ID: stockTypeId },
@@ -42,18 +32,17 @@ const generateOrderNumber = async (stockTypeId) => {
   });
 
   let sequence = 1;
+
   if (lastOrder && lastOrder.Number) {
-    const lastSequence = parseInt(lastOrder.Number.split('-').pop());
-    sequence = lastSequence + 1;
+    // Number format: PO-12 or SO-45
+    const lastSequence = parseInt(lastOrder.Number.split('-')[1], 10);
+    if (!isNaN(lastSequence)) {
+      sequence = lastSequence + 1;
+    }
   }
 
-  return `${prefix}-${year}${month}-${String(sequence).padStart(4, '0')}`;
+  return `${prefix}-${sequence}`;
 };
-
-
-
-
-
 
 
 
@@ -80,14 +69,6 @@ const createCompleteOrder = async (req, res) => {
       Number: orderNumber
     }, { transaction });
 
-    // Add master ID to details and ensure Line_Id is sequential
-    // Old code (before sale_unit):
-    // const orderDetails = details.map((detail, index) => ({
-    //   ...detail,
-    //   Order_Main_Id: orderMaster.ID,
-    //   Line_Id: index + 1
-    // }));
-    // New code: include all UOM quantities and sale_unit from frontend
     const orderDetails = details.map((detail, index) => ({
       ...detail,
       Order_Main_Id: orderMaster.ID,
@@ -233,10 +214,10 @@ const getAllOrders = async (req, res) => {
     const { count, rows } = await Order_Main.findAndCountAll({
       where: whereClause,
       include: [
-        { 
-          model: ZCoa, 
-          as: 'account', 
-          // attributes: ['id', 'acName', 'city', 'mobileNo'] 
+        {
+          model: ZCoa,
+          as: 'account',
+          attributes: ['id', 'acName', "setupName", 'city', 'mobileNo']
         },
         {
           model: Order_Detail,
@@ -244,14 +225,21 @@ const getAllOrders = async (req, res) => {
           include: [{
             model: ZItems,
             as: 'item',
-            attributes: ['id', 'itemName', 'sellingPrice'],
+            attributes: ['id', 'itemName', 'skuUOM', 'uom1_qyt', 'uom2', 'uom2_qty', 'uom3', 'uom3_qty'],
             include: [
               { model: Uom, as: 'uom1', attributes: ['id', 'uom'] },
               { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
               { model: Uom, as: 'uomThree', attributes: ['id', 'uom'] }
             ]
-          }]
-        }
+          },
+          {
+            model: Uom,
+            as: 'uom',
+            attributes: ['id', 'uom']
+          }
+          ]
+        },
+
       ],
       order: [['createdAt', 'DESC']],
       limit: parseInt(limit),
@@ -301,21 +289,58 @@ const getOrderById = async (req, res) => {
 
   try {
     const order = await Order_Main.findByPk(id, {
+      // include: [
+      //   {
+      //     model: Order_Detail,
+      //     as: 'details',
+      //     include: [
+      //       {
+      //         model: ZItems, as: 'item', include: [{ model: Uom, as: 'uom1', attributes: ['id', 'uom'] },
+      //         // model: ZItems, as: 'item', include: [{ model: Uom, as: 'uom1', attributes: ['uom'] },
+      //         { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
+      //         { model: Uom, as: 'uomThree', attributes: ['id', 'uom'] }]
+
+      //       },
+
+      //       {
+      //         model: Uom,
+      //         as: 'uom',
+      //         attributes: ['id', 'uom']
+      //       }
+      //     ]
+
+      //   },
+      //   { model: ZCoa, as: 'account' },
+
+      // ]
       include: [
+        {
+          model: ZCoa,
+          as: 'account',
+          attributes: ['id', 'acName', "setupName", 'city', 'mobileNo']
+        },
         {
           model: Order_Detail,
           as: 'details',
-          include: [
-            {
-              model: ZItems, as: 'item', include: [{ model: Uom, as: 'uom1', attributes: ['id','uom'] },
-              // model: ZItems, as: 'item', include: [{ model: Uom, as: 'uom1', attributes: ['uom'] },
-              { model: Uom, as: 'uomTwo', attributes: ['id','uom'] },
-              { model: Uom, as: 'uomThree', attributes: ['id','uom'] }]
-            }
+          include: [{
+            model: ZItems,
+            as: 'item',
+            attributes: ['id', 'itemName', 'skuUOM', 'uom1_qyt', 'uom2', 'uom2_qty', 'uom3', 'uom3_qty'],
+            include: [
+              { model: Uom, as: 'uom1', attributes: ['id', 'uom'] },
+              { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
+              { model: Uom, as: 'uomThree', attributes: ['id', 'uom'] }
+            ]
+          },
+          {
+            model: Uom,
+            as: 'uom',
+            attributes: ['id', 'uom']
+          }
           ]
         },
-        { model: ZCoa, as: 'account' }
-      ]
+
+      ],
     });
 
     if (!order) {
@@ -366,15 +391,6 @@ const updateCompleteOrder = async (req, res) => {
       where: { Order_Main_Id: id },
       transaction
     });
-
-    // Create new details
-    // Old code (before sale_unit):
-    // const orderDetails = details.map((detail, index) => ({
-    //   ...detail,
-    //   Order_Main_Id: id,
-    //   Line_Id: index + 1
-    // }));
-    // New code: include all UOM quantities and sale_unit from frontend
     const orderDetails = details.map((detail, index) => ({
       ...detail,
       Order_Main_Id: id,
@@ -405,42 +421,206 @@ const updateCompleteOrder = async (req, res) => {
   }
 };
 
+
+
+
+// const deleteCompleteOrder = async (req, res) => {
+//   const { id } = req.params;
+
+//   const transaction = await sequelize.transaction();
+
+//   try {
+//     // Check if order exists
+//     const existingOrder = await Order_Main.findByPk(id);
+//     if (!existingOrder) {
+//       await transaction.rollback();
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Order not found'
+//       });
+//     }
+
+//     // Delete details first (due to foreign key)
+//     await Order_Detail.destroy({
+//       where: { Order_Main_Id: id },
+//       transaction
+//     });
+
+//     // Delete master
+//     await Order_Main.destroy({
+//       where: { ID: id },
+//       transaction
+//     });
+
+//     await transaction.commit();
+
+//     return res.status(200).json({
+//       success: true,
+//       message: 'Order deleted successfully'
+//     });
+//   } catch (error) {
+//     await transaction.rollback();
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Failed to delete order',
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+// ADD THIS: Update order status function
+
+
+
+// const deleteCompleteOrder = async (req, res) => {
+//   const { id } = req.params;
+//   const transaction = await sequelize.transaction();
+
+//   try {
+//     const existingOrder = await Order_Main.findByPk(id);
+//     if (!existingOrder) {
+//       await transaction.rollback();
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Order not found'
+//       });
+//     }
+
+//     // ✅ ADD: Business rule validation
+//     if (existingOrder.is_Note_generated) {
+//       await transaction.rollback();
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Cannot delete order. GRN/Dispatch note already generated. Delete the note first.'
+//       });
+//     }
+
+//     // Check if any line items have been transferred
+//     const transferredItems = await Order_Detail.findOne({
+//       where: {
+//         Order_Main_Id: id,
+//         trade: true
+//       },
+//       transaction
+//     });
+
+//     if (transferredItems) {
+//       await transaction.rollback();
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Cannot delete order. Some items have already been transferred.'
+//       });
+//     }
+
+//     // Delete details first (foreign key constraint)
+//     await Order_Detail.destroy({
+//       where: { Order_Main_Id: id },
+//       transaction
+//     });
+
+//     // Delete master
+//     await Order_Main.destroy({
+//       where: { ID: id },
+//       transaction
+//     });
+
+//     await transaction.commit();
+
+//     return res.status(200).json({
+//       success: true,
+//       message: 'Order deleted successfully'
+//     });
+//   } catch (error) {
+//     await transaction.rollback();
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Failed to delete order',
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// controllers/orderController.js - UPDATE DELETE FUNCTION
+
+
+
+
+
+
 const deleteCompleteOrder = async (req, res) => {
-  const { id } = req.params;
-
-  const transaction = await sequelize.transaction();
-
   try {
-    // Check if order exists
-    const existingOrder = await Order_Main.findByPk(id);
-    if (!existingOrder) {
-      await transaction.rollback();
+    const { id } = req.params;
+
+    // ✅ ADD THIS: Check if order has stock transactions
+    const order = await Order_Main.findByPk(id, {
+      include: [{
+        model: Stk_main,
+        as: 'stockTransactions'
+      }]
+    });
+
+    if (!order) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
 
-    // Delete details first (due to foreign key)
-    await Order_Detail.destroy({
-      where: { Order_Main_Id: id },
-      transaction
-    });
+    // ✅ ADD THIS: Business rule check
+    if (order.stockTransactions && order.stockTransactions.length > 0) {
+      const stockType = order.Stock_Type_ID === 11 ? 'GRN' : 'GDN';
+      const stockNumbers = order.stockTransactions.map(st => st.Number).join(', ');
 
-    // Delete master
-    await Order_Main.destroy({
-      where: { ID: id },
-      transaction
-    });
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete order ${order.Number}. ${stockType} records exist: ${stockNumbers}. Please delete the ${stockType} records first.`,
+      });
+    }
 
-    await transaction.commit();
+    // ✅ REST OF DELETE LOGIC REMAINS THE SAME
+    await Order_Main.destroy({ where: { ID: id } });
 
     return res.status(200).json({
       success: true,
-      message: 'Order deleted successfully'
+      message: `Order deleted successfully`
     });
+
   } catch (error) {
-    await transaction.rollback();
+    // ✅ ADD THIS: Handle foreign key constraint errors
+    if (error.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot delete order due to related records. Please delete GRN/GDN records first.'
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: 'Failed to delete order',
@@ -451,19 +631,96 @@ const deleteCompleteOrder = async (req, res) => {
 
 
 
-// ADD THIS: Update order status function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const updateOrderStatus = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { status } = req.body;
+
+//     // Validate status
+//     if (!['Incomplete', 'Complete', 'Partial'].includes(status)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Invalid status. Use: Incomplete, Complete, or Partial'
+//       });
+//     }
+
+//     // Check if order exists
+//     const order = await Order_Main.findByPk(id);
+//     if (!order) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Order not found'
+//       });
+//     }
+
+//     // Update status
+//     const [updatedRows] = await Order_Main.update(
+//       { Next_Status: status },
+//       { where: { ID: id } }
+//     );
+
+//     if (updatedRows === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Failed to update order status'
+//       });
+//     }
+
+//     // Return updated order
+//     const updatedOrder = await Order_Main.findByPk(id, {
+//       include: [
+//         { model: ZCoa, as: 'account', attributes: ['id', 'acName'] }
+//       ]
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: `Order status updated to ${status}`,
+//       data: updatedOrder
+//     });
+//   } catch (error) {
+//     console.error('Error updating order status:', error);
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Failed to update order status',
+//       error: error.message
+//     });
+//   }
+// };
+
+
+// controllers/orderController.js - SIMPLIFIED WITHOUT TRANSPORTER
+
+
+
+
+
+
 const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, approved, is_Note_generated } = req.body;
 
-    // Validate status
-    if (!['Incomplete', 'Complete', 'Partial'].includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid status. Use: Incomplete, Complete, or Partial'
-      });
-    }
+    console.log('📝 Order Status Update Request:', {
+      orderId: id,
+      status,
+      approved,
+      is_Note_generated
+    });
 
     // Check if order exists
     const order = await Order_Main.findByPk(id);
@@ -474,42 +731,118 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // Update status
-    const [updatedRows] = await Order_Main.update(
-      { Next_Status: status },
-      { where: { ID: id } }
-    );
+    // Prepare update object
+    const updateData = {};
+
+    if (status !== undefined) {
+      const validStatuses = ['Incomplete', 'Complete', 'Pending', 'Cancelled'];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid status'
+        });
+      }
+      updateData.Next_Status = status;
+    }
+
+    if (approved !== undefined) {
+      const approvedValue = parseInt(approved);
+      if (![0, 1].includes(approvedValue)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid approval value. Use: 0 or 1'
+        });
+      }
+      updateData.approved = approvedValue;
+    }
+
+    if (is_Note_generated !== undefined) {
+      const noteValue = parseInt(is_Note_generated);
+      if (![0, 1].includes(noteValue)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid note generated value. Use: 0 or 1'
+        });
+      }
+      updateData.is_Note_generated = noteValue;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No valid fields to update'
+      });
+    }
+
+    console.log('💾 Updating order with data:', updateData);
+
+    // Update order
+    const [updatedRows] = await Order_Main.update(updateData, {
+      where: { ID: id }
+    });
 
     if (updatedRows === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Failed to update order status'
+        message: 'Failed to update order'
       });
     }
 
-    // Return updated order
+    // ✅ SIMPLIFIED: Get updated order WITHOUT transporter
     const updatedOrder = await Order_Main.findByPk(id, {
       include: [
-        { model: ZCoa, as: 'account', attributes: ['id', 'acName'] }
+        {
+          model: ZCoa,
+          as: 'account',
+          attributes: ['id', 'acName', 'city']
+        }
+        // ✅ REMOVED: No transporter include needed for status updates
       ]
     });
 
+    // Check if order can generate GRN/GDN
+    const canGenerateNote = updatedOrder.approved === 1 &&
+      updatedOrder.Next_Status === 'Incomplete' &&
+      updatedOrder.is_Note_generated === 0;
+
+    console.log('✅ Order updated successfully:', {
+      orderId: id,
+      updatedFields: updateData,
+      canGenerateNote
+    });
+
+    // Prepare response message
+    let message = 'Order updated successfully';
+    if (approved !== undefined) {
+      message = approved == 1 ? 'Order approved successfully' : 'Order rejected successfully';
+    } else if (status !== undefined) {
+      message = `Order status updated to ${status}`;
+    }
+
     return res.status(200).json({
       success: true,
-      message: `Order status updated to ${status}`,
-      data: updatedOrder
+      message,
+      data: {
+        ...updatedOrder.toJSON(),
+        canGenerateNote,
+        permissions: {
+          canApprove: updatedOrder.approved === 0,
+          canReject: updatedOrder.approved === 1,
+          canGenerateGRN: canGenerateNote && updatedOrder.Stock_Type_ID === 11,
+          canGenerateGDN: canGenerateNote && updatedOrder.Stock_Type_ID === 12
+        }
+      }
     });
+
   } catch (error) {
-    console.error('Error updating order status:', error);
+    console.error('❌ Error updating order:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to update order status',
+      message: 'Failed to update order',
       error: error.message
     });
   }
 };
-
-
 
 
 

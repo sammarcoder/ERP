@@ -1,6 +1,7 @@
 // import type { Metadata } from "next";
 // import { Geist, Geist_Mono } from "next/font/google";
 // import "./globals.css";
+// import { Providers } from "./providers";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -29,17 +30,19 @@
 //         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 //       >
 
+//         <Providers>
+//           <div className="flex min-h-screen ">
+//             <Sidebar />
 
-//         <div className="flex min-h-screen ">
-//           <Sidebar/>
+//             {/* Main Content Area */}
+//             <main className="flex-1 lg:ml-14 p-6 transition-all duration-300">
+//               <div className="max-w-7xl mx-auto">
+//                 {children}
+//               </div>
+//             </main>
+//           </div>
+//         </Providers>
 
-//           {/* Main Content Area */}
-//           <main className="flex-1 lg:ml-14 p-6 transition-all duration-300">
-//             <div className="max-w-7xl mx-auto">
-//               {children}
-//             </div>
-//           </main>
-//         </div>
 
 //       </body>
 //     </html>
@@ -69,13 +72,196 @@
 
 
 
+// import type { Metadata } from "next";
+// import { Geist, Geist_Mono } from "next/font/google";
+// import "./globals.css";
+// import Header from "@/components/Header";
+// import Sidebar from "@/components/Sidebar";
+// import { Providers } from "./providers";  // ← ADD THIS IMPORT
+// import { Auth0Provider } from "@auth0/nextjs-auth0";
+
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
+
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
+
+// export const metadata: Metadata = {
+//   title: "ERP System",  // ← UPDATED TITLE
+//   description: "Enterprise Resource Planning System",  // ← UPDATED DESCRIPTION
+// };
+
+// export default function RootLayout({
+//   children,
+// }: Readonly<{
+//   children: React.ReactNode;
+// }>) {
+//   return (
+//     <html lang="en">
+//       <body
+//         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+//       >
+//         {/* ← WRAP EVERYTHING WITH REDUX PROVIDER */}
+//         <Auth0Provider>
+//           <Providers>
+//             <div className="flex min-h-screen">
+//               <Sidebar />
+
+//               {/* Main Content Area */}
+//               <main className="flex-1 lg:ml-14 p-6 transition-all duration-300">
+//                 <div className="max-w-7xl mx-auto">
+//                   {children}
+//                 </div>
+//               </main>
+//             </div>
+//           </Providers>
+//         </Auth0Provider>
+
+//         {/* ← END REDUX PROVIDER WRAPPER */}
+//       </body>
+//     </html>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// keycloack
+
+
+
+
+// import type { Metadata } from "next";
+// import { Geist, Geist_Mono } from "next/font/google";
+// import "./globals.css";
+// import { Providers } from "./providers";
+// import Header from "@/components/Header";
+// import Sidebar from "@/components/Sidebar";
+// import { SessionProvider } from "next-auth/react";
+
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
+
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
+
+// export const metadata: Metadata = {
+//   title: "ERP System",
+//   description: "Enterprise Resource Planning System",
+// };
+
+// export default function RootLayout({
+//   children,
+// }: Readonly<{
+//   children: React.ReactNode;
+// }>) {
+//   return (
+//     <html lang="en">
+//       <body
+//         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+//       >
+//         <SessionProvider>
+//           <Providers>
+//             <div className="flex min-h-screen">
+//               <Sidebar />
+              
+//               {/* Main Content Area */}
+//               <main className="flex-1 lg:ml-14 p-6 transition-all duration-300">
+//                 <div className="max-w-7xl mx-auto">
+//                   {children}
+//                 </div>
+//               </main>
+//             </div>
+//           </Providers>
+//         </SessionProvider>
+//       </body>
+//     </html>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
-import { Providers } from "./providers";  // ← ADD THIS IMPORT
-import { Auth0Provider } from "@auth0/nextjs-auth0";
+import { SessionProvider } from "next-auth/react";
+import ConditionalLayout from "@/components/ConditionalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -88,8 +274,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ERP System",  // ← UPDATED TITLE
-  description: "Enterprise Resource Planning System",  // ← UPDATED DESCRIPTION
+  title: "ERP System",
+  description: "Enterprise Resource Planning System",
 };
 
 export default function RootLayout({
@@ -102,23 +288,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* ← WRAP EVERYTHING WITH REDUX PROVIDER */}
-        <Auth0Provider>
+        <SessionProvider>
           <Providers>
-            <div className="flex min-h-screen">
-              <Sidebar />
-
-              {/* Main Content Area */}
-              <main className="flex-1 lg:ml-14 p-6 transition-all duration-300">
-                <div className="max-w-7xl mx-auto">
-                  {children}
-                </div>
-              </main>
-            </div>
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
           </Providers>
-        </Auth0Provider>
-
-        {/* ← END REDUX PROVIDER WRAPPER */}
+        </SessionProvider>
       </body>
     </html>
   );

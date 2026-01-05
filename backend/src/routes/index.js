@@ -21,6 +21,7 @@ const grn = require('../controllers/grn.controller.js')
 const zcurrencyRoutes = require('./zcurrencyRoutes.js')
 // const dispatchController = require('../controllers/dispatch.controller.js')
 const dispatchController = require('./dispatch.js')
+const gdnRoutes = require('./gdn.js')
 
 router.use("/auth", authRoutes);
 router.use("/z-control", zRoutes);
@@ -43,6 +44,7 @@ router.use('/stock-order', stockRoutes)
 
 router.use('/grn', grn);
 router.use('/dispatch', dispatchController);
+router.use('/gdn', gdnRoutes);
 
 router.use('/transporter', require('./transporterRoutes'));
 

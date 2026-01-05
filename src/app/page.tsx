@@ -183,51 +183,132 @@
 
 
 
-import { auth0 } from "../../lib/auth0";
-import LoginButton from "@/components/LoginButton";
-import LogoutButton from "@/components/LogoutButton";
-import Profile from "@/components/Profile";
+// import { auth0 } from "../../lib/auth0";
+// import LoginButton from "@/components/LoginButton";
+// import LogoutButton from "@/components/LogoutButton";
+// import Profile from "@/components/Profile";
 
-export default async function Home() {
-  const session = await auth0.getSession();
-  const user = session?.user;
+// export default async function Home() {
+//   const session = await auth0.getSession();
+//   const user = session?.user;
+
+//   return (
+//     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+//       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 max-w-md w-full text-center">
+        
+//         <img
+//           src="https://cdn.auth0.com/website/auth0-logo-dark.svg"
+//           alt="Auth0 Logo"
+//           className="w-24 h-auto mx-auto mb-6"
+//         />
+        
+//         <h1 className="text-2xl font-bold text-gray-900 mb-8">
+//           Next.js + Auth0
+//         </h1>
+        
+//         <div className="action-card">
+//           {user ? (
+//             <div className="space-y-6">
+//               <p className="text-[#4c96dc] font-semibold text-lg">
+//                 ✅ Successfully logged in!
+//               </p>
+              
+//               <Profile />
+//               <LogoutButton />
+//             </div>
+//           ) : (
+//             <div className="space-y-6">
+//               <p className="text-gray-600">
+//                 Welcome! Please log in to access your protected content.
+//               </p>
+              
+//               <LoginButton />
+//             </div>
+//           )}
+//         </div>
+        
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// keycloack
+
+
+
+
+
+import { auth, signIn } from "../../auth"
+import { redirect } from "next/navigation"
+
+export default async function LoginPage() {
+  const session = await auth()
+  
+  if (session) {
+    redirect('/dashboard')
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 max-w-md w-full text-center">
-        
-        <img
-          src="https://cdn.auth0.com/website/auth0-logo-dark.svg"
-          alt="Auth0 Logo"
-          className="w-24 h-auto mx-auto mb-6"
-        />
-        
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">
-          Next.js + Auth0
-        </h1>
-        
-        <div className="action-card">
-          {user ? (
-            <div className="space-y-6">
-              <p className="text-[#4c96dc] font-semibold text-lg">
-                ✅ Successfully logged in!
-              </p>
-              
-              <Profile />
-              <LogoutButton />
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <p className="text-gray-600">
-                Welcome! Please log in to access your protected content.
-              </p>
-              
-              <LoginButton />
-            </div>
-          )}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            ERP System Login
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Please sign in with your Keycloak account
+          </p>
         </div>
         
+        <div className="mt-8 space-y-6">
+          <form
+            action={async () => {
+              "use server"
+              await signIn("keycloak", { redirectTo: "/dashboard" })
+            }}
+          >
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Sign in with Keycloak
+            </button>
+          </form>
+        </div>
       </div>
     </div>
-  );
+  )
 }
+
+
+
+
+
+

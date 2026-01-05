@@ -34,11 +34,20 @@ const Ztransporter = sequelize.define('Ztransporter', {
 Ztransporter.associate = function (models) {
   Ztransporter.hasMany(models.Stk_main, {
     foreignKey: 'Transporter_ID',
-    as: 'stockTransactions'
+    as: 'sotckTransporter',
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE'
   });
   Ztransporter.hasMany(models.ZCoa, {
     foreignKey: 'Transporter_ID',
     as: 'coaEntries'
+  });
+
+  Ztransporter.hasMany(models.Order_Main, {
+    foreignKey: 'Transporter_ID',
+    as: 'ordersTransporter',
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE'
   });
 };
 

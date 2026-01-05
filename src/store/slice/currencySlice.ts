@@ -1,7 +1,7 @@
 // import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 // import { Currency, CreateCurrencyRequest, UpdateCurrencyRequest } from '@/types/currency'
 
-// // ✅ Dynamic base URL (LAN + localhost safe, like journalVoucherApi)
+// //  Dynamic base URL (LAN + localhost safe, like journalVoucherApi)
 // const getApiBaseUrl = () => {
 //   if (typeof window !== 'undefined') {
 //     return `http://${window.location.hostname}:4000/api/z-currency`
@@ -36,7 +36,7 @@
 //       providesTags: (result, error, id) => [{ type: 'Currency', id }],
 //     }),
 
-//     // ✅ POST /api/z-currency/create - Create currency
+//     //  POST /api/z-currency/create - Create currency
 //     createCurrency: builder.mutation<{ success: boolean; data: Currency }, CreateCurrencyRequest>({
 //       query: (newCurrency) => ({
 //         url: '/create',
@@ -101,42 +101,140 @@
 
 
 
+// Works good with naxt-auth but intergeation with backend
+
+// import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+// import { Currency, CreateCurrencyRequest, UpdateCurrencyRequest } from '@/types/currency'
+
+// // ✅ Base query with Auth0 authentication
+// const baseQueryWithAuth = fetchBaseQuery({
+//   baseUrl: (() => {
+//     if (typeof window !== 'undefined') {
+//       return `http://${window.location.hostname}:4000/api/z-currency`
+//     } else {
+//       return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/z-currency'
+//     }
+//   })(),
+//   prepareHeaders: async (headers) => {
+//     try {
+//       // Get access token from Auth0
+//       const response = await fetch('/auth/access-token');
+//       if (response.ok) {
+//         const data = await response.json();
+//         if (data.token) {
+//           headers.set('authorization', `Bearer ${data.token}`);
+//         }
+//       }
+//     } catch (error) {
+//       console.error('Failed to get access token:', error);
+//     }
+    
+//     headers.set('Content-Type', 'application/json');
+//     return headers;
+//   },
+// });
+
+// export const currencyApi = createApi({
+//   reducerPath: 'currencyApi',
+//   baseQuery: baseQueryWithAuth,
+//   tagTypes: ['Currency'],
+//   endpoints: (builder) => ({
+//     // GET /api/z-currency/get - Requires: currency:read
+//     getCurrencies: builder.query<Currency[], void>({
+//       query: () => '/get',
+//       providesTags: ['Currency'],
+//       transformResponse: (response: any) => {
+//         return Array.isArray(response) ? response : response?.data || []
+//       },
+//     }),
+
+//     // GET /api/z-currency/get/:id - Requires: currency:read
+//     getCurrencyById: builder.query<Currency, number>({
+//       query: (id) => `/get/${id}`,
+//       providesTags: (result, error, id) => [{ type: 'Currency', id }],
+//     }),
+
+//     // POST /api/z-currency/create - Requires: currency:write
+//     createCurrency: builder.mutation<{ success: boolean; data: Currency }, CreateCurrencyRequest>({
+//       query: (newCurrency) => ({
+//         url: '/create',
+//         method: 'POST',
+//         body: newCurrency,
+//       }),
+//       invalidatesTags: ['Currency'],
+//     }),
+
+//     // PUT /api/z-currency/put/:id - Requires: currency:write
+//     updateCurrency: builder.mutation<{ success: boolean; data: Currency }, UpdateCurrencyRequest>({
+//       query: ({ id, ...patch }) => ({
+//         url: `/put/${id}`,
+//         method: 'PUT',
+//         body: patch,
+//       }),
+//       invalidatesTags: (result, error, { id }) => [{ type: 'Currency', id }],
+//     }),
+
+//     // DELETE /api/z-currency/delete/:id - Requires: currency:delete
+//     deleteCurrency: builder.mutation<{ success: boolean; message: string }, number>({
+//       query: (id) => ({
+//         url: `/delete/${id}`,
+//         method: 'DELETE',
+//       }),
+//       invalidatesTags: ['Currency'],
+//     }),
+//   }),
+// })
+
+// export const {
+//   useGetCurrenciesQuery,
+//   useGetCurrencyByIdQuery,
+//   useCreateCurrencyMutation,
+//   useUpdateCurrencyMutation,
+//   useDeleteCurrencyMutation,
+// } = currencyApi
 
 
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { currencyBaseQuery } from '@/lib/baseQuery'  //  Import centralized base query
 import { Currency, CreateCurrencyRequest, UpdateCurrencyRequest } from '@/types/currency'
 
-// ✅ Base query with Auth0 authentication
-const baseQueryWithAuth = fetchBaseQuery({
-  baseUrl: (() => {
-    if (typeof window !== 'undefined') {
-      return `http://${window.location.hostname}:4000/api/z-currency`
-    } else {
-      return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/z-currency'
-    }
-  })(),
-  prepareHeaders: async (headers) => {
-    try {
-      // Get access token from Auth0
-      const response = await fetch('/auth/access-token');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.token) {
-          headers.set('authorization', `Bearer ${data.token}`);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to get access token:', error);
-    }
-    
-    headers.set('Content-Type', 'application/json');
-    return headers;
-  },
-});
-
+//  Clean slice - no token logic needed here!
 export const currencyApi = createApi({
   reducerPath: 'currencyApi',
-  baseQuery: baseQueryWithAuth,
+  baseQuery: currencyBaseQuery,  //  Use centralized base query
   tagTypes: ['Currency'],
   endpoints: (builder) => ({
     // GET /api/z-currency/get - Requires: currency:read
@@ -144,6 +242,7 @@ export const currencyApi = createApi({
       query: () => '/get',
       providesTags: ['Currency'],
       transformResponse: (response: any) => {
+        console.log('📊 Currency API Response:', response)
         return Array.isArray(response) ? response : response?.data || []
       },
     }),
@@ -162,6 +261,14 @@ export const currencyApi = createApi({
         body: newCurrency,
       }),
       invalidatesTags: ['Currency'],
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          const result = await queryFulfilled
+          console.log(' Currency created successfully:', result.data)
+        } catch (error) {
+          console.error('❌ Currency creation failed:', error)
+        }
+      }
     }),
 
     // PUT /api/z-currency/put/:id - Requires: currency:write

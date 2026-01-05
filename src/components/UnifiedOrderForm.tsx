@@ -5763,7 +5763,6 @@ const UnifiedOrderForm = ({ orderType }: { orderType: string }) => {
                     <div className="">
                       <div className="mt-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center space-x-4">
-                          {/* <span className="text-sm font-medium text-gray-700">Account Filter:</span> */}
                           <label className="flex items-center">
                             <input
                               type="radio"

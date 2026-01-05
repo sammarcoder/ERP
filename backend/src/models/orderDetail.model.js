@@ -16,6 +16,12 @@ class Order_Detail extends Model {
       as: 'item',
       // constraints: false  // This prevents auto-adding foreign key column
     });
+
+    this.belongsTo(models.Uom, {
+      foreignKey: 'Uom_Id',
+      as: 'uom',
+      onDelete: 'RESTRICT'
+    });
   }
 }
 
@@ -134,7 +140,17 @@ Order_Detail.init(
     Remarks: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    trade:{
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false
+    },
+    Uom_Id:{
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
+
   },
   {
     sequelize,
