@@ -3,45 +3,99 @@ const { Ztransporter } = db;
 const { Op } = require('sequelize');
 
 // GET ALL TRANSPORTERS
-const getAllTransporters = async (req, res) => {
+const getAllTransporters2 = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = '', isActive } = req.query;
+    // const { page = 1, limit = 10, search = '', isActive } = req.query;
     
-    const offset = (page - 1) * limit;
-    const whereCondition = {};
+    // const offset = (page - 1) * limit;
+    // const whereCondition = {};
     
     // Search functionality
-    if (search) {
-      whereCondition[Op.or] = [
-        { name: { [Op.like]: `%${search}%` } },
-        { contactPerson: { [Op.like]: `%${search}%` } },
-        { phone: { [Op.like]: `%${search}%` } }
-      ];
-    }
+    // if (search) {
+    //   whereCondition[Op.or] = [
+    //     { name: { [Op.like]: `%${search}%` } },
+    //     { contactPerson: { [Op.like]: `%${search}%` } },
+    //     { phone: { [Op.like]: `%${search}%` } }
+    //   ];
+    // }
     
     // Filter by active status
     if (isActive !== undefined) {
       whereCondition.isActive = isActive === 'true';
     }
     
-    const { count, rows } = await Ztransporter.findAndCountAll({
-      where: whereCondition,
-      limit: parseInt(limit),
-      offset: offset,
-      order: [['createdAt', 'DESC']]
-    });
+    const { count, rows } = await Ztransporter.findAndCountAll(
+      // {
+      // where: whereCondition,
+      // limit: parseInt(limit),
+      // offset: offset,
+      // order: [['createdAt', 'DESC']]
+    // }
+  );
     
     console.log(`✅ Retrieved ${rows.length} transporters`);
     
     res.json({
       success: true,
       data: rows,
-      pagination: {
-        total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit)
-      }
+      // pagination: {
+      //   total: count,
+      //   page: parseInt(page),
+      //   limit: parseInt(limit),
+      //   totalPages: Math.ceil(count / limit)
+      // }
+    });
+    
+  } catch (error) {
+    console.error('💥 Error fetching transporters:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+const getAllTransporters = async (req, res) => {
+  try {
+    // const { page = 1, limit = 10, search = '', isActive } = req.query;
+    
+    // const offset = (page - 1) * limit;
+    // const whereCondition = {};
+    
+    // Search functionality
+    // if (search) {
+    //   whereCondition[Op.or] = [
+    //     { name: { [Op.like]: `%${search}%` } },
+    //     { contactPerson: { [Op.like]: `%${search}%` } },
+    //     { phone: { [Op.like]: `%${search}%` } }
+    //   ];
+    // }
+    
+    // Filter by active status
+    // if (isActive !== undefined) {
+    //   whereCondition.isActive = isActive === 'true';
+    // }
+    
+    const { count, rows } = await Ztransporter.findAndCountAll(
+      // {
+      // where: whereCondition,
+      // limit: parseInt(limit),
+      // offset: offset,
+      // order: [['createdAt', 'DESC']]
+    // }
+  );
+    
+    console.log(`✅ Retrieved ${rows.length} transporters`);
+    
+    res.json({
+      success: true,
+      data: rows,
+      // pagination: {
+      //   total: count,
+      //   page: parseInt(page),
+      //   limit: parseInt(limit),
+      //   totalPages: Math.ceil(count / limit)
+      // }
     });
     
   } catch (error) {

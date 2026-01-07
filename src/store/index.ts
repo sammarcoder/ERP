@@ -33,7 +33,7 @@ export const store = configureStore({
     [itemsApi.reducerPath]: itemsApi.reducer,
     [grnApi.reducerPath]: grnApi.reducer,
     [gdnApi.reducerPath]: gdnApi.reducer,
-    [gdnApi2.reducerPath]: gdnApi2.reducer,
+    // [gdnApi2.reducerPath]: gdnApi2.reducer,
 
 
 
@@ -55,7 +55,7 @@ export const store = configureStore({
     .concat(itemsApi.middleware)
     .concat(grnApi.middleware)
     .concat(gdnApi.middleware)
-    .concat(gdnApi2.middleware),
+    // .concat(gdnApi2.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

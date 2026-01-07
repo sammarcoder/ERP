@@ -1896,10 +1896,10 @@ export default function Stk_Detail({
               <Package className="w-5 h-5 text-[#4c96dc]" />
               Items ({finalItems.length})
             </h2>
-            <p className="text-sm text-gray-500 mt-0.5">
+            {/* <p className="text-sm text-gray-500 mt-0.5">
               {finalItems.filter(i => i.isOrderItem).length} from order, 
               {' '}{finalItems.filter(i => !i.isOrderItem).length} added manually
-            </p>
+            </p> */}
           </div>
           <Button
             variant="primary"
@@ -1913,7 +1913,7 @@ export default function Stk_Detail({
       </div>
 
       {/* Batch Info */}
-      {globalBatch && (
+      {/* {globalBatch && (
         <div className="px-5 py-3 bg-green-50 border-b border-green-100 flex items-center gap-3">
           <Tag className="w-4 h-4 text-green-600" />
           <span className="text-green-800 text-sm">
@@ -1922,7 +1922,7 @@ export default function Stk_Detail({
             <span className="text-green-500 ml-2">→ Applied to all items</span>
           </span>
         </div>
-      )}
+      )} */}
 
       {/* UOM Warning */}
       {itemsWithBadUom.length > 0 && (

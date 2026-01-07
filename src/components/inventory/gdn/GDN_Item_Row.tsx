@@ -585,7 +585,7 @@
 //   return (
 //     <div className={`p-4 ${row.isSplitRow ? 'bg-teal-50/50' : 'bg-white'}`}>
 //       <div className="grid grid-cols-12 gap-4 items-start">
-        
+
 //         {/* ══════════ Row Indicator ══════════ */}
 //         <div className="col-span-1 flex flex-col items-center">
 //           <span className="text-xs text-gray-400 mb-1">Row</span>
@@ -624,7 +624,7 @@
 //             <div className="flex flex-wrap gap-2">
 //               {batchesWithStock.map(batch => {
 //                 const isSelected = selectedBatch === batch.batchno
-                
+
 //                 return (
 //                   <button
 //                     key={batch.batchno}
@@ -937,7 +937,7 @@ export default function GDN_Item_Row({
 
 
 
-  
+
   // Handle price change
   const handlePriceChange = useCallback((price: string) => {
     const priceNum = parseFloat(price) || 0
@@ -958,27 +958,26 @@ export default function GDN_Item_Row({
   const batchesWithStock = availableBatches.filter(b => b.available_qty_uom1 > 0)
 
   return (
-    <div className={`p-4 ${row.isDuplicateRow ? 'bg-teal-50/30' : 'bg-white'}`}>
+    <div className={`p ${row.isDuplicateRow ? 'bg-teal' : 'bg-white'}`}>
       <div className="grid grid-cols-12 gap-4 items-start">
-        
+
         {/* Row Indicator */}
         <div className="col-span-1 flex flex-col items-center">
-          <span className="text-xs text-gray-400 mb-1">Row</span>
-          <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-            row.isDuplicateRow ? 'bg-teal-100 text-teal-700' : 'bg-emerald-100 text-emerald-700'
-          }`}>
+          {/* <span className="text-xs text-gray-400 mb-1">Row</span> */}
+          {/* <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${row.isDuplicateRow ? 'bg-teal-100 text-teal-700' : 'bg-emerald-100 text-emerald-700'
+            }`}>
             {rowIndex + 1}
-          </span>
-          {row.isDuplicateRow && (
+          </span> */}
+          {/* {row.isDuplicateRow && (
             <span className="text-[10px] text-teal-600 mt-1">Batch</span>
-          )}
+          )} */}
         </div>
 
         {/* Batch Selection */}
-        <div className="col-span-3">
-          <label className="text-xs text-gray-600 mb-1.5 block font-medium">
+        <div className="col-span-4">
+          {/* <label className="text-xs text-gray-600 mb-1.5 block font-medium">
             Select Batch <span className="text-red-500">*</span>
-          </label>
+          </label> */}
 
           {isLoadingBatches ? (
             <div className="flex items-center gap-2 text-emerald-600 text-sm py-3 bg-emerald-50 rounded-lg px-3">
@@ -999,7 +998,7 @@ export default function GDN_Item_Row({
             <div className="flex flex-wrap gap-2">
               {batchesWithStock.map(batch => {
                 const isSelected = selectedBatch === batch.batchno
-                
+
                 return (
                   <button
                     key={batch.batchno}
@@ -1007,20 +1006,20 @@ export default function GDN_Item_Row({
                     onClick={() => handleBatchSelect(batch.batchno)}
                     className={`
                       px-3 py-2 rounded-lg border text-sm transition-all min-w-[110px]
-                      ${isSelected 
-                        ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500' 
+                      ${isSelected
+                        ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500'
                         : 'border-gray-200 hover:border-emerald-300 bg-white'
                       }
                     `}
                   >
                     <div className="flex flex-col items-start">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-bold">#{batch.batchno}</span>
+                        <span className="font-bold">#{batch.batchName}</span>
                         {isSelected && <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />}
                       </div>
-                      <span className="text-xs text-green-600 font-semibold mt-0.5">
+                      {/* <span className="text-xs text-green-600 font-semibold mt-0.5">
                         {batch.available_qty_uom1?.toLocaleString()} avl
-                      </span>
+                      </span> */}
                     </div>
                   </button>
                 )
@@ -1031,16 +1030,16 @@ export default function GDN_Item_Row({
 
         {/* Available Qty */}
         <div className="col-span-2">
-          <label className="text-xs text-gray-600 mb-1.5 block">Available</label>
-          <div className={`text-2xl font-bold ${batchQty > 0 ? 'text-emerald-600' : 'text-gray-300'}`}>
-            {batchQty.toLocaleString()}
+          {/* <label className="text-xs text-gray-600 mb-1.5 block">Available</label> */}
+          <div className={`text-lg font-semibold ${batchQty > 0 ? 'text-emerald-600' : 'text-gray-300'} flex items-baseline gap-1`}>
+            <p >{batchQty.toLocaleString()}</p><span className="text-xs text-gray-500">{row.uomStructure?.primary?.name || 'Pcs'}</span>
           </div>
-          <span className="text-xs text-gray-500">{row.uomStructure?.primary?.name || 'Pcs'}</span>
+          {/* <span className="text-xs text-gray-500">{row.uomStructure?.primary?.name || 'Pcs'}</span> */}
         </div>
 
         {/* Dispatch Qty */}
-        <div className="col-span-3">
-          <label className="text-xs text-gray-600 mb-1.5 block">Dispatch Qty</label>
+        <div className="col-span-4">
+          {/* <label className="text-xs text-gray-600 mb-1.5 block">Dispatch Qty</label> */}
           <UomConverter
             uomData={row.uomStructure}
             lineIndex={rowIndex}
@@ -1057,7 +1056,7 @@ export default function GDN_Item_Row({
         </div>
 
         {/* Price */}
-        <div className="col-span-2">
+        {/* <div className="col-span-2">
           <label className="text-xs text-gray-600 mb-1.5 block">Price</label>
           <input
             type="number"
@@ -1069,13 +1068,13 @@ export default function GDN_Item_Row({
             <span className="text-xs text-gray-500">Total: </span>
             <span className="font-bold text-emerald-700">{rowTotal.toLocaleString()}</span>
           </div>
-        </div>
+        </div> */}
 
         {/* Remove Button */}
         <div className="col-span-1 flex items-center justify-center pt-6">
           {showRemoveButton && (
-            <button 
-              onClick={onRemove} 
+            <button
+              onClick={onRemove}
               className="p-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition-colors"
               title="Remove this batch row"
             >
@@ -1086,13 +1085,13 @@ export default function GDN_Item_Row({
       </div>
 
       {/* Status Bar */}
-      {selectedBatch && (
+      {/* {selectedBatch && (
         <div className="mt-3 pt-3 border-t flex items-center gap-3 text-xs flex-wrap">
           <span className="px-2.5 py-1 bg-gray-100 rounded-md">Batch: <strong>#{selectedBatch}</strong></span>
           <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-md">Avl: <strong>{batchQty.toLocaleString()}</strong></span>
           <span className="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-md">Dispatch: <strong>{(dispatchQty.uom1_qty || 0).toLocaleString()}</strong></span>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

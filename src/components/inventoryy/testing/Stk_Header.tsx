@@ -808,7 +808,7 @@ export default function Stk_Header({ data, formData, onFormChange, isGRN = false
         {isGRN ? 'GRN Details' : 'GDN Details'}
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 h-18 md:grid-cols-2 lg:grid-cols-5 gap-5">
         {/* COA Selection */}
         <div className="lg:col-span-2">
           <CoaSearchableInput
@@ -824,7 +824,7 @@ export default function Stk_Header({ data, formData, onFormChange, isGRN = false
         </div>
 
         {/* Batch Number Display */}
-        <div className="lg:col-span-2">
+        {/* <div className="lg:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             <Tag className="w-4 h-4 inline mr-1" />
             Batch Number
@@ -844,7 +844,7 @@ export default function Stk_Header({ data, formData, onFormChange, isGRN = false
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Date */}
         <div>
@@ -874,7 +874,7 @@ export default function Stk_Header({ data, formData, onFormChange, isGRN = false
         </div>
 
         {/* Purchase/Dispatch Type */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {isGRN ? 'Purchase Type' : 'Dispatch Type'}
           </label>
@@ -896,7 +896,7 @@ export default function Stk_Header({ data, formData, onFormChange, isGRN = false
               <option value="Local selling">Local Selling</option>
             )}
           </select>
-        </div>
+        </div> */}
 
         {/* Remarks */}
         <div>

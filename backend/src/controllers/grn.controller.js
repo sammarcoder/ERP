@@ -525,14 +525,43 @@ const sequelize = require('../../config/database');
 // =====================================================
 // HELPER: Generate GRN Number
 // =====================================================
+// const generateGRNNumber = async () => {
+//   const lastGRN = await Stk_main.findOne({
+//     where: { Stock_Type_ID: 11 },
+//     order: [['ID', 'DESC']]
+//   });
+
+//   const nextNumber = lastGRN ? lastGRN.ID + 1 : 1;
+//   return `GRN-${String(nextNumber).padStart(1, '0')}`;
+// };
+
+
+
+
+
 const generateGRNNumber = async () => {
   const lastGRN = await Stk_main.findOne({
     where: { Stock_Type_ID: 11 },
     order: [['ID', 'DESC']]
   });
 
-  const nextNumber = lastGRN ? lastGRN.ID + 1 : 1;
-  return `GRN-${String(nextNumber).padStart(6, '0')}`;
+  if (!lastGRN) {
+    return `GRN-1`;
+  }
+
+  const numberStr = lastGRN.Number || '';
+  const match = numberStr.match(/(\d+)$/);
+  let nextSeq;
+
+  if (match) {
+    nextSeq = parseInt(match[1], 10) + 1;
+  } else if (typeof lastGRN.ID === 'number') {
+    nextSeq = lastGRN.ID + 1;
+  } else {
+    nextSeq = 1;
+  }
+
+  return `GRN-${nextSeq}`;
 };
 
 // =====================================================

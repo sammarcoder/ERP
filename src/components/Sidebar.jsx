@@ -61,7 +61,9 @@ const Sidebar = () => {
                 { id: 'grn-local', title: 'GRN Local', path: '/inventory/grn' },
                 { id: 'grn-import', title: 'GRN Import', path: '/inventory/grn-import' },
                 { id: 'gdn', title: 'GDN', path: '/inventory/dispatch' },
-                { id: 'duty-calc', title: 'Duty Calculation Import', path: '/inventory/duty-calc' }
+                { id: 'duty-calc', title: 'Duty Calculation Import', path: '/inventory/duty-calc' },
+                { id: 'grn', title: 'GRN 2', path: '/inventoryy/grn' },
+                { id: 'gdn_2', title: 'GDN 2', path: '/inventory/gdn' },
             ]
         },
         {

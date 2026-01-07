@@ -87,7 +87,7 @@ export default function SelectOrderForGDN() {
                       ? 'border-emerald-200 hover:border-emerald-400 hover:shadow-md cursor-pointer' 
                       : 'border-gray-200 opacity-60'
                   }`}
-                  onClick={() => canCreateGDN && router.push(`/inventoryy/gdn/create/${order.ID}`)}
+                  onClick={() => canCreateGDN && router.push(`/inventory/gdn/create/${order.ID}`)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">

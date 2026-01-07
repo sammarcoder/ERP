@@ -761,21 +761,21 @@ export default function GDN_details_data({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mb-2">
       {items.map((item, itemIndex) => {
         const rows = itemRows.get(item.id) || []
 
         return (
-          <div key={item.id} className="border border-gray-200 rounded-xl overflow-hidden">
+          <div key={item.id} className="rounded-xl overflow-hidden">
             {/* ══════════ Item Header ══════════ */}
-            <div className="bg-gradient-to-r from-gray-50 to-emerald-50/30 px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-sm font-bold">
+            <div className=" px-4  flex items-center justify-between">
+              <div className="flex items-center ">
+                <span className="w-8 mr-2 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-sm font-bold">
                   {itemIndex + 1}
                 </span>
                 <div>
                   <h3 className="font-semibold text-gray-900">{item.itemName}</h3>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                  {/* <div className="flex items-center gap-2 text-xs text-gray-500">
                     <span>ID: {item.id}</span>
                     {item.orderQty && (
                       <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded">
@@ -785,7 +785,7 @@ export default function GDN_details_data({
                     <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
                       {rows.length} batch row{rows.length > 1 ? 's' : ''}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -832,12 +832,12 @@ export default function GDN_details_data({
       })}
 
       {/* ══════════ Grand Total ══════════ */}
-      <div className="bg-gradient-to-r from-emerald-100 to-teal-100 rounded-xl p-4 flex justify-between items-center">
+      {/* <div className="bg-gradient-to-r from-emerald-100 to-teal-100 rounded-xl p-4 flex justify-between items-center">
         <span className="font-semibold text-emerald-800">Grand Total:</span>
         <span className="text-2xl font-bold text-emerald-700">
           {grandTotal.toLocaleString()}
         </span>
-      </div>
+      </div> */}
     </div>
   )
 }

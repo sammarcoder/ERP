@@ -494,6 +494,8 @@ export interface ExtractedItemData {
   id: number
   itemName: string
   price: number
+  sellingPrice: number
+  purchasePricePKR: number
   uomData: {
     primary: { id: number; name: string; qty: number }
     secondary?: { id: number; name: string; qty: number }
@@ -592,6 +594,8 @@ export const MultiSelectItemTable: React.FC<MultiSelectItemTableProps> = ({
       price: isPurchase
         ? parseFloat(item.purchasePricePKR?.toString() || '0')
         : parseFloat(item.sellingPrice?.toString() || '0'),
+      sellingPrice: parseFloat(item.sellingPrice?.toString() || '0'),
+      purchasePricePKR: parseFloat(item.purchasePricePKR?.toString() || '0'),
       uomData: {
         primary: {
           id: item.skuUOM || 0,

@@ -234,7 +234,7 @@
 
 //   return (
 //     <div className="bg-gradient-to-br from-emerald-50 via-white to-teal-50 border border-emerald-200 rounded-xl p-6 mb-6 shadow-sm">
-      
+
 //       {/* Section Title */}
 //       <h2 className="text-lg font-semibold text-gray-900 mb-5 flex items-center gap-2">
 //         <Truck className="w-5 h-5 text-emerald-600" />
@@ -245,7 +245,7 @@
 //       {/* ROW 1: Main Identification */}
 //       {/* ═══════════════════════════════════════════════════════════════ */}
 //       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
-        
+
 //         {/* Sales Order (Read-only) */}
 //         <div>
 //           <Input
@@ -313,7 +313,7 @@
 //       {/* ROW 2: Status, Type, Transporter */}
 //       {/* ═══════════════════════════════════════════════════════════════ */}
 //       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        
+
 //         {/* Status */}
 //         <div>
 //           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
@@ -572,9 +572,9 @@
 'use client'
 import { TransporterSearchableInput } from '@/components/common/transpoter/TransporterSearchableInput'
 import { Input } from '@/components/ui/Input'
-import { 
-  Calendar, FileText, Truck, MessageSquare, User, 
-  MapPin, Building2, CreditCard, DollarSign, BarChart3
+import {
+  Calendar, FileText, Truck, MessageSquare, User,
+  MapPin, Building2, CreditCard, DollarSign, BarChart3, ReceiptText, Package
 } from 'lucide-react'
 
 interface HeaderProps {
@@ -588,9 +588,11 @@ interface HeaderProps {
     remarks: string
     sub_customer?: string
     sub_city?: string
-    labour_crt?: string
-    freight_crt?: string
-    other_expense?: string
+    labour_crt?: number | null
+    freight_crt?: number | null
+    other_expense?: number | null
+    bility_expense?: number | null
+    booked_crt?: number | null
     Transporter_ID?: number | null
     Transporter_Name?: string
   }
@@ -607,42 +609,54 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
     })
   }
 
-  const totalAdditionalCosts = (
-    parseFloat(formData.labour_crt || '0') +
-    parseFloat(formData.freight_crt || '0') +
-    parseFloat(formData.other_expense || '0')
-  )
+  // ✅ Realtime calculation: (labour + freight + bility + other) * booked_crt = total
+  const labourCost = parseFloat(String(formData.labour_crt || 0)) || 0
+  const freightCost = parseFloat(String(formData.freight_crt || 0)) || 0
+  const bilityCost = parseFloat(String(formData.bility_expense || 0)) || 0
+  const otherCost = parseFloat(String(formData.other_expense || 0)) || 0
+  const bookedCrt = parseFloat(String(formData.booked_crt || 0)) || 0
+
+
+
+  const totalLaourCost = labourCost * bookedCrt
+  const totalFreightCost = freightCost * bookedCrt
+
+  // Sum of all per-carton costs
+  const totalAdditionalCosts = totalLaourCost + totalFreightCost + bilityCost + otherCost
+  // Total = cost per carton * booked cartons
+  // const totalAdditionalCosts = costPerCarton 
 
   return (
-    <div className="bg-gradient-to-br from-emerald-50 via-white to-teal-50 border border-emerald-200 rounded-xl p-6 mb-6 shadow-sm">
-      
-      <h2 className="text-lg font-semibold text-gray-900 mb-5 flex items-center gap-2">
+    <div className="">
+
+      {/* <h2 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
         <Truck className="w-5 h-5 text-emerald-600" />
         GDN Details (Dispatch)
-      </h2>
+      </h2> */}
 
       {/* ═══════════════════════════════════════════════════════════════ */}
-      {/* ROW 1: Order & Customer Info (READ-ONLY) */}
+      {/* ROW 1: Sales Order Summary (separate) */}
       {/* ═══════════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
-        
-        {/* Sales Order (Read-only) */}
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Sales Order</label>
-          <div className="bg-gray-100 border border-gray-200 rounded-lg px-3 py-2">
-            <span className="font-semibold text-emerald-700">{data?.Number || '-'}</span>
+      {/* <div className="">
+        <div className="bg-white  rounded-lg border border-gray-100 flex items-center justify-between">
+          <div>
+            <div className="text-xs text-emerald-600">Sales Order</div>
+            <div className="text-2xl font-bold text-emerald-700">{data?.Number || '-'}</div>
+          </div>
+          <div className="text-right text-sm">
+            <div className="text-gray-600">{data?.Date ? new Date(data.Date).toLocaleDateString('en-GB') : '-'}</div>
+            <div className="text-gray-600">Items: {data?.details?.length || 0}</div>
+            <div className={data?.approved ? 'text-green-600' : 'text-red-600'}>
+              {data?.approved ? '✅ Approved' : '❌ Not Approved'}
+            </div>
           </div>
         </div>
+      </div> */}
 
-        {/* Customer (Read-only from Order) - NO SELECTION */}
-        <div className="lg:col-span-2">
-          <label className="text-xs text-gray-500 mb-1 block">Customer (from Order)</label>
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-            <div className="font-semibold text-emerald-800">{formData.COA_Name || data?.account?.acName || '-'}</div>
-            <div className="text-xs text-emerald-600">ID: {formData.COA_ID || data?.COA_ID || '-'}</div>
-          </div>
-        </div>
-
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* ROW 2: Status, Type, Transporter */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
         {/* Dispatch Date */}
         <div>
           <Input
@@ -655,36 +669,6 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
           />
         </div>
 
-        {/* Sub Customer */}
-        <div>
-          <Input
-            type="text"
-            label="Sub Customer"
-            value={formData.sub_customer || ''}
-            onChange={(e) => onFormChange({ ...formData, sub_customer: e.target.value })}
-            icon={<Building2 className="w-4 h-4" />}
-            placeholder="Sub customer..."
-          />
-        </div>
-
-        {/* Sub City */}
-        <div>
-          <Input
-            type="text"
-            label="Sub City"
-            value={formData.sub_city || ''}
-            onChange={(e) => onFormChange({ ...formData, sub_city: e.target.value })}
-            icon={<MapPin className="w-4 h-4" />}
-            placeholder="Sub city..."
-          />
-        </div>
-      </div>
-
-      {/* ═══════════════════════════════════════════════════════════════ */}
-      {/* ROW 2: Status, Type, Transporter */}
-      {/* ═══════════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        
         {/* Status */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
@@ -694,7 +678,7 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
           <select
             value={formData.Status || 'UnPost'}
             onChange={(e) => onFormChange({ ...formData, Status: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
           >
             <option value="UnPost">UnPost</option>
             <option value="Post">Posted</option>
@@ -702,7 +686,7 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
         </div>
 
         {/* Dispatch Type */}
-        <div>
+        {/* <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
             <Truck className="w-4 h-4" />
             Dispatch Type
@@ -710,17 +694,15 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
           <select
             value={formData.Dispatch_Type || 'Local selling'}
             onChange={(e) => onFormChange({ ...formData, Dispatch_Type: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
           >
             <option value="Local selling">Local Selling</option>
             <option value="Export">Export</option>
-            <option value="Inter-branch">Inter-Branch Transfer</option>
-            <option value="Sample">Sample</option>
           </select>
-        </div>
+        </div> */}
 
         {/* Transporter */}
-        <div className="lg:col-span-2">
+        {/* <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
             <Truck className="w-4 h-4" />
             Transporter
@@ -730,63 +712,165 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
             onChange={handleTransporterChange}
             placeholder="Select transporter..."
           />
+        </div> */}
+        <div>
+          <Input
+            type="text"
+            label="Remarks"
+            value={formData.remarks || ''}
+            onChange={(e) => onFormChange({ ...formData, remarks: e.target.value })}
+            placeholder="Delivery instructions..."
+            icon={<MessageSquare className="w-4 h-4" />}
+          />
         </div>
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════ */}
       {/* ROW 3: Cost Breakdown */}
       {/* ═══════════════════════════════════════════════════════════════ */}
-      <div className="bg-white rounded-xl p-4 mb-6 border border-gray-100">
-        <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+      <div className="bg-white rounded-xl ">
+        {/* <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
           <DollarSign className="w-4 h-4 text-emerald-600" />
-          Additional Costs
-        </h3>
+          Additional Costs (Per Carton Rates)
+        </h3> */}
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-2">
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+              <Truck className="w-4 h-4" />
+              Transporter
+            </label>
+            <TransporterSearchableInput
+              value={formData.Transporter_ID?.toString() || ''}
+              onChange={handleTransporterChange}
+              placeholder="Select transporter..."
+            />
+          </div>
           <Input
             type="number"
-            label="Labour Cost"
-            value={formData.labour_crt || ''}
-            onChange={(e) => onFormChange({ ...formData, labour_crt: e.target.value })}
-            placeholder="0.00"
-            icon={<User className="w-4 h-4" />}
+            label="Booked Crts"
+            value={formData.booked_crt ?? ''}
+            onChange={(e) => onFormChange({ ...formData, booked_crt: e.target.value === '' ? null : parseFloat(e.target.value) })}
+            placeholder="0"
+            step="1"
+            icon={<Package className="w-4 h-4" />}
           />
-          <Input
+          <div>
+            <Input
+              type="number"
+              label="Freight /Crt"
+              value={formData.freight_crt ?? ''}
+              onChange={(e) => onFormChange({ ...formData, freight_crt: e.target.value === '' ? null : parseFloat(e.target.value) })}
+              placeholder="0.00"
+              step="0.01"
+              icon={<Truck className="w-4 h-4" />}
+            />
+            <p className="pl-2 text-emerald-500 mt-1 text-sm">
+              {totalFreightCost.toLocaleString('en-US')}
+            </p>
+          </div>
+
+          <div>
+            <Input
+              type="number"
+              label="Labour /Crt"
+              value={formData.labour_crt ?? ''}
+              onChange={(e) => onFormChange({ ...formData, labour_crt: e.target.value === '' ? null : parseFloat(e.target.value) })}
+              placeholder="0.00"
+              step="0.01"
+              icon={<User className="w-4 h-4" />}
+            />
+
+            <p className="pl-2 text-emerald-500 mt-1 text-sm">
+              {totalLaourCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            </p>
+          </div>
+
+          <div>
+            <Input
+              type="number"
+              label="Billing /Crt"
+              value={formData.bility_expense ?? ''}
+              onChange={(e) => onFormChange({ ...formData, bility_expense: e.target.value === '' ? null : parseFloat(e.target.value) })}
+              placeholder="0.00"
+              step="0.01"
+              icon={<ReceiptText className="w-4 h-4" />}
+            />
+            <p className="pl-2 text-emerald-500 mt-1 text-sm">
+              {formData.bility_expense ? (formData.bility_expense).toLocaleString('en-US') : '0.00'}
+            </p>
+          </div>
+          <div>
+            <Input
+              type="number"
+              label="Other /Crt"
+              value={formData.other_expense ?? ''}
+              onChange={(e) => onFormChange({ ...formData, other_expense: e.target.value === '' ? null : parseFloat(e.target.value) })}
+              placeholder="0.00"
+              step="0.01"
+              icon={<CreditCard className="w-4 h-4" />}
+            />
+            <div className="flex justify-between items-center">
+              <p className="pl-2 text-emerald-500 mt-1 text-sm">
+                {formData.other_expense ? (formData.other_expense).toLocaleString('en-US') : '0.00'}
+              </p>
+              {/* <p className="text-xs text-emerald-600 font-medium">Total Expense</p> */}
+              <p className='pl-2 text-emerald-500 mt-1 text-sm '>Total: {totalLaourCost + totalFreightCost + (formData.bility_expense || 0) + (formData.other_expense || 0)}</p>
+            </div>
+
+          </div>
+
+          {/* <Input
             type="number"
-            label="Freight Cost"
-            value={formData.freight_crt || ''}
-            onChange={(e) => onFormChange({ ...formData, freight_crt: e.target.value })}
-            placeholder="0.00"
-            icon={<Truck className="w-4 h-4" />}
-          />
-          <Input
-            type="number"
-            label="Other Expense"
-            value={formData.other_expense || ''}
-            onChange={(e) => onFormChange({ ...formData, other_expense: e.target.value })}
-            placeholder="0.00"
-            icon={<CreditCard className="w-4 h-4" />}
-          />
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-            <label className="text-xs text-emerald-600 font-medium">Total Additional</label>
-            <p className="text-xl font-bold text-emerald-700">{totalAdditionalCosts.toLocaleString()}</p>
+            label="Booked Crts"
+            value={formData.booked_crt ?? ''}
+            onChange={(e) => onFormChange({ ...formData, booked_crt: e.target.value === '' ? null : parseFloat(e.target.value) })}
+            placeholder="0"
+            step="1"
+            icon={<Package className="w-4 h-4" />}
+          /> */}
+          {/* Total Calculation Display */}
+          <div className="bg-emerald-50 ">
+            {/* <label className="text-xs text-emerald-600 font-medium block">Total Expense</label>
+            <p className="text-lg font-bold text-emerald-700">
+              {totalAdditionalCosts.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p> */}
+            {/* <p className="text-xs text-emerald-500 mt-1">
+              ({costPerCarton.toFixed(2)} × {bookedCrt} crts)
+            </p> */}
           </div>
         </div>
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════ */}
-      {/* ROW 4: Remarks */}
+      {/* ROW 4: Remarks + Selected Customer */}
       {/* ═══════════════════════════════════════════════════════════════ */}
-      <div>
-        <Input
-          type="text"
-          label="Remarks"
-          value={formData.remarks || ''}
-          onChange={(e) => onFormChange({ ...formData, remarks: e.target.value })}
-          placeholder="Delivery instructions..."
-          icon={<MessageSquare className="w-4 h-4" />}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {/* <div>
+          <Input
+            type="text"
+            label="Remarks"
+            value={formData.remarks || ''}
+            onChange={(e) => onFormChange({ ...formData, remarks: e.target.value })}
+            placeholder="Delivery instructions..."
+            icon={<MessageSquare className="w-4 h-4" />}
+          />
+        </div> */}
+
+        {/* <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="text-xs text-emerald-600 font-medium">Selected Customer</label>
+              <p className="font-semibold text-emerald-800 text-lg">{formData.COA_Name || data?.account?.acName || 'Not selected'}</p>
+              {data?.account?.city && (<p className="text-xs text-emerald-600">{data.account.city}</p>)}
+            </div>
+            <div className="text-right">
+              <label className="text-xs text-emerald-600 font-medium">Customer ID</label>
+              <p className="text-2xl font-bold text-emerald-700">{formData.COA_ID || data?.COA_ID || '-'}</p>
+            </div>
+          </div>
+        </div> */}
       </div>
-    </div>
+    </div >
   )
 }

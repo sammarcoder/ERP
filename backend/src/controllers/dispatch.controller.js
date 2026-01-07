@@ -117,11 +117,13 @@ const getAvailableBatchesForItem = async (req, res) => {
     }
 
     // FIXED: Remove HAVING clause to show ALL batches (let frontend decide)
+    // ADDED: LEFT JOIN with zcoa to get batchName (acName)
     const availableBatches = await sequelize.query(`
       SELECT 
         sd.batchno,
         sd.Item_ID,
         zi.itemName,
+        zc.acName as batchName,
         
         SUM(CASE 
           WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
@@ -145,10 +147,11 @@ const getAvailableBatchesForItem = async (req, res) => {
       FROM stk_detail sd
       INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
       INNER JOIN zitems zi ON sd.Item_ID = zi.id
+      LEFT JOIN zcoas zc ON sd.batchno = zc.id
       WHERE sd.Item_ID = :itemId 
         AND sd.batchno IS NOT NULL 
         AND sd.batchno != ''
-      GROUP BY sd.batchno, sd.Item_ID, zi.itemName
+      GROUP BY sd.batchno, sd.Item_ID, zi.itemName, zc.acName
       -- FIXED: No HAVING clause - show all batches
       ORDER BY sd.batchno ASC
     `, {
@@ -158,6 +161,7 @@ const getAvailableBatchesForItem = async (req, res) => {
 
     const processedBatches = availableBatches.map(batch => ({
       batchno: batch.batchno,
+      batchName: batch.batchName || batch.batchno, // Fallback to batchno if no name found
       item_id: batch.Item_ID,
       item_name: batch.itemName,
       total_received_uom1: parseFloat(batch.total_received_uom1) || 0,

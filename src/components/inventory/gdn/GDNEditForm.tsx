@@ -869,7 +869,7 @@ export default function GDNEditForm({ gdnId }: Props) {
 
       await updateGDN(payload).unwrap()
       alert('✅ GDN updated successfully!')
-      router.push('/inventoryy/gdn')
+      router.push('/inventory/gdn')
     } catch (err: any) {
       console.error('❌ Update error:', err)
       alert(`❌ Error: ${err?.data?.error || err.message}`)

@@ -1352,70 +1352,70 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({
   // }, [mode, initialLineItems])
 
 
-useEffect(() => {
-  if (mode === 'edit' && initialLineItems && initialLineItems.length > 0) {
-    console.group('📝 OrderDetails: Edit Mode - Pre-populating line items')
+  useEffect(() => {
+    if (mode === 'edit' && initialLineItems && initialLineItems.length > 0) {
+      console.group('📝 OrderDetails: Edit Mode - Pre-populating line items')
 
-    const populatedItems = initialLineItems.map((detail: any, index: number) => {
-      
-      // ✅ FIXED: Use ITEM's conversion factors for UOM calculations
-      const extractedUomData = {
-        primary: {
-          id: detail.item?.uom1?.id || 1,
-          name: detail.item?.uom1?.uom || 'Pcs',
-          qty: parseFloat(detail.item?.uom1_qyt || 1)      // ✅ Item's conversion factor
-        },
-        secondary: detail.item?.uomTwo ? {
-          id: detail.item.uomTwo.id,
-          name: detail.item.uomTwo.uom,
-          qty: parseFloat(detail.item?.uom2_qty || 1)      // ✅ Item's conversion factor
-        } : null,
-        tertiary: detail.item?.uomThree ? {
-          id: detail.item.uomThree.id,
-          name: detail.item.uomThree.uom,
-          qty: parseFloat(detail.item?.uom3_qty || 1)      // ✅ Item's conversion factor
-        } : null
-      }
+      const populatedItems = initialLineItems.map((detail: any, index: number) => {
 
-      return {
-        lineNo: detail.Line_Id || (index + 1),
-        Item_ID: detail.Item_ID,
-        itemName: detail.item?.itemName || '',
-        unitPrice: detail.Price ? parseFloat(detail.Price) : '',
+        // ✅ FIXED: Use ITEM's conversion factors for UOM calculations
+        const extractedUomData = {
+          primary: {
+            id: detail.item?.uom1?.id || 1,
+            name: detail.item?.uom1?.uom || 'Pcs',
+            qty: parseFloat(detail.item?.uom1_qyt || 1)      // ✅ Item's conversion factor
+          },
+          secondary: detail.item?.uomTwo ? {
+            id: detail.item.uomTwo.id,
+            name: detail.item.uomTwo.uom,
+            qty: parseFloat(detail.item?.uom2_qty || 1)      // ✅ Item's conversion factor
+          } : null,
+          tertiary: detail.item?.uomThree ? {
+            id: detail.item.uomThree.id,
+            name: detail.item.uomThree.uom,
+            qty: parseFloat(detail.item?.uom3_qty || 1)      // ✅ Item's conversion factor
+          } : null
+        }
 
-        // ✅ These are the ORDER LINE quantities (user-entered values)
-        uom1_qty: detail.uom1_qty ? parseFloat(detail.uom1_qty) : '',
-        uom2_qty: detail.uom2_qty ? parseFloat(detail.uom2_qty) : '',
-        uom3_qty: detail.uom3_qty ? parseFloat(detail.uom3_qty) : '',
-        sale_unit: parseInt(detail.sale_unit || 3),
-        Uom_Id: detail.Uom_Id,
-
-        Discount_A: detail.Discount_A ? parseFloat(detail.Discount_A) : '',
-        Discount_B: detail.Discount_B ? parseFloat(detail.Discount_B) : '',
-        Discount_C: detail.Discount_C ? parseFloat(detail.Discount_C) : '',
-
-        // ✅ Pass ITEM's conversion factors to UomConverter
-        extractedUomData: extractedUomData,
-        originalItem: {
-          id: detail.Item_ID,
+        return {
+          lineNo: detail.Line_Id || (index + 1),
+          Item_ID: detail.Item_ID,
           itemName: detail.item?.itemName || '',
-          sellingPrice: parseFloat(detail.item?.sellingPrice || 0),
-          purchasePricePKR: parseFloat(detail.item?.purchasePricePKR || 0),
-          uomData: extractedUomData
-        },
-        grossTotal: 0,
-        totalDiscount: 0,
-        netTotal: 0,
-        isExpanded: false
-      }
-    })
+          unitPrice: detail.Price ? parseFloat(detail.Price) : '',
 
-    const calculatedItems = populatedItems.map(item => calculateLineTotal(item))
-    setLineItems(calculatedItems)
-    setNextLineNo((populatedItems.length || 0) + 1)
-    console.groupEnd()
-  }
-}, [mode, initialLineItems])
+          // ✅ These are the ORDER LINE quantities (user-entered values)
+          uom1_qty: detail.uom1_qty ? parseFloat(detail.uom1_qty) : '',
+          uom2_qty: detail.uom2_qty ? parseFloat(detail.uom2_qty) : '',
+          uom3_qty: detail.uom3_qty ? parseFloat(detail.uom3_qty) : '',
+          sale_unit: parseInt(detail.sale_unit || 3),
+          Uom_Id: detail.Uom_Id,
+
+          Discount_A: detail.Discount_A ? parseFloat(detail.Discount_A) : '',
+          Discount_B: detail.Discount_B ? parseFloat(detail.Discount_B) : '',
+          Discount_C: detail.Discount_C ? parseFloat(detail.Discount_C) : '',
+
+          // ✅ Pass ITEM's conversion factors to UomConverter
+          extractedUomData: extractedUomData,
+          originalItem: {
+            id: detail.Item_ID,
+            itemName: detail.item?.itemName || '',
+            sellingPrice: parseFloat(detail.item?.sellingPrice || 0),
+            purchasePricePKR: parseFloat(detail.item?.purchasePricePKR || 0),
+            uomData: extractedUomData
+          },
+          grossTotal: 0,
+          totalDiscount: 0,
+          netTotal: 0,
+          isExpanded: false
+        }
+      })
+
+      const calculatedItems = populatedItems.map(item => calculateLineTotal(item))
+      setLineItems(calculatedItems)
+      setNextLineNo((populatedItems.length || 0) + 1)
+      console.groupEnd()
+    }
+  }, [mode, initialLineItems])
 
 
 
@@ -1440,7 +1440,9 @@ useEffect(() => {
     setShowItemModal(false)
   }, [])
 
-  // ✅ FIXED: Calculate line totals with proper empty string handling
+  // ✅ FIXED: Calculate line totals with CASCADING discounts
+  // For SALES: Apply Discount_A first, then B on remaining, then C on remaining
+  // For PURCHASE: Only apply Discount_A
   const calculateLineTotal = useCallback((lineItem: OrderLineItem): OrderLineItem => {
     // ✅ Get numeric values, treat empty strings as 0 for calculations only
     const getNumericValue = (val: number | string): number => {
@@ -1452,16 +1454,36 @@ useEffect(() => {
     const unitPrice = getNumericValue(lineItem.unitPrice)
     const grossTotal = quantity * unitPrice
 
-    console.log('this is type of goress total', typeof (grossTotal))
-    // ✅ Handle discount calculations with empty strings
+    // ✅ Get discount values
     const discountA = getNumericValue(lineItem.Discount_A)
     const discountB = getNumericValue(lineItem.Discount_B)
     const discountC = getNumericValue(lineItem.Discount_C)
 
-    const discountPercent = discountA + discountB + discountC
-    const totalDiscount = (grossTotal * discountPercent) / 100
-    const netTotal = grossTotal - totalDiscount
-    console.log(formatWithMathRound(1000.67))
+    let totalDiscount = 0
+    let netTotal = grossTotal
+
+    if (isPurchase) {
+      // ✅ PURCHASE: Only apply Discount_A
+      const discountAmountA = (grossTotal * discountA) / 100
+      totalDiscount = discountAmountA
+      netTotal = grossTotal - totalDiscount
+    } else {
+      // ✅ SALES: Apply cascading discounts (A → B → C)
+      // Step 1: Apply Discount_A to grossTotal
+      const discountAmountA = (grossTotal * discountA) / 100
+      const afterA = grossTotal - discountAmountA
+
+      // Step 2: Apply Discount_B to remaining value (afterA)
+      const discountAmountB = (afterA * discountB) / 100
+      const afterB = afterA - discountAmountB
+
+      // Step 3: Apply Discount_C to remaining value (afterB)
+      const discountAmountC = (afterB * discountC) / 100
+      netTotal = afterB - discountAmountC
+
+      // Total discount is the sum of all discount amounts
+      totalDiscount = discountAmountA + discountAmountB + discountAmountC
+    }
 
     return {
       ...lineItem,
@@ -1469,7 +1491,7 @@ useEffect(() => {
       totalDiscount,
       netTotal
     }
-  }, [])
+  }, [isPurchase])
 
   // ✅ FIXED: Handle bulk item selection with proper discount application in edit mode
   const handleBulkItemSelection = useCallback((selectedItems: ExtractedItemData[]) => {
@@ -1716,7 +1738,7 @@ useEffect(() => {
 
                 </div>
 
-               
+
 
 
 

@@ -5,12 +5,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Plus, Search, Trash2, Edit, Eye, Loader2,
-  RefreshCw, AlertCircle, CheckCircle, Clock, Truck
+  RefreshCw, AlertCircle, CheckCircle, Clock, Truck, Printer
 } from 'lucide-react'
 import { useGetAllGDNsQuery, useDeleteGDNMutation } from '@/store/test/gdnApi'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { ConfirmationModal } from '@/components/common/ConfirmationModal'
+import DispatchPrintModal from '@/components/DispatchPrintModal'
 
 export default function GDNListPage() {
   const router = useRouter()
@@ -23,6 +24,7 @@ export default function GDNListPage() {
   })
 
   const [deleteModal, setDeleteModal] = useState({ open: false, gdn: null as any })
+  const [printModal, setPrintModal] = useState({ open: false, gdn: null as any })
 
   const { data, isLoading, error, refetch } = useGetAllGDNsQuery({
     status: filters.status,
@@ -83,7 +85,7 @@ export default function GDNListPage() {
         </div>
         <Button
           variant="success"
-          onClick={() => router.push('/inventoryy/gdn/select-order')}
+          onClick={() => router.push('/inventory/gdn/select-order')}
           icon={<Plus className="w-4 h-4" />}
         >
           Create New GDN
@@ -236,7 +238,7 @@ export default function GDNListPage() {
                         <div className="flex justify-center gap-1">
                           {/* View */}
                           <button
-                            onClick={() => router.push(`/inventoryy/gdn/${gdn.ID}`)}
+                            onClick={() => router.push(`/inventory/gdn/${gdn.ID}`)}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="View GDN"
                           >
@@ -245,12 +247,21 @@ export default function GDNListPage() {
 
                           {/* Edit */}
                           <button
-                            onClick={() => router.push(`/inventoryy/gdn/${gdn.ID}/edit`)}
+                            onClick={() => router.push(`/inventory/gdn/${gdn.ID}/edit`)}
                             disabled={gdn.Status === 'Post'}
                             className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             title={gdn.Status === 'Post' ? 'Cannot edit Posted GDN' : 'Edit GDN'}
                           >
                             <Edit className="w-4 h-4" />
+                          </button>
+
+                          {/* Print */}
+                          <button
+                            onClick={() => setPrintModal({ open: true, gdn })}
+                            className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                            title="Print GDN"
+                          >
+                            <Printer className="w-4 h-4" />
                           </button>
 
                           {/* Delete */}
@@ -292,6 +303,14 @@ export default function GDNListPage() {
         type="danger"
         loading={isDeleting}
       />
+
+      {/* Print Modal */}
+      {printModal.open && printModal.gdn && (
+        <DispatchPrintModal
+          dispatch={printModal.gdn}
+          onClose={() => setPrintModal({ open: false, gdn: null })}
+        />
+      )}
     </div>
   )
 }

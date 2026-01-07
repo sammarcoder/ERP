@@ -16,9 +16,26 @@ const generateGDNNumber = async () => {
     where: { Stock_Type_ID: 12 },
     order: [['ID', 'DESC']]
   });
-  const nextNumber = lastGDN ? lastGDN.ID + 1 : 1;
-  return `GDN-${String(nextNumber).padStart(6, '0')}`;
+
+  if (!lastGDN) return `GDN-1`;
+
+  const numberStr = lastGDN.Number || '';
+  const match = numberStr.match(/(\d+)$/);
+  let nextSeq;
+
+  if (match) {
+    nextSeq = parseInt(match[1], 10) + 1;
+  } else if (typeof lastGDN.ID === 'number') {
+    nextSeq = lastGDN.ID + 1;
+  } else {
+    nextSeq = 1;
+  }
+
+  return `GDN-${nextSeq}`;
 };
+
+
+
 
 // =====================================================
 // HELPER: Check Stock Availability
@@ -121,10 +138,12 @@ router.get('/', async (req, res) => {
                 { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
                 { model: Uom, as: 'uomThree', attributes: ['id', 'uom'] }
               ]
-            }
+            },
+            { model: ZCoa, as: 'batchDetails', attributes: ['id', 'acName', 'city', 'mobileNo'] },
           ]
         },
         { model: ZCoa, as: 'account', attributes: ['id', 'acName', 'city', 'mobileNo'] },
+        
         { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated'] }
       ],
       order: [['createdAt', 'DESC']],
@@ -259,11 +278,23 @@ router.post('/', async (req, res) => {
     const gdnNumber = await generateGDNNumber();
     console.log('📝 Generated:', gdnNumber);
 
-    // Create header
+    // Create header with all cost fields
     const gdn = await Stk_main.create({
-      ...stockMain,
+      Stock_Type_ID: 12,
+      COA_ID: stockMain.COA_ID,
+      Date: stockMain.Date,
       Number: gdnNumber,
-      Stock_Type_ID: 12
+      Status: stockMain.Status || 'UnPost',
+      Purchase_Type: stockMain.Purchase_Type,
+      Order_Main_ID: stockMain.Order_Main_ID,
+      Transporter_ID: stockMain.Transporter_ID || null,
+      // ✅ Cost fields
+      freight_crt: parseFloat(stockMain.freight_crt) || 0,
+      labour_crt: parseFloat(stockMain.labour_crt) || 0,
+      bility_expense: parseFloat(stockMain.bility_expense) || 0,
+      other_expense: parseFloat(stockMain.other_expense) || 0,
+      booked_crt: parseFloat(stockMain.booked_crt) || 0,
+      remarks: stockMain.remarks || null
     }, { transaction });
 
     // Create details with Stock_out fields

@@ -404,27 +404,29 @@ const DispatchPrintModal = ({ dispatch, onClose }) => {
   const date = new Date(dispatch.Date).toLocaleDateString()
 
   const getSelectedUomAndQuantity = (detail) => {
-    const stockOutUom = parseInt(detail.Stock_out_UOM);
+    // ✅ FIXED: Check both Stock_out_UOM and Sale_Unit fields
+    const stockOutUom = parseInt(detail.Stock_out_UOM) || parseInt(detail.Sale_Unit);
 
     if (stockOutUom === 1) {
       return {
-        quantity: parseFloat(detail.Stock_out_UOM_Qty) || 0,
+        quantity: parseFloat(detail.Stock_out_UOM_Qty) || parseFloat(detail.uom1_qty) || 0,
         uom: detail.item?.uom1?.uom || 'Pkt'
       };
     } else if (stockOutUom === 2) {
       return {
-        quantity: parseFloat(detail.Stock_out_SKU_UOM_Qty) || 0,
+        quantity: parseFloat(detail.Stock_out_SKU_UOM_Qty) || parseFloat(detail.uom2_qty) || 0,
         uom: detail.item?.uomTwo?.uom || 'Box'
       };
     } else if (stockOutUom === 3) {
       return {
-        quantity: parseFloat(detail.Stock_out_UOM3_Qty) || 0,
+        quantity: parseFloat(detail.Stock_out_UOM3_Qty) || parseFloat(detail.uom3_qty) || 0,
         uom: detail.item?.uomThree?.uom || 'Crt'
       };
     }
 
+    // Fallback to UOM1
     return {
-      quantity: parseFloat(detail.Stock_out_UOM_Qty) || 0,
+      quantity: parseFloat(detail.Stock_out_UOM_Qty) || parseFloat(detail.uom1_qty) || 0,
       uom: detail.item?.uom1?.uom || 'Unit'
     };
   };
@@ -549,17 +551,17 @@ th {
 <table>
 <thead>
 <tr>
-  <th style="width:8%">Sr#</th>
-  <th style="width:25%">Batch</th>
-  <th style="width:45%">Item Name</th>
-  <th style="width:22%">Quantity</th>
+  <th style="width:5%">Sr#</th>
+  <th style="width:50%">Batch</th>
+  <th style="width:40%">Item Name</th>
+  <th style="width:5%">Quantity</th>
 </tr>
 </thead>
 <tbody>
 `);
 
     const uomTotals = {};
-    const itemsPerPage = 20;
+    const itemsPerPage = 19;
     const totalItems = dispatch.details?.length || 0;
     const totalPages = Math.ceil(Math.max(totalItems, itemsPerPage) / itemsPerPage);
     let currentItemIndex = 0;
@@ -592,7 +594,7 @@ th {
           printWindow.document.write(`
 <tr>
   <td class="text-center">${currentItemIndex + 1}</td>
-  <td style="font-weight:700; font-size:16px">${detail.batchDetails?.acName || 'N/A'}</td>
+  <td style="font-weight:700; font-size:16px; ">${detail.batchDetails?.acName || 'N/A'}</td>
   <td>${detail.item?.itemName || ''}</td>
   <td class="text-right">${quantity} ${uom}</td>
 </tr>

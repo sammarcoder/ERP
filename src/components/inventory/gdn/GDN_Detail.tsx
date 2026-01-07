@@ -403,9 +403,9 @@ export default function GDN_Detail({
   }
 
   return (
-    <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-white border-2 border-emerald-300 rounded-xl shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-4 border-b bg-emerald-50/50">
+      <div className="px-5 py-4 bg-emerald-50/50">
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -427,7 +427,17 @@ export default function GDN_Detail({
       </div>
 
       {/* Content */}
-      <div className="p-5">
+      <div className=" ">
+        <div className='px-6 border border-emerald-300  flex justify-between items-center mb-6 px-12'>
+          <div className='flex justify-between py-2 w-[20%]'>
+            <div className='text-emerald-800'>item</div>
+            <div className='text-emerald-800'>Stock</div>
+          </div>
+
+          <div className='text-emerald-800'>Available Qty</div>
+          <div className='text-emerald-800'>Uom</div>
+          <div className='text-emerald-800'>Actions</div>
+        </div>
         <GDN_details_data
           items={finalItems}
           onChange={onDetailChange}

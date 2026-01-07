@@ -467,9 +467,15 @@
 'use client'
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { 
-  Loader2, Save, ArrowLeft, AlertCircle, 
-  FileText, Truck, XCircle, ShoppingCart
+import {
+  Loader2, Save, ArrowLeft, AlertCircle,
+  FileText, Truck, XCircle, ShoppingCart,
+  Package,
+  Calendar,
+  User,
+  MapPin,
+  Users,
+  Building2
 } from 'lucide-react'
 import { useGetOrderByIdQuery } from '@/store/slice/orderApi'
 import { useCreateGDNMutation } from '@/store/slice/gdnApi'
@@ -502,7 +508,15 @@ export default function GDNForm({ orderId }: Props) {
     Dispatch_Type: 'Local selling',
     COA_ID: null as number | null,
     COA_Name: '',
-    remarks: ''
+    remarks: '',
+    // Cost fields - will be auto-populated from order
+    labour_crt: null as number | null,
+    freight_crt: null as number | null,
+    bility_expense: null as number | null,
+    other_expense: null as number | null,
+    booked_crt: null as number | null,
+    Transporter_ID: null as number | null,
+    Transporter_Name: ''
   })
 
   const [finalDetails, setFinalDetails] = useState<any[]>([])
@@ -510,13 +524,21 @@ export default function GDNForm({ orderId }: Props) {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [createdGDNNumber, setCreatedGDNNumber] = useState('')
 
-  // Auto-set Customer from Order
+  // Auto-set Customer and Cost fields from Order
   useEffect(() => {
     if (orderHeader?.COA_ID && !headerForm.COA_ID) {
       setHeaderForm(prev => ({
         ...prev,
         COA_ID: orderHeader.COA_ID,
-        COA_Name: orderHeader.account?.acName || ''
+        COA_Name: orderHeader.account?.acName || '',
+        // Auto-populate cost fields from order
+        labour_crt: parseFloat(orderHeader.labour_crt) || null,
+        freight_crt: parseFloat(orderHeader.freight_crt) || null,
+        bility_expense: parseFloat(orderHeader.bility_expense) || null,
+        other_expense: parseFloat(orderHeader.other_expense) || null,
+        booked_crt: parseFloat(orderHeader.booked_crt) || null,
+        Transporter_ID: orderHeader.Transporter_ID || null,
+        Transporter_Name: orderHeader.transporter?.name || ''
       }))
     }
   }, [orderHeader])
@@ -526,16 +548,16 @@ export default function GDNForm({ orderId }: Props) {
   const isNoteGenerated = orderHeader?.is_Note_generated === true
 
   const validItems = useMemo(() => {
-    return finalDetails.filter(item => 
-      item.dispatchQty?.uom1_qty > 0 && 
+    return finalDetails.filter(item =>
+      item.dispatchQty?.uom1_qty > 0 &&
       item.batchno &&
       item.dispatchQty.uom1_qty <= item.selectedBatchQty
     )
   }, [finalDetails])
 
   const hasStockErrors = useMemo(() => {
-    return finalDetails.some(item => 
-      item.batchno && 
+    return finalDetails.some(item =>
+      item.batchno &&
       item.dispatchQty?.uom1_qty > item.selectedBatchQty
     )
   }, [finalDetails])
@@ -569,6 +591,13 @@ export default function GDNForm({ orderId }: Props) {
           Status: headerForm.Status,
           Purchase_Type: headerForm.Dispatch_Type,
           Order_Main_ID: parseInt(orderId),
+          Transporter_ID: headerForm.Transporter_ID || null,
+          // ✅ Cost fields
+          freight_crt: headerForm.freight_crt || 0,
+          labour_crt: headerForm.labour_crt || 0,
+          bility_expense: headerForm.bility_expense || 0,
+          other_expense: headerForm.other_expense || 0,
+          booked_crt: headerForm.booked_crt || 0,
           remarks: headerForm.remarks
         },
         stockDetails: validItems.map((item, idx) => ({
@@ -620,7 +649,7 @@ export default function GDNForm({ orderId }: Props) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto p-2">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
@@ -630,12 +659,12 @@ export default function GDNForm({ orderId }: Props) {
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <Truck className="w-7 h-7 text-emerald-600" />
-              Create GDN (Dispatch)
+              Create GDN
             </h1>
-            <p className="text-gray-500">
+            {/* <p className="text-gray-500">
               <ShoppingCart className="w-4 h-4 inline mr-1" />
               Sales Order: <span className="font-medium text-emerald-600">{orderHeader?.Number}</span>
-            </p>
+            </p> */}
           </div>
         </div>
 
@@ -673,37 +702,100 @@ export default function GDNForm({ orderId }: Props) {
       )}
 
       {/* Order Info */}
-      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 mb-6">
-        <h3 className="font-semibold text-emerald-700 mb-4 flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5" />
-          Sales Order Information
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-sm">
-          <div>
-            <span className="text-gray-500">Order #</span>
-            <p className="font-medium">{orderHeader?.Number}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">Date</span>
-            <p className="font-medium">{new Date(orderHeader?.Date).toLocaleDateString('en-GB')}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">Customer</span>
-            <p className="font-medium">{orderHeader?.account?.acName}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">Items</span>
-            <p className="font-medium">{orderDetails.length}</p>
+      <div className='border-2 border-emerald-200 rounded-xl p-5 mb-6'>
+        <div className="bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-xl p-4 shadow-sm mb-4">
+          <div className="flex justify-between flex-wrap gap-6 ">
+
+            {/* Order Number */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <FileText className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Order</span>
+                <p className="text-base font-semibold text-gray-900">{orderHeader?.Number || '-'}</p>
+              </div>
+            </div>
+
+            {/* Items Count */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Package className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Items</span>
+                <p className="text-base font-semibold text-gray-900">{orderDetails.length}</p>
+              </div>
+            </div>
+
+            {/* Date */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Calendar className="w-4 h-4 text-purple-600" />
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Date</span>
+                <p className="text-base font-semibold text-gray-900">
+                  {orderHeader?.Date ? new Date(orderHeader.Date).toLocaleDateString('en-GB') : '-'}
+                </p>
+              </div>
+            </div>
+
+            {/* Customer */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-100 rounded-lg">
+                <User className="w-4 h-4 text-amber-600" />
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Customer</span>
+                <p className="text-base font-semibold text-gray-900">{orderHeader?.account?.acName || '-'}</p>
+              </div>
+            </div>
+
+            {/* City */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-rose-100 rounded-lg">
+                <MapPin className="w-4 h-4 text-rose-600" />
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">City</span>
+                <p className="text-base font-semibold text-gray-900">{orderHeader?.account?.city || '-'}</p>
+              </div>
+            </div>
+
+            {/* Sub Customer */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-cyan-100 rounded-lg">
+                <Users className="w-4 h-4 text-cyan-600" />
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Sub Customer</span>
+                <p className="text-base font-semibold text-gray-900">{orderHeader?.sub_customer || '-'}</p>
+              </div>
+            </div>
+
+            {/* Sub City */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-100 rounded-lg">
+                <Building2 className="w-4 h-4 text-indigo-600" />
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Sub City</span>
+                <p className="text-base font-semibold text-gray-900">{orderHeader?.sub_city || '-'}</p>
+              </div>
+            </div>
+
           </div>
         </div>
+
+        {/* Header Form */}
+        <GDN_Header
+          data={orderHeader}
+          formData={headerForm}
+          onFormChange={setHeaderForm}
+        />
       </div>
 
-      {/* Header Form */}
-      <GDN_Header
-        data={orderHeader}
-        formData={headerForm}
-        onFormChange={setHeaderForm}
-      />
 
       {/* Detail Items - CREATE MODE */}
       <GDN_Detail
@@ -713,7 +805,7 @@ export default function GDNForm({ orderId }: Props) {
       />
 
       {/* Summary */}
-      <div className="mt-6 grid grid-cols-4 gap-4">
+      {/* <div className="mt-6 grid grid-cols-4 gap-4">
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
           <span className="text-xs text-emerald-600">Total Items</span>
           <p className="text-xl font-bold text-emerald-700">{finalDetails.length}</p>
@@ -732,7 +824,7 @@ export default function GDNForm({ orderId }: Props) {
           <span className="text-xs text-green-600">Grand Total</span>
           <p className="text-2xl font-bold text-green-700">{grandTotal.toLocaleString()}</p>
         </div>
-      </div>
+      </div> */}
 
       {/* Modals */}
       <ConfirmationModal
@@ -748,8 +840,8 @@ export default function GDNForm({ orderId }: Props) {
 
       <ConfirmationModal
         isOpen={showSuccessModal}
-        onClose={() => { setShowSuccessModal(false); router.push('/inventoryy/gdn') }}
-        onConfirm={() => { setShowSuccessModal(false); router.push('/inventoryy/gdn') }}
+        onClose={() => { setShowSuccessModal(false); router.push('/inventory/gdn') }}
+        onConfirm={() => { setShowSuccessModal(false); router.push('/inventory/gdn') }}
         title="GDN Created!"
         message={`GDN ${createdGDNNumber} created successfully.`}
         confirmText="View GDN List"

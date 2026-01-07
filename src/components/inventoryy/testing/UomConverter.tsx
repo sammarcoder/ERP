@@ -217,17 +217,7 @@ const UomConverter: React.FC<Props> = ({
     <div className="flex items-center gap-2 flex-wrap">
       {/* ✅ TERTIARY UOM - Only show if available */}
       {hasTertiary && (
-        <div className="flex items-center gap-1">
-          <input
-            type="number"
-            min="0"
-            step="any"
-            value={uom3Val}
-            onChange={handleUom3Change}
-            onKeyDown={(e) => e.key === '-' && e.preventDefault()}
-            placeholder="0"
-            className={getInputClass('3')}
-          />
+        <div className=" items-center gap-1">
           <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
             <input
               type="radio"
@@ -239,23 +229,24 @@ const UomConverter: React.FC<Props> = ({
             <span>{uomData.tertiary!.name}</span>
             <span className="text-gray-400 text-[10px]">({uomData.tertiary!.qty})</span>
           </label>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={uom3Val}
+            onChange={handleUom3Change}
+            onKeyDown={(e) => e.key === '-' && e.preventDefault()}
+            placeholder="0"
+            className={getInputClass('3')}
+          />
+          
         </div>
       )}
 
       {/* ✅ SECONDARY UOM - Only show if available */}
       {hasSecondary && (
-        <div className="flex items-center gap-1">
-          <input
-            type="number"
-            min="0"
-            step="any"
-            value={uom2Val}
-            onChange={handleUom2Change}
-            onKeyDown={(e) => e.key === '-' && e.preventDefault()}
-            placeholder="0"
-            className={getInputClass('2')}
-          />
-          <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
+        <div className="items-center gap-1">
+           <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
             <input
               type="radio"
               name={radioName}
@@ -266,22 +257,23 @@ const UomConverter: React.FC<Props> = ({
             <span>{uomData.secondary!.name}</span>
             <span className="text-gray-400 text-[10px]">({uomData.secondary!.qty})</span>
           </label>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={uom2Val}
+            onChange={handleUom2Change}
+            onKeyDown={(e) => e.key === '-' && e.preventDefault()}
+            placeholder="0"
+            className={getInputClass('2')}
+          />
+         
         </div>
       )}
 
       {/* ✅ PRIMARY UOM - Always show */}
-      <div className="flex items-center gap-1">
-        <input
-          type="number"
-          min="0"
-          step="any"
-          value={uom1Val}
-          onChange={handleUom1Change}
-          onKeyDown={(e) => e.key === '-' && e.preventDefault()}
-          placeholder="0"
-          className={getInputClass('1')}
-        />
-        <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
+      <div className="items-center gap-1">
+         <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
           <input
             type="radio"
             name={radioName}
@@ -291,6 +283,17 @@ const UomConverter: React.FC<Props> = ({
           />
           <span>{uomData.primary.name}</span>
         </label>
+        <input
+          type="number"
+          min="0"
+          step="any"
+          value={uom1Val}
+          onChange={handleUom1Change}
+          onKeyDown={(e) => e.key === '-' && e.preventDefault()}
+          placeholder="0"
+          className={`${getInputClass('1')}`}
+        />
+       
       </div>
 
       {/* ✅ Warning if no conversion available */}
