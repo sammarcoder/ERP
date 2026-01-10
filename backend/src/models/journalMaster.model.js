@@ -28,15 +28,18 @@ const JournalMaster = sequelize.define('JournalMaster', {
     status: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true,
+        defaultValue: false,
     },
     isOpening: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
         defaultValue: false,
     },
-}
-,
+    is_partially_deleted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,}
+},
  {
   tableName: 'JournalMaster', // 👈 match your existing migration table name
   freezeTableName: true, }

@@ -93,18 +93,6 @@ class ZItems extends Model {
             foreignKey: 'Item_ID',
             as: "stock_item"
         })
-
-        // this.hasMany('')
-
-        // Supplier association (if you have a Supplier model)
-        // this.belongsTo(models.Supplier, {
-        //     foreignKey: 'supplier',
-        //     as: 'supplierInfo',
-        //     constraints: true,
-        //     onDelete: 'SET NULL'
-        // });
-
-
     }
 }
 

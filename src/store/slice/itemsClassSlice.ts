@@ -119,7 +119,7 @@
 
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { ItemClass, CreateItemClassRequest, UpdateItemClassRequest } from '@/types/itemClass'
+import { ItemClass, CreateItemClassRequest, UpdateItemClassRequest } from '@/types/itemsClass'
 
 // ✅ Dynamic LAN + fallback for deployment
 const getApiBaseUrl = () => {

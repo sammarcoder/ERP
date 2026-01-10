@@ -52,4 +52,12 @@ router.use('/salesman', require('./salesmanRoutes'));
 router.use('/z-currency', require('./zcurrencyRoutes'));
 
 
+
+router.use('/machine', require('./machineRoutes'));
+router.use('/shift', require('./shiftRoutes'));
+router.use('/department', require('./departmentRoutes'));
+router.use('/employee', require('./employeeRoutes'));
+router.use('/mould', require('./mouldRoutes'));
+
+
 module.exports = router

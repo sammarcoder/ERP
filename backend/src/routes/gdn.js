@@ -2,10 +2,11 @@
 
 const express = require('express');
 const router = express.Router();
-const { Stk_main, Stk_Detail, ZItems, ZCoa, Order_Main, Order_Detail, Uom } = require('../models');
+const { Stk_main, Stk_Detail, ZItems, ZCoa, Order_Main, Order_Detail, Uom,Ztransporter } = require('../models');
 const { Op } = require('sequelize');
 // const sequelize = require('../config/database');
 const db = require('../models');
+const { ar } = require('zod/v4/locales');
 const sequelize = db.sequelize;
 
 // =====================================================
@@ -144,7 +145,8 @@ router.get('/', async (req, res) => {
         },
         { model: ZCoa, as: 'account', attributes: ['id', 'acName', 'city', 'mobileNo'] },
         
-        { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated'] }
+        { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated','sub_city', 'sub_customer'] },
+         {model: Ztransporter, as: 'transporter', artributes: ['id', 'name'] }
       ],
       order: [['createdAt', 'DESC']],
       limit: parseInt(limit),
@@ -182,11 +184,13 @@ router.get('/:id', async (req, res) => {
                 { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
                 { model: Uom, as: 'uomThree', attributes: ['id', 'uom'] }
               ]
-            }
+            },
+            { model: ZCoa, as: 'batchDetails', attributes: ['id', 'acName', 'city', 'mobileNo'] }
           ]
         },
-        { model: ZCoa, as: 'account' },
-        { model: Order_Main, as: 'order' }
+        { model: ZCoa, as: 'account', attributes: ['id', 'acName', 'city', 'mobileNo'] },
+        { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated','sub_city', 'sub_customer'] },
+        {model: Ztransporter, as: 'transporter', artributes: ['id', 'name'] }
       ]
     });
 

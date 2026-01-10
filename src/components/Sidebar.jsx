@@ -38,6 +38,22 @@ const Sidebar = () => {
             subItems: []
         },
         {
+            id: 'manufacture',
+            title: 'Manufactures',
+            icon: '📄',
+            path: null,
+            subItems: [
+                { id: 'departments', title: 'Departments', path: '/departments' },
+                // { id: 'journal-voucher', title: 'Journal Voucher', path: '/vouchers/journal' },
+                { id: 'employees', title: 'Employees', path: '/employees' },
+                { id: 'machines', title: 'Machines', path: '/machines' },
+                { id: 'shifts', title: 'Shifts', path: '/shifts' },
+                { id: 'moulds', title: 'Moulds', path: '/moulds' },
+                // { id: 'sales-voucher', title: 'Sales Voucher', path: '/vouchers/sales' },
+                // { id: 'transfer-voucher', title: 'Transfer Voucher', path: '/vouchers/transfer' }
+            ]
+        },
+        {
             id: 'vouchers',
             title: 'Vouchers',
             icon: '📄',

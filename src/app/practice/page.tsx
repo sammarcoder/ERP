@@ -549,7 +549,7 @@
 //             >
 //               Open Sales Modal
 //             </Button>
-            
+
 //             <Button 
 //               variant="success"
 //               onClick={() => {
@@ -559,7 +559,7 @@
 //             >
 //               Open Purchase Modal
 //             </Button>
-            
+
 //             <Button 
 //               variant="ghost"
 //               onClick={() => setItems([])}
@@ -569,7 +569,7 @@
 //             </Button>
 //           </div>
 
-       
+
 //         </div>
 
 //         <div className="bg-white rounded-lg shadow-sm p-6">
@@ -608,7 +608,7 @@
 //                   </div>
 //                 </div>
 //               ))}
-              
+
 //               <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
 //                 <p className="text-yellow-800">
 //                   <strong>Duplicate Prevention Active:</strong> Items with IDs {alreadyAddedItemIds.join(', ')} 
@@ -690,72 +690,91 @@
 
 
 
-// app/sales/create/page.tsx - Complete Order System
-'use client'
-import React, { useState } from 'react'
-import { OrderHeader } from '@/components/orders/OrderHeader'
-import { OrderDetails } from '@/components/orders/OrderDetails'
-import { Button } from '@/components/ui/Button'
+// // app/sales/create/page.tsx - Complete Order System
+// 'use client'
+// import React, { useState } from 'react'
+// import { OrderHeader } from '@/components/orders/OrderHeader'
+// import { OrderDetails } from '@/components/orders/OrderDetails'
+// import { Button } from '@/components/ui/Button'
 
-export default function CreateSalesOrderPage() {
-  const [headerData, setHeaderData] = useState({
-    date: new Date().toISOString().split('T')[0],
-    COA_ID: '',
-    Transporter_ID: '',
-    Stock_Type_ID: 12,
-    discountA: 0,
-    discountB: 0,
-    discountC: 0,
-    freight_crt: 0,
-    labour_crt: 0,
-    bility_expense: 0,
-    other_expense: 0
-  })
-  
-  const [orderDetails, setOrderDetails] = useState([])
+// export default function CreateSalesOrderPage() {
+//   const [headerData, setHeaderData] = useState({
+//     date: new Date().toISOString().split('T')[0],
+//     COA_ID: '',
+//     Transporter_ID: '',
+//     Stock_Type_ID: 12,
+//     discountA: 0,
+//     discountB: 0,
+//     discountC: 0,
+//     freight_crt: 0,
+//     labour_crt: 0,
+//     bility_expense: 0,
+//     other_expense: 0
+//   })
 
-  const handleSubmitOrder = () => {
-    console.group('🚀 Complete Order Submission')
-    console.log('Header Data:', headerData)
-    console.log('Order Details:', orderDetails)
-    console.log('Total Items:', orderDetails.length)
-    console.groupEnd()
-    
-    // TODO: Submit to API
-  }
+//   const [orderDetails, setOrderDetails] = useState([])
 
+//   const handleSubmitOrder = () => {
+//     console.group('🚀 Complete Order Submission')
+//     console.log('Header Data:', headerData)
+//     console.log('Order Details:', orderDetails)
+//     console.log('Total Items:', orderDetails.length)
+//     console.groupEnd()
+
+//     // TODO: Submit to API
+//   }
+
+//   return (
+//     <div className="max-w-7xl mx-auto p-8 space-y-8">
+//       <div>
+//         <h1 className="text-3xl font-bold text-gray-900">Create Sales Order</h1>
+//         <p className="text-gray-600 mt-2">Complete order management with bulk item selection</p>
+//       </div>
+
+//       {/* ✅ Order Header */}
+//       <OrderHeader
+//         orderType="sales"
+//         value={headerData}
+//         onChange={setHeaderData}
+//       />
+
+//       {/* ✅ Order Details */}
+//       <OrderDetails
+//         headerData={headerData}
+//         isPurchase={false}
+//         onChange={setOrderDetails}
+//       />
+
+//       {/* ✅ Submit Order */}
+//       <div className="flex justify-end">
+//         <Button
+//           variant="primary"
+//           size="lg"
+//           onClick={handleSubmitOrder}
+//           disabled={!headerData.COA_ID || orderDetails.length === 0}
+//         >
+//           Submit Sales Order ({orderDetails.length} items)
+//         </Button>
+//       </div>
+//     </div>
+//   )
+// }
+
+
+
+
+import React from 'react'
+import {CoaSearchableInput} from '@/components/common/coa/CoaSearchableInput'
+
+const page = () => {
   return (
-    <div className="max-w-7xl mx-auto p-8 space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Create Sales Order</h1>
-        <p className="text-gray-600 mt-2">Complete order management with bulk item selection</p>
-      </div>
-
-      {/* ✅ Order Header */}
-      <OrderHeader
-        orderType="sales"
-        value={headerData}
-        onChange={setHeaderData}
+    <div>
+      <CoaSearchableInput
+        orderType="carriage"
+        label="Select Transporter"
       />
-
-      {/* ✅ Order Details */}
-      <OrderDetails
-        headerData={headerData}
-        isPurchase={false}
-        onChange={setOrderDetails}
-      />
-
-      {/* ✅ Submit Order */}
-      <div className="flex justify-end">
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={handleSubmitOrder}
-          disabled={!headerData.COA_ID || orderDetails.length === 0}
-        >
-          Submit Sales Order ({orderDetails.length} items)
-        </Button>
-      </div>
     </div>
   )
 }
+
+export default page

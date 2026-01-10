@@ -241,6 +241,19 @@ export const coaApi = createApi({
       },
       providesTags: ['COA'],
     }),
+
+    getCoaByCarriage: builder.query<any, string | number>({
+      query: () => `/by-coa-type-carriage`,
+      transformResponse: (response: any) => {   
+        console.log('🔍 COA By Carriage ID Response:', response)
+        if (response.success) {
+          return response.data || response.zCoaRecord || response
+        }
+        return response
+
+      },
+      providesTags: ['COA'],
+    }),
     
     // ✅ Create new COA
     createCoa: builder.mutation<any, any>({
@@ -278,6 +291,7 @@ export const {
   useGetCustomerCoaQuery,
   useGetSupplierCoaQuery,
   useGetCoaByIdQuery,
+  useGetCoaByCarriageQuery,
   useCreateCoaMutation,
   useUpdateCoaMutation,
   useDeleteCoaMutation,

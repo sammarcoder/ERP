@@ -1,5 +1,5 @@
 const db = require('../models');
-const { Order_Main, Order_Detail, ZItems, Uom, ZCoa, Stk_main } = db;
+const { Order_Main, Order_Detail, ZItems, Uom, ZCoa, Stk_main, Ztransporter } = db;
 const sequelize = db.sequelize;
 
 
@@ -239,6 +239,7 @@ const getAllOrders = async (req, res) => {
           }
           ]
         },
+        {model: Ztransporter, as: 'transporter' }
 
       ],
       order: [['createdAt', 'DESC']],
@@ -339,6 +340,7 @@ const getOrderById = async (req, res) => {
           }
           ]
         },
+        {model: Ztransporter, as: 'transporter' }
 
       ],
     });

@@ -311,49 +311,159 @@ const deleteCompleteStock = async (req, res) => {
 
 
 
+// const updateStockMain = async (req, res) => {
+//   const { id } = req.params;
+//   const { 
+//     is_Voucher_Generated, 
+//     Carriage_Amount,
+//     Carriage_ID  // Store COA ID here, not in Transporter
+//   } = req.body;
+  
+//   try {
+//     const updateFields = {};
+    
+//     if (is_Voucher_Generated !== undefined) updateFields.is_Voucher_Generated = is_Voucher_Generated;
+//     if (Carriage_Amount !== undefined) updateFields.Carriage_Amount = Carriage_Amount;
+//     if (Carriage_ID !== undefined) updateFields.Carriage_ID = Carriage_ID;  // ADD THIS
+
+
+//     console.log(`🔄 Updating stock main ID: ${id} with fields:`, updateFields);
+
+//     const [updated] = await Stk_main.update(updateFields, {
+//       where: { ID: id }
+//     });
+    
+//     if (updated > 0) {
+//       console.log(`✅ Successfully updated stock main ID: ${id}`);
+//       res.json({
+//         success: true,
+//         message: 'Stock main updated successfully',
+//         updatedFields: updateFields
+//       });
+//     } else {
+//       res.status(404).json({
+//         success: false,
+//         error: 'Stock main not found'
+//       });
+//     }
+//   } catch (error) {
+//     console.error(`💥 Error updating stock main ID: ${id}:`, error);
+//     res.status(500).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+// controllers/stockOrderController.js
+
+// const updateStockMain = async (req, res) => {
+//   const { id } = req.params;
+//   const { 
+//     is_Voucher_Generated, 
+//     Carriage_Amount,
+//     Carriage_ID,
+//     approved,        // ✅ ADD THIS
+//     Status           // ✅ ADD THIS
+//   } = req.body;
+  
+//   try {
+//     const updateFields = {};
+    
+//     if (is_Voucher_Generated !== undefined) updateFields.is_Voucher_Generated = is_Voucher_Generated;
+//     if (Carriage_Amount !== undefined) updateFields.Carriage_Amount = Carriage_Amount;
+//     if (Carriage_ID !== undefined) updateFields.Carriage_ID = Carriage_ID;
+//     if (approved !== undefined) updateFields.approved = approved;  // ✅ ADD THIS
+//     if (Status !== undefined) updateFields.Status = Status;        // ✅ ADD THIS
+
+//     console.log(`🔄 Updating stock main ID: ${id} with fields:`, updateFields);
+
+//     const [updated] = await Stk_main.update(updateFields, {
+//       where: { ID: id }
+//     });
+    
+//     if (updated > 0) {
+//       console.log(`✅ Successfully updated stock main ID: ${id}`);
+//       res.json({
+//         success: true,
+//         message: 'Stock main updated successfully',
+//         updatedFields: updateFields
+//       });
+//     } else {
+//       res.status(404).json({
+//         success: false,
+//         error: 'Stock main not found'
+//       });
+//     }
+//   } catch (error) {
+//     console.error(`💥 Error updating stock main ID: ${id}:`, error);
+//     res.status(500).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// controllers/stockOrderController.js
+
 const updateStockMain = async (req, res) => {
   const { id } = req.params;
-  const { 
-    is_Voucher_Generated, 
-    Carriage_Amount,
-    Carriage_ID  // Store COA ID here, not in Transporter
-  } = req.body;
-  
+  const { is_Voucher_Generated, Carriage_Amount, Carriage_ID, approved, Status } = req.body;
+
   try {
     const updateFields = {};
-    
+
     if (is_Voucher_Generated !== undefined) updateFields.is_Voucher_Generated = is_Voucher_Generated;
     if (Carriage_Amount !== undefined) updateFields.Carriage_Amount = Carriage_Amount;
-    if (Carriage_ID !== undefined) updateFields.Carriage_ID = Carriage_ID;  // ADD THIS
+    if (Carriage_ID !== undefined) updateFields.Carriage_ID = Carriage_ID;
+    if (approved !== undefined) updateFields.approved = approved;
+    if (Status !== undefined) updateFields.Status = Status;
 
+    console.log(`🔄 Updating stk_main ID: ${id}`, updateFields);
 
-    console.log(`🔄 Updating stock main ID: ${id} with fields:`, updateFields);
+    const [updated] = await Stk_main.update(updateFields, { where: { ID: id } });
 
-    const [updated] = await Stk_main.update(updateFields, {
-      where: { ID: id }
-    });
-    
     if (updated > 0) {
-      console.log(`✅ Successfully updated stock main ID: ${id}`);
-      res.json({
-        success: true,
-        message: 'Stock main updated successfully',
-        updatedFields: updateFields
-      });
+      res.json({ success: true, message: 'Updated successfully' });
     } else {
-      res.status(404).json({
-        success: false,
-        error: 'Stock main not found'
-      });
+      res.status(404).json({ success: false, error: 'Stock main not found' });
     }
   } catch (error) {
-    console.error(`💥 Error updating stock main ID: ${id}:`, error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -97,6 +97,10 @@ const Stk_main = sequelize.define('Stk_main', {
     remarks: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    approved:{
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 
 }, {
