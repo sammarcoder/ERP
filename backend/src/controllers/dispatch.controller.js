@@ -29,6 +29,7 @@ const getAvailableBatchesForEdit = async (req, res) => {
         sd.batchno,
         sd.Item_ID,
         zi.itemName,
+        zc.acName as batchName,
         
         -- Total received from GRN
         SUM(CASE 
@@ -64,10 +65,11 @@ const getAvailableBatchesForEdit = async (req, res) => {
       FROM stk_detail sd
       INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
       INNER JOIN zitems zi ON sd.Item_ID = zi.id
+      LEFT JOIN zcoas zc ON sd.batchno = zc.id
       WHERE sd.Item_ID = :itemId 
         AND sd.batchno IS NOT NULL 
         AND sd.batchno != ''
-      GROUP BY sd.batchno, sd.Item_ID, zi.itemName
+      GROUP BY sd.batchno, sd.Item_ID, zi.itemName, zc.acName
       ORDER BY sd.batchno ASC
     `, {
       replacements: { itemId, dispatchId },
@@ -76,6 +78,7 @@ const getAvailableBatchesForEdit = async (req, res) => {
 
     const processedBatches = batches.map(batch => ({
       batchno: batch.batchno,
+      batchName: batch.batchName || batch.batchno,
       item_id: batch.Item_ID,
       item_name: batch.itemName,
       total_received_uom1: parseFloat(batch.total_received_uom1) || 0,

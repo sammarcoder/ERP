@@ -25,6 +25,7 @@ import { shiftApi } from './slice/shiftApi';
 import { departmentApi } from './slice/departmentApi';
 import { employeeApi } from './slice/employeeApi';
 import { mouldApi } from './slice/mouldApi';
+import { mouldingApi } from './slice/mouldingApi';
 
 
 
@@ -55,6 +56,7 @@ export const store = configureStore({
     [departmentApi.reducerPath]: departmentApi.reducer,
     [employeeApi.reducerPath]: employeeApi.reducer,
      [mouldApi.reducerPath]: mouldApi.reducer,
+      [mouldingApi.reducerPath]: mouldingApi.reducer,
 
 
 
@@ -84,7 +86,8 @@ export const store = configureStore({
       .concat(shiftApi.middleware)
       .concat(departmentApi.middleware)
       .concat(employeeApi.middleware)
-       .concat(mouldApi.middleware),
+       .concat(mouldApi.middleware)
+       .concat(mouldingApi.middleware),
 });
 
 setupListeners(store.dispatch);

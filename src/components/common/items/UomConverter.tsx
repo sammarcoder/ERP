@@ -23,12 +23,12 @@ interface UomConverterProps {
   isPurchase?: boolean;
 }
 
-const UomConverter = ({ 
-  uomData, 
+const UomConverter = ({
+  uomData,
   lineIndex, // ✅ NEW: Make radio buttons unique per line
-  onChange, 
-  initialValues = {}, 
-  isPurchase = false 
+  onChange,
+  initialValues = {},
+  isPurchase = false
 }: UomConverterProps) => {
   // ✅ FIX: Default to tertiary selection but empty value
   const [saleUnit, setSaleUnit] = useState<string>(initialValues.sale_unit || '3');
@@ -61,7 +61,7 @@ const UomConverter = ({
         sale_unit: parseInt(selectedSaleUnit), // ✅ FIX: Send as number, not string
         Uom_Id: uomId // ✅ FIX: Include Uom_Id in response
       };
-      
+
       console.log(`🔄 UOM Data for line ${lineIndex}:`, data);
       onChange(data);
     }
@@ -70,12 +70,12 @@ const UomConverter = ({
   const handleUom1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUom1Val(value);
-    
+
     if (value && !isNaN(Number(value))) {
       const numValue = parseFloat(value);
       let uom2 = '';
       let uom3 = '';
-      
+
       if (uomData.secondary) {
         uom2 = (numValue / uomData.secondary.qty).toFixed(6);
         setUom2Val(uom2);
@@ -84,7 +84,7 @@ const UomConverter = ({
         uom3 = (numValue / uomData.tertiary.qty).toFixed(6);
         setUom3Val(uom3);
       }
-      
+
       notifyParent(value, uom2, uom3, saleUnit);
     } else {
       setUom2Val('');
@@ -96,17 +96,17 @@ const UomConverter = ({
   const handleUom2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUom2Val(value);
-    
+
     if (value && !isNaN(Number(value)) && uomData.secondary) {
       const numValue = parseFloat(value);
       const uom1 = (numValue * uomData.secondary.qty).toFixed(2);
       let uom3 = '';
-      
+
       if (uomData.tertiary) {
         uom3 = (numValue * uomData.secondary.qty / uomData.tertiary.qty).toFixed(6);
         setUom3Val(uom3);
       }
-      
+
       setUom1Val(uom1);
       notifyParent(uom1, value, uom3, saleUnit);
     } else {
@@ -119,17 +119,17 @@ const UomConverter = ({
   const handleUom3Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUom3Val(value);
-    
+
     if (value && !isNaN(Number(value)) && uomData.tertiary) {
       const numValue = parseFloat(value);
       const uom1 = (numValue * uomData.tertiary.qty).toFixed(2);
       let uom2 = '';
-      
+
       if (uomData.secondary) {
         uom2 = (numValue * uomData.tertiary.qty / uomData.secondary.qty).toFixed(2);
         setUom2Val(uom2);
       }
-      
+
       setUom1Val(uom1);
       notifyParent(uom1, uom2, value, saleUnit);
     } else {
@@ -153,101 +153,99 @@ const UomConverter = ({
     <div className="flex items-start">
       {/* ✅ Tertiary UOM */}
       {uomData.tertiary && (
-        <div className="flex gap-2 w-24 border-gray-400 px-1.5">
+        <div className=" gap-2 border-gray-400 px-1.5">
+          <label className="text-xs flex text-gray-600 mb-0.5 font-medium" title=''>
+            {/* {!isPurchase && ( */}
+            <input
+              type="radio"
+              name={radioGroupName} // ✅ FIX: Unique name per line
+              value="3"
+              checked={saleUnit === '3'}
+              onChange={() => handleSaleUnitChange('3')}
+              className="mr-1 w-3 h-3"
+            />
+            {/* )} */}
+            <div>
+              {uomData.tertiary.name}
+            </div>
+
+          </label>
           <input
             type="text"
             value={uom3Val}
             onChange={handleUom3Change}
             placeholder="0" // ✅ FIX: No default value
-            className={`border rounded-md px-1 py-0.5 w-14 h-8 text-sm focus:ring-1 transition-all ${
-              saleUnit === '3' && !isPurchase
-                ? 'border-green-400 bg-green-50 focus:ring-green-500'
-                : 'border-gray-300 focus:ring-purple-500'
-            }`}
+            className={`border rounded-md px-1 py-0.5 w-14 h-8 text-sm focus:ring-1 transition-all ${saleUnit === '3' && !isPurchase
+              ? 'border-green-400 bg-green-50 focus:ring-green-500'
+              : 'border-gray-300 focus:ring-purple-500'
+              }`}
           />
-           <label className="text-xs text-gray-600 mb-0.5 font-medium" title=''>
-            {/* {!isPurchase && ( */}
-              <input
-                type="radio"
-                name={radioGroupName} // ✅ FIX: Unique name per line
-                value="3"
-                checked={saleUnit === '3'}
-                onChange={() => handleSaleUnitChange('3')}
-                className="mr-1 w-3 h-3"
-              />
-            {/* )} */}
-            <div>
-                {uomData.tertiary.name}
-            </div>
-           
-          </label>
+
         </div>
       )}
 
       {/* ✅ Secondary UOM */}
       {uomData.secondary && (
-        <div className="flex gap-2 w-26 border-gray-400  px-1.5">
-          
+        <div className=" gap-2  border-gray-400  px-1.5">
+          <label className="text-xs flex text-gray-600 mb-0.5 font-medium">
+            {/* {!isPurchase && ( */}
+            <input
+              type="radio"
+              name={radioGroupName} // ✅ FIX: Unique name per line
+              value="2"
+              checked={saleUnit === '2'}
+              onChange={() => handleSaleUnitChange('2')}
+              className="mr-1 w-3 h-3"
+            />
+            {/* )} */}
+            <div>
+              {uomData.secondary.name}
+            </div>
+
+          </label>
           <input
             type="text"
             value={uom2Val}
             onChange={handleUom2Change}
             placeholder="0"
-            className={`border rounded-md px-1 py-0.5 w-16 h-8 text-sm focus:ring-1 transition-all ${
-              saleUnit === '2' && !isPurchase
-                ? 'border-green-400 bg-green-50 focus:ring-green-500'
-                : 'border-gray-300 focus:ring-blue-500'
-            }`}
+            className={`border rounded-md px-1 py-0.5 w-16 h-8 text-sm focus:ring-1 transition-all ${saleUnit === '2' && !isPurchase
+              ? 'border-green-400 bg-green-50 focus:ring-green-500'
+              : 'border-gray-300 focus:ring-blue-500'
+              }`}
           />
-          <label className="text-xs text-gray-600 mb-0.5 font-medium">
-            {/* {!isPurchase && ( */}
-              <input
-                type="radio"
-                name={radioGroupName} // ✅ FIX: Unique name per line
-                value="2"
-                checked={saleUnit === '2'}
-                onChange={() => handleSaleUnitChange('2')}
-                className="mr-1 w-3 h-3"
-              />
-            {/* )} */}
-            <div>
-                 {uomData.secondary.name}
-            </div>
-            
-          </label>
+
         </div>
       )}
 
       {/* ✅ Primary UOM */}
-      <div className="flex gap-2 w-30  border-gray-400 px-1.5">
-        
+      <div className=" gap-2 border-gray-400 px-1.5">
+        <label className="text-xs flex text-gray-600 mb-0.5 font-medium  items-center">
+          {/* {!isPurchase && ( */}
+          <input
+            type="radio"
+            name={radioGroupName} // ✅ FIX: Unique name per line
+            value="1"
+            checked={saleUnit === '1'}
+            onChange={() => handleSaleUnitChange('1')}
+            className="mr-1 w-3 h-3"
+          />
+          {/* )} */}
+          <div>
+            {uomData.primary.name}
+          </div>
+
+        </label>
         <input
           type="text"
           value={uom1Val}
           onChange={handleUom1Change}
           placeholder="0"
-          className={`border rounded-md px-1 py-0.5 w-16 h-8 text-sm focus:ring-1 transition-all w-[80px] ${
-            saleUnit === '1' && !isPurchase
-              ? 'border-green-400 bg-green-50 focus:ring-green-500'
-              : 'border-gray-300 focus:ring-blue-500'
-          }`}
+          className={`border rounded-md px-1 py-0.5 w-16 h-8 text-sm focus:ring-1 transition-all w-[80px] ${saleUnit === '1' && !isPurchase
+            ? 'border-green-400 bg-green-50 focus:ring-green-500'
+            : 'border-gray-300 focus:ring-blue-500'
+            }`}
         />
-        <label className="text-xs  text-gray-600 mb-0.5 font-medium  items-center">
-          {/* {!isPurchase && ( */}
-            <input
-              type="radio"
-              name={radioGroupName} // ✅ FIX: Unique name per line
-              value="1"
-              checked={saleUnit === '1'}
-              onChange={() => handleSaleUnitChange('1')}
-              className="mr-1 w-3 h-3"
-            />
-          {/* )} */}
-          <div>
-              {uomData.primary.name}
-          </div>
-          
-        </label>
+
       </div>
     </div>
   );

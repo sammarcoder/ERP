@@ -49,6 +49,7 @@ const Sidebar = () => {
                 { id: 'machines', title: 'Machines', path: '/machines' },
                 { id: 'shifts', title: 'Shifts', path: '/shifts' },
                 { id: 'moulds', title: 'Moulds', path: '/moulds' },
+                { id: 'moulding', title: 'Moulding', path: '/moulding' },
                 // { id: 'sales-voucher', title: 'Sales Voucher', path: '/vouchers/sales' },
                 // { id: 'transfer-voucher', title: 'Transfer Voucher', path: '/vouchers/transfer' }
             ]
@@ -74,9 +75,9 @@ const Sidebar = () => {
             icon: '📦',
             path: null,
             subItems: [
-                { id: 'grn-local', title: 'GRN Local', path: '/inventory/grn' },
+                // { id: 'grn-local', title: 'GRN Local', path: '/inventory/grn' },
                 { id: 'grn-import', title: 'GRN Import', path: '/inventory/grn-import' },
-                { id: 'gdn', title: 'GDN', path: '/inventory/dispatch' },
+                // { id: 'gdn', title: 'GDN', path: '/inventory/dispatch' },
                 { id: 'duty-calc', title: 'Duty Calculation Import', path: '/inventory/duty-calc' },
                 { id: 'grn', title: 'GRN 2', path: '/inventoryy/grn' },
                 { id: 'gdn_2', title: 'GDN 2', path: '/inventory/gdn' },
@@ -88,8 +89,8 @@ const Sidebar = () => {
             icon: '🛒',
             path: null,
             subItems: [
-                { id: 'sales-order', title: 'Sales Order', path: '/order/sales' },
-                { id: 'purchase-order', title: 'Purchase Order', path: '/order/purchase' },
+                // { id: 'sales-order', title: 'Sales Order', path: '/order/sales' },
+                // { id: 'purchase-order', title: 'Purchase Order', path: '/order/purchase' },
                 { id: 'sales-order-2', title: 'Sales Order 2', path: '/orders/sales' },
                 { id: 'purchase-order-2', title: 'Purchase Order 2', path: '/orders/purchase' }
             ]

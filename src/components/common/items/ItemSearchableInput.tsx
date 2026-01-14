@@ -119,11 +119,11 @@ export const ItemSearchableInput: React.FC<ItemSearchableInputProps> = ({
             <div className="flex items-center flex-1">
               <Package className="w-4 h-4 text-[#509ee3] mr-2" />
               <span className="text-gray-900">{selectedItem.itemName}</span>
-              {selectedItem.uom1 && (
+              {/* {selectedItem.uom1 && (
                 <span className="ml-2 text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                   {selectedItem.uom1.uom}
                 </span>
-              )}
+              )} */}
             </div>
           ) : (
             <span className="text-gray-400">{placeholder}</span>
@@ -163,9 +163,9 @@ export const ItemSearchableInput: React.FC<ItemSearchableInputProps> = ({
                   <Package className="w-4 h-4 text-[#509ee3] mr-3" />
                   <div className="flex-1">
                     <div className="text-sm font-medium text-gray-900">{item.itemName}</div>
-                    {item.uom1 && (
+                    {/* {item.uom1 && (
                       <div className="text-xs text-gray-500">UOM: {item.uom1.uom}</div>
-                    )}
+                    )} */}
                   </div>
                   {value === item.id && (
                     <div className="w-2 h-2 bg-[#509ee3] rounded-full"></div>

@@ -23,6 +23,8 @@ const zcurrencyRoutes = require('./zcurrencyRoutes.js')
 const dispatchController = require('./dispatch.js')
 const gdnRoutes = require('./gdn.js')
 
+const salesVoucherRoutes = require('./salesVoucher.routes.js')
+
 router.use("/auth", authRoutes);
 router.use("/z-control", zRoutes);
 
@@ -58,6 +60,11 @@ router.use('/shift', require('./shiftRoutes'));
 router.use('/department', require('./departmentRoutes'));
 router.use('/employee', require('./employeeRoutes'));
 router.use('/mould', require('./mouldRoutes'));
+router.use('/moulding', require('./mouldingRoutes'));
+
+
+
+router.use('/sales-voucher', salesVoucherRoutes);
 
 
 module.exports = router

@@ -253,7 +253,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
           showFilter={true}
           clearable={true}
         />
-        {orderType !== 'purchase' && (
+        {orderType === 'sales' && (
           <>
             <Input
               type="text"
@@ -280,15 +280,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
 
       {/* ✅ Financial Fields Section - YOUR EXACT LAYOUT */}
       <div className="">
-        {/* <h3 className="text-md font-medium text-gray-800 flex items-center gap-2">
-          <DollarSign className="w-4 h-4" />
-          Financial Details
-          {value.COA_ID && (
-            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-              {mode === 'edit' ? 'Editable values' : 'Auto-filled from'} {coaLabel.toLowerCase()} {mode === 'create' && '(editable)'}
-            </span>
-          )}
-        </h3> */}
+       
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-2">
           <div className=''>

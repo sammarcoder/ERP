@@ -274,7 +274,7 @@ const directPrintOrder = (order, isPurchase = false) => {
             <span style="margin-right:20px;"><strong>Sub:</strong> ${order.sub_city || order.account?.sub_city || 'N/A'}</span>
           </div>
           <div class="ada-box">
-            <div class="ada-label">ADA:${order.transporter.name}</div>
+            <div class="ada-label">ADA:${order.transporter?.name}</div>
             <div class="ada-value">${transporterInfo || '&nbsp;'}</div>
           </div>
         </div>

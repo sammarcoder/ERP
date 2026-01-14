@@ -13,7 +13,7 @@ export default function EditSalesOrderPage() {
   const params = useParams()
   const router = useRouter()
   const orderId = params.id as string
-  
+
   // ✅ State for header and line items
   const [headerData, setHeaderData] = useState<any>({
     date: new Date().toISOString().split('T')[0],
@@ -45,14 +45,14 @@ export default function EditSalesOrderPage() {
   useEffect(() => {
     if (existingOrder?.data) {
       console.log('📋 Pre-populating header data from existing order:', existingOrder.data)
-      
+
       const order = existingOrder.data
       setHeaderData({
         date: order.Date ? order.Date.split('T')[0] : new Date().toISOString().split('T')[0],
         COA_ID: order.COA_ID || '',
         Transporter_ID: order.Transporter_ID || '',
         Stock_Type_ID: 11, // Sales order
-        
+
         // ✅ Financial fields - preserve existing or empty
         freight_crt: order.freight_crt || '',
         labour_crt: order.labour_crt || '',
@@ -62,7 +62,7 @@ export default function EditSalesOrderPage() {
         sub_customer: order.sub_customer || '',
         sub_city: order.sub_city || '',
         str: order.str || '',
-        
+
         // ✅ Discount fields from account data (critical for line items)
         discountA: order.account?.discountA ? parseFloat(order.account.discountA) : '',
         discountB: order.account?.discountB ? parseFloat(order.account.discountB) : '',
@@ -118,7 +118,7 @@ export default function EditSalesOrderPage() {
       const detailsData = lineItems.map((item, index) => ({
         Line_Id: item.lineNo,
         Item_ID: item.Item_ID,
-        Price: '0.00',
+        Price: item.unitPrice ? item.unitPrice.toString() : '0.00',
         Stock_In_UOM: null,
         Stock_In_UOM_Qty: '0.000',
         Stock_SKU_Price: '0.00',
@@ -162,7 +162,7 @@ export default function EditSalesOrderPage() {
     } catch (error) {
       console.error('❌ Failed to update order:', error)
       console.groupEnd()
-      
+
       // ✅ Close modal and show error
       setShowConfirmModal(false)
       const errorMessage = error?.data?.message || error?.message || 'Unknown error occurred'
@@ -200,27 +200,28 @@ export default function EditSalesOrderPage() {
       {/* ✅ Page Header with Navigation */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <Button
-            onClick={() => router.back()}
-            variant="ghost"
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Orders
-          </Button>
-          
+
+
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl font-semibold text-gray-900">
               Edit Sales Order #{existingOrder?.data?.Number}
             </h1>
-            <p className="text-gray-600 mt-1">
+            {/* <p className="text-gray-600 mt-1">
               Modify order details and update when ready
-            </p>
+            </p> */}
           </div>
         </div>
 
         {/* ✅ Action Buttons */}
         <div className="flex items-center gap-3">
+          <Button
+            onClick={() => router.back()}
+            // variant="ghost"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Orders
+          </Button>
           <Button
             onClick={() => window.location.reload()}
             variant="ghost"
@@ -230,20 +231,20 @@ export default function EditSalesOrderPage() {
             <RotateCcw className="w-4 h-4" />
             Reset Changes
           </Button>
-          
-          <Button
+
+          {/* <Button
             onClick={handleUpdateButtonClick}
             disabled={isUpdating || !headerData.COA_ID || lineItems.length === 0}
             className="flex items-center gap-2 bg-green-600 text-white px-6 py-3 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-4 h-4" />
             {isUpdating ? 'Updating Order...' : 'Update Order'}
-          </Button>
+          </Button> */}
         </div>
       </div>
 
       {/* ✅ Order Status Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4 text-sm">
             <span className="font-medium">Current Status:</span>
@@ -265,12 +266,12 @@ export default function EditSalesOrderPage() {
             Created: {existingOrder?.data?.createdAt ? new Date(existingOrder.data.createdAt).toLocaleDateString() : 'Unknown'}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* ✅ Order Header Component */}
       <OrderHeader
         mode="edit"
-        orderType="sales"
+        orderType="purchase"
         value={headerData}
         onChange={setHeaderData}
         initialData={existingOrder?.data}
@@ -280,27 +281,28 @@ export default function EditSalesOrderPage() {
       <OrderDetails
         mode="edit"
         headerData={headerData}
-        isPurchase={false}
+        isPurchase={true}
         onChange={setLineItems}
         initialLineItems={existingOrder?.data?.details || []}
       />
 
       {/* ✅ Footer Summary */}
       {lineItems.length > 0 && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mt-6">
+        <div className="rounded-lg  p-2 mt-4">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">
-              <p>Ready to update? Make sure all information is correct.</p>
-              <p className="mt-1">Changes will be saved to order #{existingOrder?.data?.Number}</p>
+              {/* <p>Ready to update? Make sure all information is correct.</p>
+              <p className="mt-1">Changes will be saved to order #{existingOrder?.data?.Number}</p> */}
             </div>
-            
+
             <Button
               onClick={handleUpdateButtonClick}
               disabled={isUpdating || !headerData.COA_ID || lineItems.length === 0}
-              className="bg-green-600 text-white px-8 py-3 font-semibold hover:bg-green-700 disabled:opacity-50"
+              // className="bg-green-600 text-white px-8 py-3 font-semibold hover:bg-green-700 disabled:opacity-50"
             >
               <Save className="w-5 h-5 mr-2" />
               {isUpdating ? 'Updating...' : 'Update Order'}
+              
             </Button>
           </div>
         </div>

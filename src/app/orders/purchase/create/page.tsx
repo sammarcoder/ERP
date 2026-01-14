@@ -1,5 +1,6 @@
 'use client'
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { OrderHeader } from '@/components/orders/OrderHeader'
 import { OrderDetails } from '@/components/orders/OrderDetails'
 import { Button } from '@/components/ui/Button'
@@ -8,6 +9,8 @@ import { formatOrderForApi } from '@/utils/orderDataFormatter'
 import { useCreateOrderMutation } from '@/store/slice/orderApi'
 
 export default function CreateSalesOrderPage() {
+  const router = useRouter()
+  
   // ✅ Initial state structure
   const getInitialHeaderData = () => ({
     date: new Date().toISOString().split('T')[0],
@@ -59,6 +62,9 @@ export default function CreateSalesOrderPage() {
       // Show success modal or notification here if needed
       console.log('🎉 Form reset - ready for new order')
       
+      // ✅ Navigate to orders list
+      router.push('/orders/purchase')
+      
     } catch (error: any) {
       console.error('❌ Order Submission Failed:', error)
       const errorMessage = error.data?.message || error.message || 'Unknown error occurred'
@@ -107,15 +113,6 @@ export default function CreateSalesOrderPage() {
         </div>
         
         <div className="flex gap-4">
-          {/* ✅ Reset Button */}
-          {/* <Button
-            variant="ghost"
-            onClick={resetForm}
-            disabled={isLoading}
-          >
-            Reset Form
-          </Button>
-           */}
           <Button
             variant="primary"
             size="lg"

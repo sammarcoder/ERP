@@ -1358,8 +1358,8 @@ export default function Stk_details_data({
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order Qty</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">GRN Qty</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Batch</th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
+              {/* <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th> */}
+              {/* <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th> */}
               <th className="px-4 py-3 w-12"></th>
             </tr>
           </thead>
@@ -1415,7 +1415,7 @@ export default function Stk_details_data({
                 </td>
 
                 {/* Price */}
-                <td className="px-4 py-4 text-right">
+                {/* <td className="px-4 py-4 text-right">
                   <input
                     type="number"
                     value={row.unitPrice || ''}
@@ -1423,14 +1423,14 @@ export default function Stk_details_data({
                     className="w-24 border border-gray-200 rounded-lg px-3 py-1.5 text-right text-sm focus:ring-2 focus:ring-[#4c96dc] focus:border-[#4c96dc]"
                     placeholder="0.00"
                   />
-                </td>
+                </td> */}
 
                 {/* Total */}
-                <td className="px-4 py-4 text-right">
+                {/* <td className="px-4 py-4 text-right">
                   <span className="font-semibold text-gray-900">
                     {((row.grnQty?.uom1_qty || 0) * (row.unitPrice || 0)).toLocaleString()}
                   </span>
-                </td>
+                </td> */}
 
                 {/* Delete */}
                 <td className="px-4 py-4">
@@ -1445,19 +1445,19 @@ export default function Stk_details_data({
               </tr>
             ))}
           </tbody>
-          <tfoot>
+          {/* <tfoot>
             <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-t-2 border-gray-200">
               <td colSpan={6} className="px-4 py-4 text-right">
-                <span className="text-gray-600 font-semibold">Grand Total:</span>
+                <span className="text-gray-600 font-semibold">Grand Total: {grandTotal.toLocaleString()}</span>
               </td>
               <td className="px-4 py-4 text-right">
                 <span className="text-2xl font-bold text-emerald-600">
-                  {grandTotal.toLocaleString()}
+                 
                 </span>
               </td>
               <td></td>
             </tr>
-          </tfoot>
+          </tfoot> */}
         </table>
       </div>
     </div>

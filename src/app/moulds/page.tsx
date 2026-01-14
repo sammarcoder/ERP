@@ -242,7 +242,11 @@ export default function MouldsPage() {
             
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Mould Name */}
-              <Input 
+             
+
+              {/* Cycle Time & Cavities */}
+              <div className="grid grid-cols-4 gap-4">
+                 <Input 
                 label="Mould Name" 
                 value={formData.name} 
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -250,11 +254,8 @@ export default function MouldsPage() {
                 required
                 error={formErrors.name}
               />
-
-              {/* Cycle Time & Cavities */}
-              <div className="grid grid-cols-3 gap-4">
                 <Input 
-                  label="Cycle Time (seconds)" 
+                  label="Cycle Time (sec)" 
                   type="number"
                   min="1"
                   value={formData.cycleTime} 

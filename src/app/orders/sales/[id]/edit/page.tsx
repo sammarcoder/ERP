@@ -118,7 +118,8 @@ export default function EditSalesOrderPage() {
       const detailsData = lineItems.map((item, index) => ({
         Line_Id: item.lineNo,
         Item_ID: item.Item_ID,
-        Price: '0.00',
+        // Price: '0.00',
+        Price: item.unitPrice ? item.unitPrice.toString() : '0.00',
         Stock_In_UOM: null,
         Stock_In_UOM_Qty: '0.000',
         Stock_SKU_Price: '0.00',
@@ -213,9 +214,9 @@ export default function EditSalesOrderPage() {
             <h1 className="text-3xl font-bold text-gray-900">
               Edit Sales Order #{existingOrder?.data?.Number}
             </h1>
-            <p className="text-gray-600 mt-1">
+            {/* <p className="text-gray-600 mt-1">
               Modify order details and update when ready
-            </p>
+            </p> */}
           </div>
         </div>
 
@@ -243,7 +244,7 @@ export default function EditSalesOrderPage() {
       </div>
 
       {/* ✅ Order Status Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4 text-sm">
             <span className="font-medium">Current Status:</span>
@@ -265,7 +266,7 @@ export default function EditSalesOrderPage() {
             Created: {existingOrder?.data?.createdAt ? new Date(existingOrder.data.createdAt).toLocaleDateString() : 'Unknown'}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* ✅ Order Header Component */}
       <OrderHeader

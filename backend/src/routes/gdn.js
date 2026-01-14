@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { Stk_main, Stk_Detail, ZItems, ZCoa, Order_Main, Order_Detail, Uom,Ztransporter } = require('../models');
+const { Stk_main, Stk_Detail, ZItems, ZCoa, Order_Main, Order_Detail, Uom, Ztransporter } = require('../models');
 const { Op } = require('sequelize');
 // const sequelize = require('../config/database');
 const db = require('../models');
@@ -144,12 +144,12 @@ router.get('/', async (req, res) => {
           ]
         },
         { model: ZCoa, as: 'account', attributes: ['id', 'acName', 'city', 'mobileNo'] },
-        
-        { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated','sub_city', 'sub_customer'] },
-         {model: Ztransporter, as: 'transporter', artributes: ['id', 'name'] }
+
+        { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated', 'sub_city', 'sub_customer'] },
+        { model: Ztransporter, as: 'transporter', artributes: ['id', 'name'] }
       ],
       order: [['createdAt', 'DESC']],
-      limit: parseInt(limit),
+      // limit: parseInt(limit),
       offset
     });
 
@@ -189,8 +189,8 @@ router.get('/:id', async (req, res) => {
           ]
         },
         { model: ZCoa, as: 'account', attributes: ['id', 'acName', 'city', 'mobileNo'] },
-        { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated','sub_city', 'sub_customer'] },
-        {model: Ztransporter, as: 'transporter', artributes: ['id', 'name'] }
+        { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated', 'sub_city', 'sub_customer'] },
+        { model: Ztransporter, as: 'transporter', artributes: ['id', 'name'] }
       ]
     });
 
@@ -371,16 +371,36 @@ router.put('/:id', async (req, res) => {
     // Replace details
     await Stk_Detail.destroy({ where: { STK_Main_ID: id }, transaction });
 
+    // const updatedDetails = stockDetails.map((detail, idx) => ({
+    //   ...detail,
+    //   STK_Main_ID: parseInt(id),
+    //   Line_Id: idx + 1,
+    //   Stock_out_UOM: detail.Stock_In_UOM,
+    //   Stock_out_UOM_Qty: detail.uom1_qty,
+    //   Stock_out_SKU_UOM: detail.Stock_In_SKU_UOM,
+    //   Stock_out_SKU_UOM_Qty: detail.uom2_qty,
+    //   Stock_out_UOM3_Qty: detail.uom3_qty
+    // }));
+
+
     const updatedDetails = stockDetails.map((detail, idx) => ({
-      ...detail,
       STK_Main_ID: parseInt(id),
       Line_Id: idx + 1,
-      Stock_out_UOM: detail.Stock_In_UOM,
-      Stock_out_UOM_Qty: detail.uom1_qty,
-      Stock_out_SKU_UOM: detail.Stock_In_SKU_UOM,
-      Stock_out_SKU_UOM_Qty: detail.uom2_qty,
-      Stock_out_UOM3_Qty: detail.uom3_qty
+      Item_ID: detail.Item_ID,
+      batchno: parseInt(detail.batchno) || null,
+      uom1_qty: parseFloat(detail.uom1_qty) || 0,
+      uom2_qty: parseFloat(detail.uom2_qty) || 0,
+      uom3_qty: parseFloat(detail.uom3_qty) || 0,
+      Sale_Unit: parseInt(detail.Sale_Unit) || 1,
+      sale_Uom: parseInt(detail.sale_Uom) || 0,
+      Stock_Price: parseFloat(detail.Stock_Price) || 0,
+      Stock_out_UOM: parseInt(detail.Stock_out_UOM) || 1,
+      Stock_out_UOM_Qty: parseFloat(detail.uom1_qty) || 0,
+      Stock_out_SKU_UOM: detail.Stock_out_SKU_UOM ? parseInt(detail.Stock_out_SKU_UOM) : null,
+      Stock_out_SKU_UOM_Qty: parseFloat(detail.uom2_qty) || 0,
+      Stock_out_UOM3_Qty: parseFloat(detail.uom3_qty) || 0
     }));
+
 
     await Stk_Detail.bulkCreate(updatedDetails, { transaction });
 

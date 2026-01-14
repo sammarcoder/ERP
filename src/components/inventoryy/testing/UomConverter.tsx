@@ -86,27 +86,54 @@ const UomConverter: React.FC<Props> = ({
     return isNaN(num) || num < 0 ? 0 : num
   }
 
-  const notifyParent = useCallback((u1: string, u2: string, u3: string, su: string) => {
-    if (!onChangeRef.current) return
+  // const notifyParent = useCallback((u1: string, u2: string, u3: string, su: string) => {
+  //   if (!onChangeRef.current) return
 
-    let uomId = 0
-    if (su === '1') uomId = uomData.primary.id
-    else if (su === '2') uomId = uomData.secondary?.id || 0
-    else if (su === '3') uomId = uomData.tertiary?.id || 0
+  //   let uomId = 0
+  //   if (su === '1') uomId = uomData.primary.id
+  //   else if (su === '2') uomId = uomData.secondary?.id || 0
+  //   else if (su === '3') uomId = uomData.tertiary?.id || 0
 
-    const data = {
-      uom1_qty: parsePositive(u1),
-      uom2_qty: parsePositive(u2),
-      uom3_qty: parsePositive(u3),
-      sale_unit: parseInt(su),
-      Uom_Id: uomId
-    }
+  //   const data = {
+  //     uom1_qty: parsePositive(u1),
+  //     uom2_qty: parsePositive(u2),
+  //     uom3_qty: parsePositive(u3),
+  //     sale_unit: parseInt(su),
+  //     Uom_Id: uomId
+  //   }
 
-    console.log(`📊 UOM Notify (Item ${itemId}):`, data)
-    onChangeRef.current(data)
-  }, [uomData, itemId])
+  //   console.log(`📊 UOM Notify (Item ${itemId}):`, data)
+  //   onChangeRef.current(data)
+  // }, [uomData, itemId])
 
   // ✅ Handle PRIMARY (UOM1) input change
+  
+  // Replace the existing notifyParent function with this:
+
+const notifyParent = useCallback((u1: string, u2: string, u3: string, su: string) => {
+  if (!onChangeRef.current) return
+
+  let uomId = 0
+  if (su === '1') uomId = uomData.primary.id 
+  else if (su === '2') uomId = uomData.secondary?.id || 0
+  else if (su === '3') uomId = uomData.tertiary?.id || 0
+
+  const data = {
+    uom1_qty: parsePositive(u1),
+    uom2_qty: parsePositive(u2),
+    uom3_qty: parsePositive(u3),
+    sale_unit: parseInt(su),
+    Uom_Id: uomId,
+    sale_Uom: uomId  // ✅ Added: Same as Uom_Id for backend
+  }
+console.log('uomData.primary:', uomData.primary)
+  console.log(`📊 UOM Notify (Item ${itemId}):`, data)
+  onChangeRef.current(data)
+}, [uomData, itemId])
+
+  
+  
+  
   const handleUom1Change = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value
     

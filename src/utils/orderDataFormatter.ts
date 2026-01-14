@@ -164,7 +164,7 @@ export const formatOrderForApi = (headerData: any, orderDetails: any[]): ApiOrde
 
     return {
       Item_ID: item.Item_ID,
-      unitPrice: item.unitPrice || 0, // ✅ FIX: Ensure unitPrice is included
+      Price: item.unitPrice || 0, // ✅ FIX: Map unitPrice to Price (DB field name)
       uom1_qty: item.uom1_qty || 0,
       uom2_qty: item.uom2_qty || 0,
       uom3_qty: item.uom3_qty || 0,
@@ -196,10 +196,10 @@ export const formatOrderForApi = (headerData: any, orderDetails: any[]): ApiOrde
   return { master, details }
 }
 
-// ✅ Updated interface to include unitPrice
+// ✅ Updated interface to include Price (DB field name)
 interface ApiOrderDetail {
   Item_ID: number
-  unitPrice: number // ✅ FIX: Explicitly include unitPrice
+  Price: number // ✅ FIX: Use Price (DB field name) not unitPrice
   uom1_qty: number
   uom2_qty: number
   uom3_qty: number

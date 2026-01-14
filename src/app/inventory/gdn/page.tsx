@@ -11,7 +11,11 @@ import { useGetAllGDNsQuery, useDeleteGDNMutation } from '@/store/test/gdnApi'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { ConfirmationModal } from '@/components/common/ConfirmationModal'
+import { Pagination } from '@/components/common/Pagination'
 import DispatchPrintModal from '@/components/DispatchPrintModal'
+
+import formattedDate from '@/components/ui/date'
+
 
 export default function GDNListPage() {
   const router = useRouter()
@@ -22,6 +26,9 @@ export default function GDNListPage() {
     dateTo: '',
     search: ''
   })
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   const [deleteModal, setDeleteModal] = useState({ open: false, gdn: null as any })
   const [printModal, setPrintModal] = useState({ open: false, gdn: null as any })
@@ -57,6 +64,19 @@ export default function GDNListPage() {
       gdn.order?.Number?.toLowerCase().includes(search)
     )
   })
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredGDNs.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedGDNs = filteredGDNs.slice(startIndex, endIndex)
+  const unpostCount = filteredGDNs.filter((g: any) => g.Status === 'UnPost').length
+
+  // Reset to page 1 when filters change
+  const handleFilterChange = (newFilters: any) => {
+    setFilters(newFilters)
+    setCurrentPage(1)
+  }
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '-'
@@ -99,7 +119,7 @@ export default function GDNListPage() {
             <Input
               label="Search"
               value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              onChange={(e) => handleFilterChange({ ...filters, search: e.target.value })}
               placeholder="Search by GDN#, Customer, Order#..."
               icon={<Search className="w-4 h-4" />}
             />
@@ -108,7 +128,7 @@ export default function GDNListPage() {
             <label className="block text-sm text-gray-500 mb-1">Status</label>
             <select
               value={filters.status}
-              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+              onChange={(e) => handleFilterChange({ ...filters, status: e.target.value })}
               className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
             >
               <option value="all">All Status</option>
@@ -120,13 +140,13 @@ export default function GDNListPage() {
             type="date"
             label="From"
             value={filters.dateFrom}
-            onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+            onChange={(e) => handleFilterChange({ ...filters, dateFrom: e.target.value })}
           />
           <Input
             type="date"
             label="To"
             value={filters.dateTo}
-            onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+            onChange={(e) => handleFilterChange({ ...filters, dateTo: e.target.value })}
           />
           <Button
             variant="secondary"
@@ -163,9 +183,10 @@ export default function GDNListPage() {
                   <th className="px-4 py-3 text-left text-sm font-semibold text-emerald-800">GDN #</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-emerald-800">Date</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-emerald-800">Customer</th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-emerald-800">Sub Customer</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-emerald-800">Order #</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-emerald-800">Items</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-emerald-800">Total</th>
+                  {/* <th className="px-4 py-3 text-right text-sm font-semibold text-emerald-800">Total</th> */}
                   <th className="px-4 py-3 text-center text-sm font-semibold text-emerald-800">Status</th>
                   <th className="px-4 py-3 text-center text-sm font-semibold text-emerald-800">Actions</th>
                 </tr>
@@ -180,8 +201,8 @@ export default function GDNListPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredGDNs.map((gdn: any) => (
-                    <tr key={gdn.ID} className="hover:bg-emerald-50/30 transition-colors">
+                  paginatedGDNs.map((gdn: any, index: number) => (
+                    <tr key={gdn.ID} className={`hover:bg-emerald-50/30 transition-colors ${index % 2 === 1 ? 'bg-gray-100' : 'bg-white'}`}>
                       {/* GDN Number */}
                       <td className="px-4 py-3">
                         <span className="font-semibold text-emerald-600">{gdn.Number}</span>
@@ -189,13 +210,16 @@ export default function GDNListPage() {
 
                       {/* Date */}
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {formatDate(gdn.Date)}
+                        {formattedDate(formatDate(gdn.Date))}
                       </td>
 
                       {/* Customer */}
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">{gdn.account?.acName || '-'}</div>
-                        <div className="text-xs text-gray-500">{gdn.account?.city || ''}</div>
+                        {/* <div className="text-xs text-gray-500">{gdn.account?.city || 'No City'}</div> */}
+                      </td>
+                      <td className="px-4 py-3 w-32">
+                        <span className="text-teal-600 font-medium">{gdn.order?.sub_customer || '-'}</span>
                       </td>
 
                       {/* Order Number */}
@@ -211,19 +235,18 @@ export default function GDNListPage() {
                       </td>
 
                       {/* Total */}
-                      <td className="px-4 py-3 text-right">
+                      {/* <td className="px-4 py-3 text-right">
                         <span className="font-semibold text-gray-900">
                           {calculateTotal(gdn.details).toLocaleString()}
                         </span>
-                      </td>
+                      </td> */}
 
                       {/* Status */}
                       <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
-                          gdn.Status === 'Post'
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${gdn.Status === 'Post'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-amber-100 text-amber-800'
-                        }`}>
+                          }`}>
                           {gdn.Status === 'Post' ? (
                             <CheckCircle className="w-3 h-3" />
                           ) : (
@@ -282,10 +305,25 @@ export default function GDNListPage() {
             </table>
           </div>
 
-          {/* Pagination Info */}
+          {/* Pagination */}
           {filteredGDNs.length > 0 && (
-            <div className="px-4 py-3 border-t border-gray-100 bg-gray-50 text-sm text-gray-600">
-              Showing {filteredGDNs.length} of {gdns.length} dispatch notes
+            <div className="border-t border-gray-100">
+              <div className="px-4 py-2 bg-gray-50 flex justify-between items-center text-sm">
+                <span className="text-gray-600">
+                  Total: <span className="font-medium">{filteredGDNs.length}</span> dispatch notes
+                </span>
+                <span className="font-semibold text-gray-700">
+                  UnPost: <span className="text-amber-600">{unpostCount}</span>
+                </span>
+              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredGDNs.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+              />
             </div>
           )}
         </div>

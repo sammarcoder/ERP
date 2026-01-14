@@ -193,9 +193,9 @@ export const ItemMultiSelectInput: React.FC<ItemMultiSelectInputProps> = ({
                     <Package className="w-4 h-4 text-[#509ee3] mr-3" />
                     <div className="flex-1">
                       <div className="text-sm font-medium text-gray-900">{item.itemName}</div>
-                      {item.uom1 && (
+                      {/* {item.uom1 && (
                         <div className="text-xs text-gray-500">UOM: {item.uom1.uom}</div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 )
