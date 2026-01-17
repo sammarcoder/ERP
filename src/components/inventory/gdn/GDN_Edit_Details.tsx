@@ -125,7 +125,7 @@ export default function GDN_Edit_Details({ initialRows, onChange, dispatchId }: 
                 <span className="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-sm font-bold">
                   {itemIndex + 1}
                 </span>
-                {/* <div>
+                <div>
                   <h3 className="font-semibold text-gray-900">{firstRow.itemName}</h3>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     <span>ID: {itemId}</span>
@@ -133,7 +133,7 @@ export default function GDN_Edit_Details({ initialRows, onChange, dispatchId }: 
                       {itemRows.length} batch row{itemRows.length > 1 ? 's' : ''}
                     </span>
                   </div>
-                </div> */}
+                </div>
               </div>
 
               <button
@@ -157,7 +157,7 @@ export default function GDN_Edit_Details({ initialRows, onChange, dispatchId }: 
                   dispatchId={dispatchId}
                   onUpdate={(updatedRow) => handleRowUpdate(row.rowId, updatedRow)}
                   onDelete={() => handleRowDelete(row.rowId)}
-                  showDeleteButton={itemRows.length > 1 || !row.isExistingRow}
+                  showDeleteButton={true}
                 />
               ))}
             </div>

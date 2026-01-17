@@ -525,7 +525,7 @@ const VoucherDetails: React.FC<VoucherDetailsProps> = ({
         </div>
 
         <div className="flex items-center space-x-4">
-          {canWrite && (
+          
             <Button
               variant="primary"
               size="sm"
@@ -534,7 +534,7 @@ const VoucherDetails: React.FC<VoucherDetailsProps> = ({
             >
               Add Row
             </Button>
-          )}
+         
         </div>
       </div>
 

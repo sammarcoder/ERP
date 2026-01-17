@@ -63,8 +63,8 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
   return (
     <div className="">
 
-      
-     
+
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 mb-4">
         {/* Dispatch Date */}
         <div>
@@ -78,7 +78,7 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
           />
         </div>
 
-      
+
         <div>
           <Input
             type="text"
@@ -95,18 +95,27 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
       {/* ROW 3: Cost Breakdown */}
       {/* ═══════════════════════════════════════════════════════════════ */}
       <div className="bg-white rounded-xl ">
-     
+
         <div className="grid grid-cols-1 md:grid-cols-6 gap-2">
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
               <Truck className="w-4 h-4" />
               Transporter
             </label>
-            <TransporterSearchableInput
+            {/* <TransporterSearchableInput
               value={formData.Transporter_ID?.toString() || ''}
+              
               onChange={handleTransporterChange}
               placeholder="Select transporter..."
+            /> */}
+            <TransporterSearchableInput
+              value={formData.Transporter_ID}
+              onChange={handleTransporterChange}
+              variant="default"
+              size="md"
+              placeholder="Select transporter..."
             />
+
           </div>
           <Input
             type="number"
@@ -182,12 +191,12 @@ export default function GDN_Header({ data, formData, onFormChange }: HeaderProps
 
           </div>
 
-        
-         
+
+
         </div>
       </div>
 
-      
+
     </div >
   )
 }

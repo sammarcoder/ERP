@@ -258,13 +258,19 @@ const createJournalDetailEntries = async (stockMain, journalMasterId, transactio
   const subCity = stockMain.order?.sub_city || '';
   const subCustomer = stockMain.order?.sub_customer || '';
   const customerName = stockMain.account?.acName || '';
+  const customerCity = stockMain.account?.city || '';
 
+  // Customer description: S.Inv, subCustomer, subCity
   let customerDesc = 'S.Inv';
-  if (subCity) customerDesc += `, ${subCity}`;
   if (subCustomer) customerDesc += `, ${subCustomer}`;
+  if (subCity) customerDesc += `, ${subCity}`;
 
-  let carriageDesc = 'S.Inv';
-  if (customerName) carriageDesc += `, ${customerName}`;
+  // Carriage description: customerName, customerCity (from COA)
+  let carriageDesc = customerName || '';
+  if (customerCity) carriageDesc += `, ${customerCity}`;
+
+  // Batch description: customerName (from COA)
+  const batchDesc = customerName || '';
 
   const journalDetails = [];
   let lineId = 1;
@@ -279,7 +285,7 @@ const createJournalDetailEntries = async (stockMain, journalMasterId, transactio
     recieptNo: '',
     ownDb: 0,
     ownCr: 0,
-    rate: 1,
+    rate: 0,
     amountDb: customerAmount,
     amountCr: 0,
     isCost: false,
@@ -299,10 +305,10 @@ const createJournalDetailEntries = async (stockMain, journalMasterId, transactio
       recieptNo: '',
       ownDb: 0,
       ownCr: 0,
-      rate: 1,
+      rate: 0,
       amountDb: carriageAmount,
       amountCr: 0,
-      isCost: true,
+      isCost: false,
       currencyId: 1,
       status: false
     });
@@ -315,12 +321,12 @@ const createJournalDetailEntries = async (stockMain, journalMasterId, transactio
       jmId: journalMasterId,
       lineId: lineId++,
       coaId: parseInt(batchId) || 999,
-      description: batchData.batchName,
+      description: batchDesc,
       chqNo: null,
       recieptNo:'',
       ownDb: 0,
       ownCr: 0,
-      rate: 1,
+      rate: 0,
       amountDb: 0,
       amountCr: batchData.amount,
       isCost: false,

@@ -179,6 +179,7 @@ router.get('/:id', async (req, res) => {
             {
               model: ZItems,
               as: 'item',
+              attributes: ['id', 'itemName', 'skuUOM', 'uom2', 'uom2_qty', 'uom3', 'uom3_qty', 'sellingPrice'],
               include: [
                 { model: Uom, as: 'uom1', attributes: ['id', 'uom'] },
                 { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
@@ -190,7 +191,7 @@ router.get('/:id', async (req, res) => {
         },
         { model: ZCoa, as: 'account', attributes: ['id', 'acName', 'city', 'mobileNo'] },
         { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated', 'sub_city', 'sub_customer'] },
-        { model: Ztransporter, as: 'transporter', artributes: ['id', 'name'] }
+        { model: Ztransporter, as: 'transporter', attributes: ['id', 'name'] }
       ]
     });
 
@@ -363,7 +364,15 @@ router.put('/:id', async (req, res) => {
         Date: stockMain.Date,
         Status: stockMain.Status,
         Purchase_Type: stockMain.Purchase_Type,
-        remarks: stockMain.remarks
+        remarks: stockMain.remarks,
+        sub_customer: stockMain.sub_customer || null,
+        sub_city: stockMain.sub_city || null,
+        Transporter_ID: stockMain.Transporter_ID || null,
+        labour_crt: stockMain.labour_crt ?? 0,
+        freight_crt: stockMain.freight_crt ?? 0,
+        bility_expense: stockMain.bility_expense ?? 0,
+        other_expense: stockMain.other_expense ?? 0,
+        booked_crt: stockMain.booked_crt ?? 0
       },
       { where: { ID: id }, transaction }
     );
@@ -398,7 +407,11 @@ router.put('/:id', async (req, res) => {
       Stock_out_UOM_Qty: parseFloat(detail.uom1_qty) || 0,
       Stock_out_SKU_UOM: detail.Stock_out_SKU_UOM ? parseInt(detail.Stock_out_SKU_UOM) : null,
       Stock_out_SKU_UOM_Qty: parseFloat(detail.uom2_qty) || 0,
-      Stock_out_UOM3_Qty: parseFloat(detail.uom3_qty) || 0
+      Stock_out_UOM3_Qty: parseFloat(detail.uom3_qty) || 0,
+      // ✅ Include discount fields
+      Discount_A: parseFloat(detail.Discount_A) || 0,
+      Discount_B: parseFloat(detail.Discount_B) || 0,
+      Discount_C: parseFloat(detail.Discount_C) || 0
     }));
 
 

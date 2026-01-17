@@ -44,6 +44,13 @@ export default function GDN_Item_Row({
   const [discountB, setDiscountB] = useState<number>(row.Discount_B || 0)
   const [discountC, setDiscountC] = useState<number>(row.Discount_C || 0)
 
+  // ✅ Sync discounts when row prop changes (auto-populate from order)
+  useEffect(() => {
+    if (row.Discount_A !== undefined) setDiscountA(row.Discount_A || 0)
+    if (row.Discount_B !== undefined) setDiscountB(row.Discount_B || 0)
+    if (row.Discount_C !== undefined) setDiscountC(row.Discount_C || 0)
+  }, [row.Discount_A, row.Discount_B, row.Discount_C])
+
   // ═══════════════════════════════════════════════════════════════
   // FETCH BATCHES USING NATIVE FETCH
   // ═══════════════════════════════════════════════════════════════

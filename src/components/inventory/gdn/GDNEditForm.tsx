@@ -161,22 +161,19 @@ export default function GDNEditForm({ gdnId }: Props) {
             sellingPrice: parseFloat(detail.Stock_Price) || parseFloat(fullItem?.sellingPrice) || 0,
             batchno: detail.batchno,
             selectedBatchQty: 0,
-            // dispatchQty: {
-            //   uom1_qty: parseFloat(detail.uom1_qty) || 0,
-            //   uom2_qty: parseFloat(detail.uom2_qty) || 0,
-            //   uom3_qty: parseFloat(detail.uom3_qty) || 0,
-            //   sale_unit: parseInt(detail.Sale_Unit) || 1
-            // },
             dispatchQty: {
               uom1_qty: parseFloat(detail.uom1_qty) || 0,
               uom2_qty: parseFloat(detail.uom2_qty) || 0,
               uom3_qty: parseFloat(detail.uom3_qty) || 0,
               sale_unit: parseInt(detail.Sale_Unit) || 1,
-              Uom_Id: parseInt(detail.sale_Uom) || 0,    // ✅ Add this
-              sale_Uom: parseInt(detail.sale_Uom) || 0   // ✅ Add this
+              Uom_Id: parseInt(detail.sale_Uom) || 0,
+              sale_Uom: parseInt(detail.sale_Uom) || 0
             },
-
             unitPrice: parseFloat(detail.Stock_Price) || 0,
+            // ✅ Include discount fields from existing GDN detail
+            Discount_A: parseFloat(detail.Discount_A) || 0,
+            Discount_B: parseFloat(detail.Discount_B) || 0,
+            Discount_C: parseFloat(detail.Discount_C) || 0,
             isExistingRow: true
           }
         })
@@ -287,9 +284,11 @@ export default function GDNEditForm({ gdnId }: Props) {
           sub_customer: headerForm.sub_customer,
           sub_city: headerForm.sub_city,
           Transporter_ID: headerForm.Transporter_ID,
-          labour_crt: parseFloat(headerForm.labour_crt) || 0,
-          freight_crt: parseFloat(headerForm.freight_crt) || 0,
-          other_expense: parseFloat(headerForm.other_expense) || 0
+          labour_crt: headerForm.labour_crt ?? 0,
+          freight_crt: headerForm.freight_crt ?? 0,
+          bility_expense: headerForm.bility_expense ?? 0,
+          other_expense: headerForm.other_expense ?? 0,
+          booked_crt: headerForm.booked_crt ?? 0
         },
         stockDetails: validItems.map((item, idx) => ({
           Line_Id: idx + 1,
@@ -299,17 +298,19 @@ export default function GDNEditForm({ gdnId }: Props) {
           uom2_qty: item.dispatchQty.uom2_qty || 0,
           uom3_qty: item.dispatchQty.uom3_qty || 0,
           Sale_Unit: item.dispatchQty.sale_unit || 1,
-          // sale_Uom: item.dispatchQty.Uom_Id || 0,
           sale_Uom: item.dispatchQty?.sale_Uom?.id || item.dispatchQty?.sale_Uom || item.dispatchQty?.Uom_Id || 0,
 
           Stock_out_UOM: item.uomStructure?.primary?.id || 1,
 
           Stock_Price: item.unitPrice || 0,
-          // Stock_out_UOM: item.uomStructure?.primary?.id || 1,
           Stock_out_UOM_Qty: item.dispatchQty.uom1_qty,
           Stock_out_SKU_UOM: item.uomStructure?.secondary?.id || null,
           Stock_out_SKU_UOM_Qty: item.dispatchQty.uom2_qty || 0,
-          Stock_out_UOM3_Qty: item.dispatchQty.uom3_qty || 0
+          Stock_out_UOM3_Qty: item.dispatchQty.uom3_qty || 0,
+          // ✅ Include discount fields
+          Discount_A: item.Discount_A || 0,
+          Discount_B: item.Discount_B || 0,
+          Discount_C: item.Discount_C || 0
         }))
       }
 
