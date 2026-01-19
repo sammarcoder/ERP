@@ -437,7 +437,8 @@ const updateStockMain = async (req, res) => {
     freight_crt,
     bility_expense,
     other_expense,
-    booked_crt
+    booked_crt,
+    Transporter_ID
   } = req.body;
 
   try {
@@ -453,6 +454,7 @@ const updateStockMain = async (req, res) => {
     if (bility_expense !== undefined) updateFields.bility_expense = bility_expense;
     if (other_expense !== undefined) updateFields.other_expense = other_expense;
     if (booked_crt !== undefined) updateFields.booked_crt = booked_crt;
+    if (Transporter_ID !== undefined) updateFields.Transporter_ID = Transporter_ID;
 
     console.log(`🔄 Updating stk_main ID: ${id}`, updateFields);
 

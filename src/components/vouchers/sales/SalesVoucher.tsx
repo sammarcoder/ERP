@@ -528,6 +528,7 @@ import {
   usePostVoucherToJournalMutation,
   useGetCarriageAccountsQuery,
 } from '@/store/slice/salesVoucherApi';
+import { TransporterSearchableInput } from '@/components/common/transpoter/TransporterSearchableInput';
 
 // ✅ Handle numeric input - only allow numbers and decimal
 const handleNumericInput = (value: string): number | null => {
@@ -549,6 +550,7 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [details, setDetails] = useState<any[]>([]);
   const [carriageConfirmed, setCarriageConfirmed] = useState(false);
+  const [transporterId, setTransporterId] = useState<number | null>(null);
 
   // Carriage fields
   const [carriage, setCarriage] = useState({
@@ -589,6 +591,7 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
         otherExpense: gdn.other_expense !== null && gdn.other_expense !== undefined ? parseFloat(gdn.other_expense) : null,
         bookedCrt: gdn.booked_crt !== null && gdn.booked_crt !== undefined ? parseFloat(gdn.booked_crt) : null,
       });
+      setTransporterId(gdn.Transporter_ID || null);
     }
   }, [gdn]);
 
@@ -669,6 +672,7 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
           Carriage_ID: carriage.id, Carriage_Amount: totals.carriageAmount,
           labour_crt: carriage.labourCrt || 0, freight_crt: carriage.freightCrt || 0,
           bility_expense: carriage.biltyExpense || 0, other_expense: carriage.otherExpense || 0, booked_crt: carriage.bookedCrt || 0,
+          Transporter_ID: transporterId,
         }
       }).unwrap();
 
@@ -802,9 +806,27 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
           {/* Tab 2: Carriage */}
           {activeTab === 'carriage' && (
             <div className="space-y-2">
+              {/* Transporter Selection */}
+
+
               {/* Cost Breakdown Grid - Like GDN_Header */}
               <div className="bg-white rounded-xl">
-                <div className="grid grid-cols-2 md:grid-cols-7 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-8 gap-2">
+                  <div className="bg-white rounded-xl">
+                    <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                      <Truck className="w-3 h-3" />
+                      Transporter
+                    </label>
+                      
+                    <TransporterSearchableInput
+                      value={transporterId || ''}
+                      onChange={(id) => setTransporterId(id ? Number(id) : null)}
+                      label="Transporter"
+                      placeholder="Search transporter..."
+                      helperText="Select transporter for delivery"
+                      size="sm"
+                    />
+                  </div>
                   {/* Carriage Account */}
                   <div>
                     <label className="flex items-center gap-1 text-xs font-medium text-gray-700 mb-1">
