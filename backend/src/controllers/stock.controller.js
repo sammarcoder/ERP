@@ -427,7 +427,18 @@ const deleteCompleteStock = async (req, res) => {
 
 const updateStockMain = async (req, res) => {
   const { id } = req.params;
-  const { is_Voucher_Generated, Carriage_Amount, Carriage_ID, approved, Status } = req.body;
+  const { 
+    is_Voucher_Generated, 
+    Carriage_Amount, 
+    Carriage_ID, 
+    approved, 
+    Status,
+    labour_crt,
+    freight_crt,
+    bility_expense,
+    other_expense,
+    booked_crt
+  } = req.body;
 
   try {
     const updateFields = {};
@@ -437,6 +448,11 @@ const updateStockMain = async (req, res) => {
     if (Carriage_ID !== undefined) updateFields.Carriage_ID = Carriage_ID;
     if (approved !== undefined) updateFields.approved = approved;
     if (Status !== undefined) updateFields.Status = Status;
+    if (labour_crt !== undefined) updateFields.labour_crt = labour_crt;
+    if (freight_crt !== undefined) updateFields.freight_crt = freight_crt;
+    if (bility_expense !== undefined) updateFields.bility_expense = bility_expense;
+    if (other_expense !== undefined) updateFields.other_expense = other_expense;
+    if (booked_crt !== undefined) updateFields.booked_crt = booked_crt;
 
     console.log(`🔄 Updating stk_main ID: ${id}`, updateFields);
 

@@ -675,8 +675,8 @@ router.get('/', async (req, res) => {
         }
       ],
       order: [['createdAt', 'DESC']],
-      limit: parseInt(limit),
-      offset
+      // limit: parseInt(limit),
+      // offset
     });
 
     res.json({
