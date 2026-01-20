@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Trash2, AlertTriangle, CheckCircle, Loader2, Package, RefreshCw } from 'lucide-react'
 import UomConverter from '@/components/inventoryy/testing/UomConverter'
+import { getApiBaseUrl } from '@/lib/apiConfig';
 
 interface Props {
   row: any
@@ -14,12 +15,12 @@ interface Props {
   showRemoveButton?: boolean
 }
 
-const getApiBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    return `http://${window.location.hostname}:4000/api`
-  }
-  return 'http://localhost:4000/api'
-}
+// const getApiBaseUrl = () => {
+//   if (typeof window !== 'undefined') {
+//     return `http://${window.location.hostname}:4000/api`
+//   }
+//   return 'http://localhost:4000/api'
+// }
 
 export default function GDN_Item_Row({
   row,
@@ -54,108 +55,219 @@ export default function GDN_Item_Row({
   // ═══════════════════════════════════════════════════════════════
   // FETCH BATCHES USING NATIVE FETCH
   // ═══════════════════════════════════════════════════════════════
-  useEffect(() => {
-    const fetchBatches = async () => {
-      if (!row.Item_ID) return
+  // useEffect(() => {
+  //   const fetchBatches = async () => {
+  //     if (!row.Item_ID) return
 
-      setIsLoadingBatches(true)
-      setBatchError(null)
+  //     setIsLoadingBatches(true)
+  //     setBatchError(null)
 
-      try {
-        const baseUrl = getApiBaseUrl()
-        let url: string
+  //     try {
+  //       const baseUrl = getApiBaseUrl()
+  //       let url: string
 
-        if (mode === 'edit' && dispatchId) {
-          url = `${baseUrl}/dispatch/available-batches-edit/${row.Item_ID}/${dispatchId}`
-        } else {
-          url = `${baseUrl}/dispatch/available-batches/${row.Item_ID}`
-        }
+  //       if (mode === 'edit' && dispatchId) {
+  //         url = `${baseUrl}/dispatch/available-batches-edit/${row.Item_ID}/${dispatchId}`
+  //       } else {
+  //         url = `${baseUrl}/dispatch/available-batches/${row.Item_ID}`
+  //       }
 
-        console.log(`📡 Fetching batches for Item ${row.Item_ID}:`, url)
+  //       console.log(`📡 Fetching batches for Item ${row.Item_ID}:`, url)
 
-        const response = await fetch(url)
+  //       const response = await fetch(url)
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`)
-        }
+  //       if (!response.ok) {
+  //         throw new Error(`HTTP ${response.status}`)
+  //       }
 
-        const result = await response.json()
+  //       const result = await response.json()
 
-        if (result.success && Array.isArray(result.data)) {
-          console.log(`✅ Found ${result.data.length} batch(es) for Item ${row.Item_ID}`)
-          setAvailableBatches(result.data)
-        } else {
-          setAvailableBatches([])
-        }
+  //       if (result.success && Array.isArray(result.data)) {
+  //         console.log(`✅ Found ${result.data.length} batch(es) for Item ${row.Item_ID}`)
+  //         setAvailableBatches(result.data)
+  //       } else {
+  //         setAvailableBatches([])
+  //       }
 
-      } catch (error: any) {
-        console.error('❌ Batch fetch error:', error)
-        setBatchError(error.message)
-        setAvailableBatches([])
-      } finally {
-        setIsLoadingBatches(false)
-      }
-    }
+  //     } catch (error: any) {
+  //       console.error('❌ Batch fetch error:', error)
+  //       setBatchError(error.message)
+  //       setAvailableBatches([])
+  //     } finally {
+  //       setIsLoadingBatches(false)
+  //     }
+  //   }
 
-    fetchBatches()
-  }, [row.Item_ID, mode, dispatchId])
-
-
-
-
-
-
+  //   fetchBatches()
+  // }, [row.Item_ID, mode, dispatchId])
 
 
   // ✅ Refresh available qty - keeps entered data, only updates batches
-  const handleRefreshBatches = useCallback(async () => {
-    if (!row.Item_ID) return
+  // const handleRefreshBatches = useCallback(async () => {
+  //   if (!row.Item_ID) return
 
-    setIsLoadingBatches(true)
-    setBatchError(null)
+  //   setIsLoadingBatches(true)
+  //   setBatchError(null)
+
+  //   try {
+  //     const baseUrl = getApiBaseUrl()
+  //     let url: string
+
+  //     if (mode === 'edit' && dispatchId) {
+  //       url = `${baseUrl}/dispatch/available-batches-edit/${row.Item_ID}/${dispatchId}`
+  //     } else {
+  //       url = `${baseUrl}/dispatch/available-batches/${row.Item_ID}`
+  //     }
+
+  //     console.log(`🔄 Refreshing batches for Item ${row.Item_ID}`)
+
+  //     const response = await fetch(url)
+
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP ${response.status}`)
+  //     }
+
+  //     const result = await response.json()
+
+  //     if (result.success && Array.isArray(result.data)) {
+  //       console.log(`✅ Refreshed: ${result.data.length} batch(es) for Item ${row.Item_ID}`)
+  //       setAvailableBatches(result.data)
+
+  //       // ✅ Update selected batch qty if batch is already selected
+  //       if (selectedBatch) {
+  //         const updatedBatch = result.data.find((b: any) => b.batchno === selectedBatch)
+  //         if (updatedBatch) {
+  //           setBatchQty(updatedBatch.available_qty_uom1 || 0)
+  //         }
+  //       }
+  //     } else {
+  //       setAvailableBatches([])
+  //     }
+
+  //   } catch (error: any) {
+  //     console.error('❌ Refresh error:', error)
+  //     setBatchError(error.message)
+  //   } finally {
+  //     setIsLoadingBatches(false)
+  //   }
+  // }, [row.Item_ID, mode, dispatchId, selectedBatch])
+
+
+
+
+
+// Import at the top of your component file
+
+
+// ═══════════════════════════════════════════════════════════════
+// useEffect - Fetch Batches
+// ═══════════════════════════════════════════════════════════════
+useEffect(() => {
+  const fetchBatches = async () => {
+    if (!row.Item_ID) return;
+
+    setIsLoadingBatches(true);
+    setBatchError(null);
 
     try {
-      const baseUrl = getApiBaseUrl()
-      let url: string
+      const baseUrl = getApiBaseUrl();  // ✅ Uses dynamic port (4000 or 4001)
+      let url: string;
 
       if (mode === 'edit' && dispatchId) {
-        url = `${baseUrl}/dispatch/available-batches-edit/${row.Item_ID}/${dispatchId}`
+        url = `${baseUrl}/dispatch/available-batches-edit/${row.Item_ID}/${dispatchId}`;
       } else {
-        url = `${baseUrl}/dispatch/available-batches/${row.Item_ID}`
+        url = `${baseUrl}/dispatch/available-batches/${row.Item_ID}`;
       }
 
-      console.log(`🔄 Refreshing batches for Item ${row.Item_ID}`)
+      console.log(`📡 Fetching batches for Item ${row.Item_ID}:`, url);
 
-      const response = await fetch(url)
+      const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
+        throw new Error(`HTTP ${response.status}`);
       }
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success && Array.isArray(result.data)) {
-        console.log(`✅ Refreshed: ${result.data.length} batch(es) for Item ${row.Item_ID}`)
-        setAvailableBatches(result.data)
-
-        // ✅ Update selected batch qty if batch is already selected
-        if (selectedBatch) {
-          const updatedBatch = result.data.find((b: any) => b.batchno === selectedBatch)
-          if (updatedBatch) {
-            setBatchQty(updatedBatch.available_qty_uom1 || 0)
-          }
-        }
+        console.log(`✅ Found ${result.data.length} batch(es) for Item ${row.Item_ID}`);
+        setAvailableBatches(result.data);
       } else {
-        setAvailableBatches([])
+        setAvailableBatches([]);
       }
 
     } catch (error: any) {
-      console.error('❌ Refresh error:', error)
-      setBatchError(error.message)
+      console.error('❌ Batch fetch error:', error);
+      setBatchError(error.message);
+      setAvailableBatches([]);
     } finally {
-      setIsLoadingBatches(false)
+      setIsLoadingBatches(false);
     }
-  }, [row.Item_ID, mode, dispatchId, selectedBatch])
+  };
+
+  fetchBatches();
+}, [row.Item_ID, mode, dispatchId]);
+
+// ═══════════════════════════════════════════════════════════════
+// handleRefreshBatches
+// ═══════════════════════════════════════════════════════════════
+const handleRefreshBatches = useCallback(async () => {
+  if (!row.Item_ID) return;
+
+  setIsLoadingBatches(true);
+  setBatchError(null);
+
+  try {
+    const baseUrl = getApiBaseUrl();  // ✅ Uses dynamic port (4000 or 4001)
+    let url: string;
+
+    if (mode === 'edit' && dispatchId) {
+      url = `${baseUrl}/dispatch/available-batches-edit/${row.Item_ID}/${dispatchId}`;
+    } else {
+      url = `${baseUrl}/dispatch/available-batches/${row.Item_ID}`;
+    }
+
+    console.log(`🔄 Refreshing batches for Item ${row.Item_ID}`);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (result.success && Array.isArray(result.data)) {
+      console.log(`✅ Refreshed: ${result.data.length} batch(es) for Item ${row.Item_ID}`);
+      setAvailableBatches(result.data);
+
+      // ✅ Update selected batch qty if batch is already selected
+      if (selectedBatch) {
+        const updatedBatch = result.data.find((b: any) => b.batchno === selectedBatch);
+        if (updatedBatch) {
+          setBatchQty(updatedBatch.available_qty_uom1 || 0);
+        }
+      }
+    } else {
+      setAvailableBatches([]);
+    }
+
+  } catch (error: any) {
+    console.error('❌ Refresh error:', error);
+    setBatchError(error.message);
+  } finally {
+    setIsLoadingBatches(false);
+  }
+}, [row.Item_ID, mode, dispatchId, selectedBatch]);
+
+
+
+
+
+
+
+
+
 
 
 

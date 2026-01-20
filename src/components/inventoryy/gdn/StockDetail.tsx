@@ -1375,496 +1375,496 @@
 
 
 
-  //Can't not select the uom 1 or primary uniy need to be fixed
+  // //Can't not select the uom 1 or primary uniy need to be fixed
 
 
-  // components/inventory/StockDetail.tsx - YOUR UI DESIGN APPLIED
-  'use client'
-  import React, { useState, useEffect } from 'react'
-  import UomConverter from '@/components/common/items/UomConverter'
-  import { MultiSelectItemTable } from '@/components/common/items/MultiSelectItemTable'
-  import { Button } from '@/components/ui/Button'
-  import { Plus, Trash2 } from 'lucide-react'
+  // // components/inventory/StockDetail.tsx - YOUR UI DESIGN APPLIED
+  // 'use client'
+  // import React, { useState, useEffect } from 'react'
+  // import UomConverter from '@/components/common/items/UomConverter'
+  // import { MultiSelectItemTable } from '@/components/common/items/MultiSelectItemTable'
+  // import { Button } from '@/components/ui/Button'
+  // import { Plus, Trash2 } from 'lucide-react'
 
-  const StockDetail = ({
-    detailItems: initialItems = [],
-    onDetailChange,
-    mode = 'create',
-    isFromOrder = false
-  }) => {
+  // const StockDetail = ({
+  //   detailItems: initialItems = [],
+  //   onDetailChange,
+  //   mode = 'create',
+  //   isFromOrder = false
+  // }) => {
 
-    const [detailItems, setDetailItems] = useState([])
-    const [availableBatches, setAvailableBatches] = useState({})
-    const [allCOAs, setAllCOAs] = useState([])
-    const [message, setMessage] = useState('')
-    const [showItemModal, setShowItemModal] = useState(false)
+  //   const [detailItems, setDetailItems] = useState([])
+  //   const [availableBatches, setAvailableBatches] = useState({})
+  //   const [allCOAs, setAllCOAs] = useState([])
+  //   const [message, setMessage] = useState('')
+  //   const [showItemModal, setShowItemModal] = useState(false)
 
-    // ✅ Your existing logic (unchanged)
-    useEffect(() => {
-      if (initialItems.length > 0) {
-        const processedItems = initialItems.map((item, index) => ({
-          Line_Id: index + 1,
-          Batch_Number: '',
-          Item: item.item?.itemName || 'Unknown',
-          Item_ID: item.Item_ID,
-          Qty_in_SO: parseFloat(
-            item.sale_unit === '3' ? item.uom3_qty :
-            item.sale_unit === '2' ? item.uom2_qty :
-            item.uom1_qty || 0
-          ),
-          Uom_SO: item.uom?.uom || 'Unknown',
-          uom1_qty: 0,
-          uom2_qty: 0,
-          uom3_qty: 0,
-          sale_unit: parseInt(item.sale_unit) || 3,
-          Uom_Id: item.Uom_Id || 0,
-          QTY_Dispatched: 0,
-          Stock_Price: parseFloat(item.item?.sellingPrice || 0),
-          item: item.item
-        }))
-        setDetailItems(processedItems)
-      }
-    }, [initialItems])
+  //   // ✅ Your existing logic (unchanged)
+  //   useEffect(() => {
+  //     if (initialItems.length > 0) {
+  //       const processedItems = initialItems.map((item, index) => ({
+  //         Line_Id: index + 1,
+  //         Batch_Number: '',
+  //         Item: item.item?.itemName || 'Unknown',
+  //         Item_ID: item.Item_ID,
+  //         Qty_in_SO: parseFloat(
+  //           item.sale_unit === '3' ? item.uom3_qty :
+  //           item.sale_unit === '2' ? item.uom2_qty :
+  //           item.uom1_qty || 0
+  //         ),
+  //         Uom_SO: item.uom?.uom || 'Unknown',
+  //         uom1_qty: 0,
+  //         uom2_qty: 0,
+  //         uom3_qty: 0,
+  //         sale_unit: parseInt(item.sale_unit) || 3,
+  //         Uom_Id: item.Uom_Id || 0,
+  //         QTY_Dispatched: 0,
+  //         Stock_Price: parseFloat(item.item?.sellingPrice || 0),
+  //         item: item.item
+  //       }))
+  //       setDetailItems(processedItems)
+  //     }
+  //   }, [initialItems])
 
-    useEffect(() => {
-      onDetailChange(detailItems)
-    }, [detailItems])
+  //   useEffect(() => {
+  //     onDetailChange(detailItems)
+  //   }, [detailItems])
 
-    // ✅ Your yellow material logic (unchanged)
-    const getTotalUsedByOthers = (itemId, batchNumber, excludeIndex = -1) => {
-      let totalUsedPcs = 0
-      detailItems.forEach((row, index) => {
-        if (index === excludeIndex || row.Item_ID !== itemId || row.Batch_Number !== batchNumber) return
-        const itemData = row.item
-        let usedPcs = 0
-        if (row.sale_unit === 1 && row.uom1_qty > 0) {
-          usedPcs = parseFloat(row.uom1_qty)
-        } else if (row.sale_unit === 2 && row.uom2_qty > 0 && itemData?.uom2_qty) {
-          usedPcs = parseFloat(row.uom2_qty) * parseFloat(itemData.uom2_qty)
-        } else if (row.sale_unit === 3 && row.uom3_qty > 0 && itemData?.uom3_qty) {
-          usedPcs = parseFloat(row.uom3_qty) * parseFloat(itemData.uom3_qty)
-        }
-        totalUsedPcs += usedPcs
-      })
-      return totalUsedPcs
-    }
+  //   // ✅ Your yellow material logic (unchanged)
+  //   const getTotalUsedByOthers = (itemId, batchNumber, excludeIndex = -1) => {
+  //     let totalUsedPcs = 0
+  //     detailItems.forEach((row, index) => {
+  //       if (index === excludeIndex || row.Item_ID !== itemId || row.Batch_Number !== batchNumber) return
+  //       const itemData = row.item
+  //       let usedPcs = 0
+  //       if (row.sale_unit === 1 && row.uom1_qty > 0) {
+  //         usedPcs = parseFloat(row.uom1_qty)
+  //       } else if (row.sale_unit === 2 && row.uom2_qty > 0 && itemData?.uom2_qty) {
+  //         usedPcs = parseFloat(row.uom2_qty) * parseFloat(itemData.uom2_qty)
+  //       } else if (row.sale_unit === 3 && row.uom3_qty > 0 && itemData?.uom3_qty) {
+  //         usedPcs = parseFloat(row.uom3_qty) * parseFloat(itemData.uom3_qty)
+  //       }
+  //       totalUsedPcs += usedPcs
+  //     })
+  //     return totalUsedPcs
+  //   }
 
-    const getAvailableBefore = (itemId, batchNumber, displayUom, itemData, currentIndex = -1) => {
-      if (!itemId || !batchNumber || !itemData) return 0
-      const batches = availableBatches[itemId] || []
-      const batch = batches.find(b => b.batchno.toString() === batchNumber.toString())
-      if (!batch) return 0
-      const batchTotalPcs = parseFloat(batch.available_qty_uom1) || 0
-      const usedByOthers = getTotalUsedByOthers(itemId, batchNumber, currentIndex)
-      const availableForThisRowPcs = Math.max(0, batchTotalPcs - usedByOthers)
-      let conversionFactor = 1
-      if (displayUom === 2 && itemData.uom2_qty) {
-        conversionFactor = parseFloat(itemData.uom2_qty)
-      } else if (displayUom === 3 && itemData.uom3_qty) {
-        conversionFactor = parseFloat(itemData.uom3_qty)
-      }
-      return availableForThisRowPcs / conversionFactor
-    }
+  //   const getAvailableBefore = (itemId, batchNumber, displayUom, itemData, currentIndex = -1) => {
+  //     if (!itemId || !batchNumber || !itemData) return 0
+  //     const batches = availableBatches[itemId] || []
+  //     const batch = batches.find(b => b.batchno.toString() === batchNumber.toString())
+  //     if (!batch) return 0
+  //     const batchTotalPcs = parseFloat(batch.available_qty_uom1) || 0
+  //     const usedByOthers = getTotalUsedByOthers(itemId, batchNumber, currentIndex)
+  //     const availableForThisRowPcs = Math.max(0, batchTotalPcs - usedByOthers)
+  //     let conversionFactor = 1
+  //     if (displayUom === 2 && itemData.uom2_qty) {
+  //       conversionFactor = parseFloat(itemData.uom2_qty)
+  //     } else if (displayUom === 3 && itemData.uom3_qty) {
+  //       conversionFactor = parseFloat(itemData.uom3_qty)
+  //     }
+  //     return availableForThisRowPcs / conversionFactor
+  //   }
 
-    const getCurrentRowUsageInPcs = (item) => {
-      if (!item.QTY_Dispatched || item.QTY_Dispatched <= 0) return 0
-      const itemData = item.item
-      let currentUsagePcs = 0
-      if (item.sale_unit === 1) {
-        currentUsagePcs = parseFloat(item.uom1_qty || 0)
-      } else if (item.sale_unit === 2 && itemData?.uom2_qty) {
-        currentUsagePcs = parseFloat(item.uom2_qty || 0) * parseFloat(itemData.uom2_qty)
-      } else if (item.sale_unit === 3 && itemData?.uom3_qty) {
-        currentUsagePcs = parseFloat(item.uom3_qty || 0) * parseFloat(itemData.uom3_qty)
-      }
-      return currentUsagePcs
-    }
+  //   const getCurrentRowUsageInPcs = (item) => {
+  //     if (!item.QTY_Dispatched || item.QTY_Dispatched <= 0) return 0
+  //     const itemData = item.item
+  //     let currentUsagePcs = 0
+  //     if (item.sale_unit === 1) {
+  //       currentUsagePcs = parseFloat(item.uom1_qty || 0)
+  //     } else if (item.sale_unit === 2 && itemData?.uom2_qty) {
+  //       currentUsagePcs = parseFloat(item.uom2_qty || 0) * parseFloat(itemData.uom2_qty)
+  //     } else if (item.sale_unit === 3 && itemData?.uom3_qty) {
+  //       currentUsagePcs = parseFloat(item.uom3_qty || 0) * parseFloat(itemData.uom3_qty)
+  //     }
+  //     return currentUsagePcs
+  //   }
 
-    const getAvailableAfter = (item, currentIndex) => {
-      if (!item.Batch_Number || !item.item) return 0
-      const batchTotalPcs = availableBatches[item.Item_ID]?.find(b => 
-        b.batchno.toString() === item.Batch_Number.toString()
-      )?.available_qty_uom1 || 0
-      const usedByOthers = getTotalUsedByOthers(item.Item_ID, item.Batch_Number, currentIndex)
-      const usedByCurrentRow = getCurrentRowUsageInPcs(item)
-      const totalUsed = usedByOthers + usedByCurrentRow
-      const remainingAfterPcs = Math.max(0, parseFloat(batchTotalPcs) - totalUsed)
-      let conversionFactor = 1
-      if (item.sale_unit === 2 && item.item.uom2_qty) {
-        conversionFactor = parseFloat(item.item.uom2_qty)
-      } else if (item.sale_unit === 3 && item.item.uom3_qty) {
-        conversionFactor = parseFloat(item.item.uom3_qty)
-      }
-      return remainingAfterPcs / conversionFactor
-    }
+  //   const getAvailableAfter = (item, currentIndex) => {
+  //     if (!item.Batch_Number || !item.item) return 0
+  //     const batchTotalPcs = availableBatches[item.Item_ID]?.find(b => 
+  //       b.batchno.toString() === item.Batch_Number.toString()
+  //     )?.available_qty_uom1 || 0
+  //     const usedByOthers = getTotalUsedByOthers(item.Item_ID, item.Batch_Number, currentIndex)
+  //     const usedByCurrentRow = getCurrentRowUsageInPcs(item)
+  //     const totalUsed = usedByOthers + usedByCurrentRow
+  //     const remainingAfterPcs = Math.max(0, parseFloat(batchTotalPcs) - totalUsed)
+  //     let conversionFactor = 1
+  //     if (item.sale_unit === 2 && item.item.uom2_qty) {
+  //       conversionFactor = parseFloat(item.item.uom2_qty)
+  //     } else if (item.sale_unit === 3 && item.item.uom3_qty) {
+  //       conversionFactor = parseFloat(item.item.uom3_qty)
+  //     }
+  //     return remainingAfterPcs / conversionFactor
+  //   }
 
-    // ✅ Your existing fetch functions (unchanged)
-    const fetchBatches = async () => {
-      const batchData = {}
-      for (const item of detailItems) {
-        if (item.Item_ID) {
-          const response = await fetch(`http://${window.location.hostname}:4000/api/dispatch/available-batches/${item.Item_ID}`)
-          const result = await response.json()
-          if (result.success && result.data) {
-            batchData[item.Item_ID] = result.data
-          }
-        }
-      }
-      setAvailableBatches(batchData)
-    }
+  //   // ✅ Your existing fetch functions (unchanged)
+  //   const fetchBatches = async () => {
+  //     const batchData = {}
+  //     for (const item of detailItems) {
+  //       if (item.Item_ID) {
+  //         const response = await fetch(`http://${window.location.hostname}:4000/api/dispatch/available-batches/${item.Item_ID}`)
+  //         const result = await response.json()
+  //         if (result.success && result.data) {
+  //           batchData[item.Item_ID] = result.data
+  //         }
+  //       }
+  //     }
+  //     setAvailableBatches(batchData)
+  //   }
 
-    const fetchCOAs = async () => {
-      const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/get`)
-      const result = await response.json()
-      if (result.success && result.zCoaRecords) {
-        setAllCOAs(Array.isArray(result.zCoaRecords) ? result.zCoaRecords : [result.zCoaRecords])
-      }
-    }
+  //   const fetchCOAs = async () => {
+  //     const response = await fetch(`http://${window.location.hostname}:4000/api/z-coa/get`)
+  //     const result = await response.json()
+  //     if (result.success && result.zCoaRecords) {
+  //       setAllCOAs(Array.isArray(result.zCoaRecords) ? result.zCoaRecords : [result.zCoaRecords])
+  //     }
+  //   }
 
-    useEffect(() => {
-      fetchCOAs()
-      if (detailItems.length > 0) {
-        fetchBatches()
-      }
-    }, [detailItems.length])
+  //   useEffect(() => {
+  //     fetchCOAs()
+  //     if (detailItems.length > 0) {
+  //       fetchBatches()
+  //     }
+  //   }, [detailItems.length])
 
-    const getCoaName = (coaId) => {
-      const coa = allCOAs.find(c => c.id === parseInt(coaId))
-      return coa ? coa.acName : `COA-${coaId}`
-    }
+  //   const getCoaName = (coaId) => {
+  //     const coa = allCOAs.find(c => c.id === parseInt(coaId))
+  //     return coa ? coa.acName : `COA-${coaId}`
+  //   }
 
-    const handleUomChange = (rowIndex, values) => {
-      const saleUnit = parseInt(values.sale_unit) || 1
-      const requestedQty = parseFloat(
-        saleUnit === 2 ? values.uom2_qty :
-        saleUnit === 3 ? values.uom3_qty :
-        values.uom1_qty
-      ) || 0
+  //   const handleUomChange = (rowIndex, values) => {
+  //     const saleUnit = parseInt(values.sale_unit) || 1
+  //     const requestedQty = parseFloat(
+  //       saleUnit === 2 ? values.uom2_qty :
+  //       saleUnit === 3 ? values.uom3_qty :
+  //       values.uom1_qty
+  //     ) || 0
 
-      const updated = [...detailItems]
-      updated[rowIndex] = {
-        ...updated[rowIndex],
-        uom1_qty: parseFloat(values.uom1_qty) || 0,
-        uom2_qty: parseFloat(values.uom2_qty) || 0,
-        uom3_qty: parseFloat(values.uom3_qty) || 0,
-        sale_unit: saleUnit,
-        QTY_Dispatched: requestedQty
-      }
-      setDetailItems(updated)
-    }
+  //     const updated = [...detailItems]
+  //     updated[rowIndex] = {
+  //       ...updated[rowIndex],
+  //       uom1_qty: parseFloat(values.uom1_qty) || 0,
+  //       uom2_qty: parseFloat(values.uom2_qty) || 0,
+  //       uom3_qty: parseFloat(values.uom3_qty) || 0,
+  //       sale_unit: saleUnit,
+  //       QTY_Dispatched: requestedQty
+  //     }
+  //     setDetailItems(updated)
+  //   }
 
-    const handleOpenModal = () => setShowItemModal(true)
-    const handleCloseModal = () => setShowItemModal(false)
+  //   const handleOpenModal = () => setShowItemModal(true)
+  //   const handleCloseModal = () => setShowItemModal(false)
 
-    return (
-      <div className="bg-white border border-gray-300 rounded-lg shadow-md">
-        {/* ✅ YOUR EXACT HEADER DESIGN */}
-        <div className="flex justify-end p-3">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="primary"
-              onClick={handleOpenModal}
-              className="flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              {mode === 'edit' ? 'Add More Items' : 'Add Items'}
-            </Button>
-          </div>
-        </div>
+  //   return (
+  //     <div className="bg-white border border-gray-300 rounded-lg shadow-md">
+  //       {/* ✅ YOUR EXACT HEADER DESIGN */}
+  //       <div className="flex justify-end p-3">
+  //         <div className="flex items-center justify-between">
+  //           <Button
+  //             variant="primary"
+  //             onClick={handleOpenModal}
+  //             className="flex items-center gap-2"
+  //           >
+  //             <Plus className="w-4 h-4" />
+  //             {mode === 'edit' ? 'Add More Items' : 'Add Items'}
+  //           </Button>
+  //         </div>
+  //       </div>
 
-        {/* ✅ YOUR EXACT TABLE LAYOUT */}
-        <div className="bg-white overflow-hidden">
-          {/* Table Header */}
-          <div className="max-w-7xl bg-gray-100 border-b border-gray-300">
-            <div className="flex justify-between px-2 py-3 text-sm font-medium text-gray-700">
-              <div className="text-center w-[5%]">LINE</div>
-              <div className="text-center w-[12%]">BATCH</div>
-              <div className="text-center w-[15%]">ITEM</div>
-              <div className="text-center w-[8%]">SO QTY</div>
-              <div className="text-center w-[8%]">AVAILABLE</div>
-              <div className="text-center w-[25%]">DISPATCH QTY</div>
-              <div className="text-center w-[8%]">AFTER</div>
-              <div className="text-center w-[5%]">ACTION</div>
-            </div>
-          </div>
+  //       {/* ✅ YOUR EXACT TABLE LAYOUT */}
+  //       <div className="bg-white overflow-hidden">
+  //         {/* Table Header */}
+  //         <div className="max-w-7xl bg-gray-100 border-b border-gray-300">
+  //           <div className="flex justify-between px-2 py-3 text-sm font-medium text-gray-700">
+  //             <div className="text-center w-[5%]">LINE</div>
+  //             <div className="text-center w-[12%]">BATCH</div>
+  //             <div className="text-center w-[15%]">ITEM</div>
+  //             <div className="text-center w-[8%]">SO QTY</div>
+  //             <div className="text-center w-[8%]">AVAILABLE</div>
+  //             <div className="text-center w-[25%]">DISPATCH QTY</div>
+  //             <div className="text-center w-[8%]">AFTER</div>
+  //             <div className="text-center w-[5%]">ACTION</div>
+  //           </div>
+  //         </div>
 
-          {/* ✅ YOUR EXACT EMPTY STATE OR TABLE BODY */}
-          {detailItems.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              <p className="text-lg">
-                {mode === 'edit' ? 'No items in this dispatch' : 'No items added yet'}
-              </p>
-              <p className="text-sm mt-2">
-                {mode === 'edit'
-                  ? 'Add items to this dispatch using "Add More Items"'
-                  : 'Click "Add Items" to select products'
-                }
-              </p>
-            </div>
-          ) : (
-            <div>
-              {detailItems.map((item, index) => {
-                const itemData = item.item || {}
-                const availableBefore = getAvailableBefore(item.Item_ID, item.Batch_Number, item.sale_unit, itemData, index)
-                const availableAfter = getAvailableAfter(item, index)
+  //         {/* ✅ YOUR EXACT EMPTY STATE OR TABLE BODY */}
+  //         {detailItems.length === 0 ? (
+  //           <div className="p-12 text-center text-gray-500">
+  //             <p className="text-lg">
+  //               {mode === 'edit' ? 'No items in this dispatch' : 'No items added yet'}
+  //             </p>
+  //             <p className="text-sm mt-2">
+  //               {mode === 'edit'
+  //                 ? 'Add items to this dispatch using "Add More Items"'
+  //                 : 'Click "Add Items" to select products'
+  //               }
+  //             </p>
+  //           </div>
+  //         ) : (
+  //           <div>
+  //             {detailItems.map((item, index) => {
+  //               const itemData = item.item || {}
+  //               const availableBefore = getAvailableBefore(item.Item_ID, item.Batch_Number, item.sale_unit, itemData, index)
+  //               const availableAfter = getAvailableAfter(item, index)
                 
-                const uomData = {
-                  primary: {
-                    id: itemData.uom1?.id || 1,
-                    name: itemData.uom1?.uom || 'Pcs',
-                    qty: 1
-                  },
-                  secondary: itemData.uomTwo ? {
-                    id: itemData.uomTwo.id,
-                    name: itemData.uomTwo.uom,
-                    qty: parseFloat(itemData.uom2_qty) || 10
-                  } : undefined,
-                  tertiary: itemData.uomThree ? {
-                    id: itemData.uomThree.id,
-                    name: itemData.uomThree.uom,
-                    qty: parseFloat(itemData.uom3_qty) || 100
-                  } : undefined
-                }
+  //               const uomData = {
+  //                 primary: {
+  //                   id: itemData.uom1?.id || 1,
+  //                   name: itemData.uom1?.uom || 'Pcs',
+  //                   qty: 1
+  //                 },
+  //                 secondary: itemData.uomTwo ? {
+  //                   id: itemData.uomTwo.id,
+  //                   name: itemData.uomTwo.uom,
+  //                   qty: parseFloat(itemData.uom2_qty) || 10
+  //                 } : undefined,
+  //                 tertiary: itemData.uomThree ? {
+  //                   id: itemData.uomThree.id,
+  //                   name: itemData.uomThree.uom,
+  //                   qty: parseFloat(itemData.uom3_qty) || 100
+  //                 } : undefined
+  //               }
 
-                const currentUomName = item.sale_unit === 1 ? 'Pcs' : 
-                                      item.sale_unit === 2 ? 'Box' : 
-                                      'Crt'
+  //               const currentUomName = item.sale_unit === 1 ? 'Pcs' : 
+  //                                     item.sale_unit === 2 ? 'Box' : 
+  //                                     'Crt'
 
-                return (
-                  <div
-                    key={`line-${item.Line_Id}`}
-                    className={`flex items-start justify-between px-2 py-3 ${
-                      index % 2 === 0 ? 'bg-gray-0' : 'bg-gray-200'
-                    }`}
-                  >
-                    {/* Line Number */}
-                    <div className='w-[5%]'>
-                      <div className="bg-green-100 text-green-800 rounded-xl flex items-center justify-center w-8 h-8 mx-auto">
-                        {index + 1}
-                      </div>
-                    </div>
+  //               return (
+  //                 <div
+  //                   key={`line-${item.Line_Id}`}
+  //                   className={`flex items-start justify-between px-2 py-3 ${
+  //                     index % 2 === 0 ? 'bg-gray-0' : 'bg-gray-200'
+  //                   }`}
+  //                 >
+  //                   {/* Line Number */}
+  //                   <div className='w-[5%]'>
+  //                     <div className="bg-green-100 text-green-800 rounded-xl flex items-center justify-center w-8 h-8 mx-auto">
+  //                       {index + 1}
+  //                     </div>
+  //                   </div>
 
-                    {/* Batch Selection */}
-                    <div className="w-[12%]">
-                      <select
-                        value={item.Batch_Number || ''}
-                        onChange={(e) => {
-                          const updated = [...detailItems]
-                          updated[index] = {
-                            ...updated[index],
-                            Batch_Number: e.target.value
-                          }
-                          setDetailItems(updated)
-                        }}
-                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm h-8"
-                      >
-                        <option value="">Select Batch</option>
-                        {(availableBatches[item.Item_ID] || []).map((batch, bIdx) => {
-                          const usedFromBatch = getTotalUsedByOthers(item.Item_ID, batch.batchno, index)
-                          const batchTotalPcs = parseFloat(batch.available_qty_uom1)
-                          const remainingPcs = batchTotalPcs - usedFromBatch
-                          const remainingCrt = itemData.uom3_qty ? 
-                            remainingPcs / parseFloat(itemData.uom3_qty) : 
-                            remainingPcs / 3600
+  //                   {/* Batch Selection */}
+  //                   <div className="w-[12%]">
+  //                     <select
+  //                       value={item.Batch_Number || ''}
+  //                       onChange={(e) => {
+  //                         const updated = [...detailItems]
+  //                         updated[index] = {
+  //                           ...updated[index],
+  //                           Batch_Number: e.target.value
+  //                         }
+  //                         setDetailItems(updated)
+  //                       }}
+  //                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm h-8"
+  //                     >
+  //                       <option value="">Select Batch</option>
+  //                       {(availableBatches[item.Item_ID] || []).map((batch, bIdx) => {
+  //                         const usedFromBatch = getTotalUsedByOthers(item.Item_ID, batch.batchno, index)
+  //                         const batchTotalPcs = parseFloat(batch.available_qty_uom1)
+  //                         const remainingPcs = batchTotalPcs - usedFromBatch
+  //                         const remainingCrt = itemData.uom3_qty ? 
+  //                           remainingPcs / parseFloat(itemData.uom3_qty) : 
+  //                           remainingPcs / 3600
                           
-                          return (
-                            <option key={bIdx} value={batch.batchno}>
-                              {getCoaName(batch.batchno)} - {Math.max(0, remainingCrt).toFixed(1)} Crt
-                            </option>
-                          )
-                        })}
-                      </select>
-                    </div>
+  //                         return (
+  //                           <option key={bIdx} value={batch.batchno}>
+  //                             {getCoaName(batch.batchno)} - {Math.max(0, remainingCrt).toFixed(1)} Crt
+  //                           </option>
+  //                         )
+  //                       })}
+  //                     </select>
+  //                   </div>
 
-                    {/* Item Name */}
-                    <div className="w-[15%]">
-                      <span className="text-gray-900 text-center font-normal text-sm truncate block">
-                        {item.Item}
-                      </span>
-                      <div className="text-xs text-gray-500 text-center">ID: {item.Item_ID}</div>
-                    </div>
+  //                   {/* Item Name */}
+  //                   <div className="w-[15%]">
+  //                     <span className="text-gray-900 text-center font-normal text-sm truncate block">
+  //                       {item.Item}
+  //                     </span>
+  //                     <div className="text-xs text-gray-500 text-center">ID: {item.Item_ID}</div>
+  //                   </div>
 
-                    {/* SO Quantity */}
-                    <div className="w-[8%]">
-                      <div className="text-center">
-                        <div className="text-sm font-normal text-blue-800">
-                          {item.Qty_in_SO}
-                        </div>
-                        <div className="text-xs text-blue-600">
-                          {item.Uom_SO}
-                        </div>
-                      </div>
-                    </div>
+  //                   {/* SO Quantity */}
+  //                   <div className="w-[8%]">
+  //                     <div className="text-center">
+  //                       <div className="text-sm font-normal text-blue-800">
+  //                         {item.Qty_in_SO}
+  //                       </div>
+  //                       <div className="text-xs text-blue-600">
+  //                         {item.Uom_SO}
+  //                       </div>
+  //                     </div>
+  //                   </div>
 
-                    {/* Available Stock */}
-                    <div className="w-[8%]">
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-green-600">
-                          {item.Batch_Number ? availableBefore.toFixed(3) : '-'}
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {currentUomName}
-                        </div>
-                      </div>
-                    </div>
+  //                   {/* Available Stock */}
+  //                   <div className="w-[8%]">
+  //                     <div className="text-center">
+  //                       <div className="text-sm font-bold text-green-600">
+  //                         {item.Batch_Number ? availableBefore.toFixed(3) : '-'}
+  //                       </div>
+  //                       <div className="text-xs text-gray-600">
+  //                         {currentUomName}
+  //                       </div>
+  //                     </div>
+  //                   </div>
 
-                    {/* ✅ DISPATCH QTY: UOM Selection with your design pattern */}
-                    <div className="w-[25%]">
-                      <div>
-                        {item.Batch_Number && itemData.uom1 ? (
-                          <UomConverter
-                            key={`uom-${item.Item_ID}-${index}`}
-                            uomData={uomData}
-                            lineIndex={index}
-                            onChange={(values) => handleUomChange(index, values)}
-                            initialValues={{
-                              uom1_qty: item.uom1_qty === '' ? '' : item.uom1_qty.toString(),
-                              uom2_qty: item.uom2_qty === '' ? '' : item.uom2_qty.toString(),
-                              uom3_qty: item.uom3_qty === '' ? '' : item.uom3_qty.toString(),
-                              sale_unit: item.sale_unit.toString()
-                            }}
-                            isPurchase={false}
-                            tableMode={true}
-                          />
-                        ) : (
-                          <div className="text-center text-gray-500 py-2 text-sm">
-                            Select batch first
-                          </div>
-                        )}
-                      </div>
-                    </div>
+  //                   {/* ✅ DISPATCH QTY: UOM Selection with your design pattern */}
+  //                   <div className="w-[25%]">
+  //                     <div>
+  //                       {item.Batch_Number && itemData.uom1 ? (
+  //                         <UomConverter
+  //                           key={`uom-${item.Item_ID}-${index}`}
+  //                           uomData={uomData}
+  //                           lineIndex={index}
+  //                           onChange={(values) => handleUomChange(index, values)}
+  //                           initialValues={{
+  //                             uom1_qty: item.uom1_qty === '' ? '' : item.uom1_qty.toString(),
+  //                             uom2_qty: item.uom2_qty === '' ? '' : item.uom2_qty.toString(),
+  //                             uom3_qty: item.uom3_qty === '' ? '' : item.uom3_qty.toString(),
+  //                             sale_unit: item.sale_unit.toString()
+  //                           }}
+  //                           isPurchase={false}
+  //                           tableMode={true}
+  //                         />
+  //                       ) : (
+  //                         <div className="text-center text-gray-500 py-2 text-sm">
+  //                           Select batch first
+  //                         </div>
+  //                       )}
+  //                     </div>
+  //                   </div>
 
-                    {/* ✅ AVAILABLE AFTER: Shows remaining after current allocation */}
-                    <div className="w-[8%]">
-                      <div className="text-center">
-                        <div className={`text-sm font-bold ${
-                          availableAfter >= 0 ? 'text-purple-600' : 'text-red-600'
-                        }`}>
-                          {item.Batch_Number && item.QTY_Dispatched > 0 ? availableAfter.toFixed(3) : '-'}
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {currentUomName} Left
-                        </div>
-                      </div>
-                    </div>
+  //                   {/* ✅ AVAILABLE AFTER: Shows remaining after current allocation */}
+  //                   <div className="w-[8%]">
+  //                     <div className="text-center">
+  //                       <div className={`text-sm font-bold ${
+  //                         availableAfter >= 0 ? 'text-purple-600' : 'text-red-600'
+  //                       }`}>
+  //                         {item.Batch_Number && item.QTY_Dispatched > 0 ? availableAfter.toFixed(3) : '-'}
+  //                       </div>
+  //                       <div className="text-xs text-gray-600">
+  //                         {currentUomName} Left
+  //                       </div>
+  //                     </div>
+  //                   </div>
 
-                    {/* Actions */}
-                    <div className="w-[5%]">
-                      <div className="flex items-center justify-center gap-1">
-                        <button
-                          onClick={() => {
-                            const newRow = {
-                              ...item,
-                              Line_Id: detailItems.length + 1,
-                              Batch_Number: '',
-                              Qty_in_SO: 0,
-                              Uom_SO: '-',
-                              uom1_qty: 0,
-                              uom2_qty: 0,
-                              uom3_qty: 0,
-                              sale_unit: 2,
-                              QTY_Dispatched: 0
-                            }
+  //                   {/* Actions */}
+  //                   <div className="w-[5%]">
+  //                     <div className="flex items-center justify-center gap-1">
+  //                       <button
+  //                         onClick={() => {
+  //                           const newRow = {
+  //                             ...item,
+  //                             Line_Id: detailItems.length + 1,
+  //                             Batch_Number: '',
+  //                             Qty_in_SO: 0,
+  //                             Uom_SO: '-',
+  //                             uom1_qty: 0,
+  //                             uom2_qty: 0,
+  //                             uom3_qty: 0,
+  //                             sale_unit: 2,
+  //                             QTY_Dispatched: 0
+  //                           }
                             
-                            const updated = [...detailItems, newRow]
-                            const resequenced = updated.map((itm, idx) => ({
-                              ...itm,
-                              Line_Id: idx + 1
-                            }))
+  //                           const updated = [...detailItems, newRow]
+  //                           const resequenced = updated.map((itm, idx) => ({
+  //                             ...itm,
+  //                             Line_Id: idx + 1
+  //                           }))
                             
-                            setDetailItems(resequenced)
-                          }}
-                          className="p-1 hover:bg-green-100 rounded text-green-600"
-                          title="Add batch"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
+  //                           setDetailItems(resequenced)
+  //                         }}
+  //                         className="p-1 hover:bg-green-100 rounded text-green-600"
+  //                         title="Add batch"
+  //                       >
+  //                         <Plus className="w-4 h-4" />
+  //                       </button>
                         
-                        {detailItems.length > 1 && (
-                          <button
-                            onClick={() => {
-                              const filtered = detailItems.filter((_, i) => i !== index)
-                              const resequenced = filtered.map((itm, idx) => ({
-                                ...itm,
-                                Line_Id: idx + 1
-                              }))
-                              setDetailItems(resequenced)
-                            }}
-                            className="p-1 hover:bg-red-100 rounded text-red-600"
-                            title="Delete line"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
+  //                       {detailItems.length > 1 && (
+  //                         <button
+  //                           onClick={() => {
+  //                             const filtered = detailItems.filter((_, i) => i !== index)
+  //                             const resequenced = filtered.map((itm, idx) => ({
+  //                               ...itm,
+  //                               Line_Id: idx + 1
+  //                             }))
+  //                             setDetailItems(resequenced)
+  //                           }}
+  //                           className="p-1 hover:bg-red-100 rounded text-red-600"
+  //                           title="Delete line"
+  //                         >
+  //                           <Trash2 className="w-4 h-4" />
+  //                         </button>
+  //                       )}
+  //                     </div>
+  //                   </div>
+  //                 </div>
+  //               )
+  //             })}
+  //           </div>
+  //         )}
+  //       </div>
 
-        {/* ✅ YOUR EXACT SUMMARY FOOTER */}
-        {detailItems.length > 0 && (
-          <div className="flex items-center justify-end p-2 bg-green-50 border-t">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="text-center w-30">
-                  <div className="font-semibold text-blue-600">
-                    {detailItems.filter(item => item.Batch_Number).length} Batched
-                  </div>
-                </div>
+  //       {/* ✅ YOUR EXACT SUMMARY FOOTER */}
+  //       {detailItems.length > 0 && (
+  //         <div className="flex items-center justify-end p-2 bg-green-50 border-t">
+  //           <div className="flex items-center justify-between">
+  //             <div className="flex items-center">
+  //               <div className="text-center w-30">
+  //                 <div className="font-semibold text-blue-600">
+  //                   {detailItems.filter(item => item.Batch_Number).length} Batched
+  //                 </div>
+  //               </div>
                 
-                <div className="text-center w-30">
-                  <div className="font-semibold text-orange-600">
-                    {detailItems.filter(item => item.QTY_Dispatched > 0).length} With Qty
-                  </div>
-                </div>
+  //               <div className="text-center w-30">
+  //                 <div className="font-semibold text-orange-600">
+  //                   {detailItems.filter(item => item.QTY_Dispatched > 0).length} With Qty
+  //                 </div>
+  //               </div>
 
-                <div className="text-center w-30">
-                  <div className="font-semibold text-green-800 px-4 py-2 rounded-lg">
-                    {detailItems.filter(item => item.Batch_Number && item.QTY_Dispatched > 0).length} Ready
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+  //               <div className="text-center w-30">
+  //                 <div className="font-semibold text-green-800 px-4 py-2 rounded-lg">
+  //                   {detailItems.filter(item => item.Batch_Number && item.QTY_Dispatched > 0).length} Ready
+  //                 </div>
+  //               </div>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       )}
 
-        {/* ✅ YOUR EXACT MODAL */}
-        {showItemModal && (
-          <MultiSelectItemTable
-            onSelectionComplete={(selectedItems) => {
-              const newItems = selectedItems.map((item, index) => ({
-                Line_Id: detailItems.length + index + 1,
-                Batch_Number: '',
-                Item: item.itemName,
-                Item_ID: item.id,
-                Qty_in_SO: 0,
-                Uom_SO: '-',
-                uom1_qty: 0,
-                uom2_qty: 0,
-                uom3_qty: 0,
-                sale_unit: 1,
-                QTY_Dispatched: 0,
-                Stock_Price: item.sellingPrice || 0,
-                item: item.originalItem
-              }))
+  //       {/* ✅ YOUR EXACT MODAL */}
+  //       {showItemModal && (
+  //         <MultiSelectItemTable
+  //           onSelectionComplete={(selectedItems) => {
+  //             const newItems = selectedItems.map((item, index) => ({
+  //               Line_Id: detailItems.length + index + 1,
+  //               Batch_Number: '',
+  //               Item: item.itemName,
+  //               Item_ID: item.id,
+  //               Qty_in_SO: 0,
+  //               Uom_SO: '-',
+  //               uom1_qty: 0,
+  //               uom2_qty: 0,
+  //               uom3_qty: 0,
+  //               sale_unit: 1,
+  //               QTY_Dispatched: 0,
+  //               Stock_Price: item.sellingPrice || 0,
+  //               item: item.originalItem
+  //             }))
               
-              setDetailItems([...detailItems, ...newItems])
-              setShowItemModal(false)
-            }}
-            onCancel={handleCloseModal}
-            isPurchase={false}
-            alreadyAddedItemIds={detailItems.map(item => item.Item_ID)}
-          />
-        )}
-      </div>
-    )
-  }
+  //             setDetailItems([...detailItems, ...newItems])
+  //             setShowItemModal(false)
+  //           }}
+  //           onCancel={handleCloseModal}
+  //           isPurchase={false}
+  //           alreadyAddedItemIds={detailItems.map(item => item.Item_ID)}
+  //         />
+  //       )}
+  //     </div>
+  //   )
+  // }
 
-  export default StockDetail
+  // export default StockDetail
 
 
 

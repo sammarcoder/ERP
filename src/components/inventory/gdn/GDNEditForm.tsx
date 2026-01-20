@@ -413,41 +413,7 @@ export default function GDNEditForm({ gdnId }: Props) {
 
       {/* Header Form */}
       <div className="bg-white border rounded-xl p-5 mb-6">
-        {/* <h2 className="font-semibold mb-4 flex items-center gap-2">
-          <Truck className="w-5 h-5 text-emerald-600" />
-          GDN Details
-        </h2> */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="lg:col-span-2">
-            <label className="text-xs text-gray-500 mb-1 block">Customer</label>
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-              <span className="font-semibold text-emerald-800">{headerForm.COA_Name || '-'}</span>
-              <span className="text-xs text-emerald-600 ml-2">(ID: {headerForm.COA_ID})</span>
-            </div>
-          </div>
-          <Input
-            type="date"
-            label="Date"
-            value={headerForm.Date}
-            onChange={(e) => setHeaderForm(prev => ({ ...prev, Date: e.target.value }))}
-          />
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Status</label>
-            <select
-              value={headerForm.Status}
-              onChange={(e) => setHeaderForm(prev => ({ ...prev, Status: e.target.value }))}
-              className="w-full border rounded-lg px-3 py-2"
-            >
-              <option value="UnPost">UnPost</option>
-              <option value="Post">Posted</option>
-            </select>
-          </div>
-          <Input
-            label="Remarks"
-            value={headerForm.remarks}
-            onChange={(e) => setHeaderForm(prev => ({ ...prev, remarks: e.target.value }))}
-          />
-        </div> */}
+
         {/* Header - Customer Info (Read-only) */}
         <div className="bg-white border-2 border-emerald-300 rounded-xl p-5 mb-6">
           <div className="flex items-center gap-3 mb-4">
@@ -496,21 +462,7 @@ export default function GDNEditForm({ gdnId }: Props) {
         </div>
       </div>
 
-      {/* Summary */}
-      <div className="mt-6 grid grid-cols-3 gap-4">
-        {/* <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-          <span className="text-xs text-emerald-600">Total Rows</span>
-          <p className="text-xl font-bold text-emerald-700">{existingDetails.length}</p>
-        </div> */}
-        {/* <div className="bg-teal-50 border border-teal-200 rounded-xl p-4">
-          <span className="text-xs text-teal-600">Valid Rows</span>
-          <p className="text-xl font-bold text-teal-700">{validItems.length}</p>
-        </div> */}
-        {/* <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-          <span className="text-xs text-green-600">Grand Total</span>
-          <p className="text-2xl font-bold text-green-700">{grandTotal.toLocaleString()}</p>
-        </div> */}
-      </div>
+     
 
       {/* ✅ FIXED: Modal with proper state management */}
       {modalOpen && (

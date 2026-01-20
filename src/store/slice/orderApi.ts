@@ -1,5 +1,4 @@
-
-// // store/api/orderApi.ts - ONLY FIX THE FRONTEND
+// // store/slice/orderApi.ts - UPDATED WITH APPROVAL STATUS ENDPOINT
 // import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 // const getApiBaseUrl = () => {
@@ -26,7 +25,7 @@
 //       invalidatesTags: ['Order'],
 //     }),
 
-//     // ✅ FIXED: Use stockTypeId to match your backend
+//     // ✅ Get all orders with stockTypeId filter
 //     getAllOrders: builder.query<any, {
 //       stockTypeId?: 11 | 12 | string  
 //       status?: string
@@ -38,7 +37,6 @@
 //       query: (params = {}) => {
 //         const queryParams = new URLSearchParams()
         
-//         // ✅ Use stockTypeId - matches your backend exactly
 //         if (params.stockTypeId) queryParams.append('stockTypeId', params.stockTypeId.toString())
 //         if (params.status && params.status !== 'all') queryParams.append('status', params.status)
 //         if (params.dateFrom) queryParams.append('dateFrom', params.dateFrom)
@@ -53,7 +51,7 @@
 
 //     getOrderById: builder.query<any, string | number>({
 //       query: (id) => `/${id}`,
-//       providesTags: ['Order'],
+//       providesTags: (result, error, id) => [{ type: 'Order', id }],
 //     }),
 
 //     updateOrder: builder.mutation<any, { id: string | number; master: any; details: any[] }>({
@@ -62,7 +60,60 @@
 //         method: 'PUT',
 //         body: { master, details },
 //       }),
-//       invalidatesTags: ['Order'],
+//       invalidatesTags: (result, error, { id }) => [
+//         { type: 'Order', id },
+//         { type: 'Order', id: 'LIST' }
+//       ],
+//     }),
+
+//     // ✅ NEW: Update order approval status
+//     updateOrderStatus: builder.mutation<any, { 
+//       id: string | number; 
+//       status?: string;
+//       approved?: number;
+//       is_Note_generated?: number;
+//     }>({
+//       query: ({ id, ...updateData }) => ({
+//         url: `/update-status/${id}`, // ✅ YOUR SPECIFIC PATH
+//         method: 'PUT',
+//         body: updateData,
+//       }),
+//       invalidatesTags: (result, error, { id }) => [
+//         { type: 'Order', id },
+//         { type: 'Order', id: 'LIST' }
+//       ],
+//     }),
+
+//     // ✅ NEW: Specific mutation for approval updates (cleaner for UI)
+//     updateOrderApproval: builder.mutation<any, { 
+//       id: string | number; 
+//       approved: number; 
+//     }>({
+//       query: ({ id, approved }) => ({
+//         url: `/update-status/${id}`, // ✅ YOUR SPECIFIC PATH
+//         method: 'PUT',
+//         body: { approved },
+//       }),
+//       invalidatesTags: (result, error, { id }) => [
+//         { type: 'Order', id },
+//         { type: 'Order', id: 'LIST' }
+//       ],
+//     }),
+
+//     // ✅ NEW: System update for note generation status
+//     updateOrderNoteStatus: builder.mutation<any, { 
+//       id: string | number; 
+//       is_Note_generated: number; 
+//     }>({
+//       query: ({ id, is_Note_generated }) => ({
+//         url: `/update-status/${id}`, // ✅ YOUR SPECIFIC PATH
+//         method: 'PUT',
+//         body: { is_Note_generated },
+//       }),
+//       invalidatesTags: (result, error, { id }) => [
+//         { type: 'Order', id },
+//         { type: 'Order', id: 'LIST' }
+//       ],
 //     }),
 
 //     deleteOrder: builder.mutation<any, string | number>({
@@ -80,6 +131,9 @@
 //   useGetAllOrdersQuery,
 //   useGetOrderByIdQuery,
 //   useUpdateOrderMutation,
+//   useUpdateOrderStatusMutation,     // ✅ General status updates
+//   useUpdateOrderApprovalMutation,   // ✅ Specific for approval dropdown
+//   useUpdateOrderNoteStatusMutation, // ✅ System updates for GRN/GDN generation
 //   useDeleteOrderMutation,
 // } = orderApi
 
@@ -120,32 +174,14 @@
 
 
 
+// store/slice/orderApi.ts
 
-
-
-
-
-
-
-
-
-
-// store/slice/orderApi.ts - UPDATED WITH APPROVAL STATUS ENDPOINT
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-
-const getApiBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    return `http://${window.location.hostname}:4000/api`
-  } else {
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
-  }
-}
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { orderBaseQuery } from '@/lib/baseQuery';
 
 export const orderApi = createApi({
   reducerPath: 'orderApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${getApiBaseUrl()}/order`,
-  }),
+  baseQuery: orderBaseQuery,  // ✅ Uses dynamic port (4000 or 4001)
   tagTypes: ['Order'],
   endpoints: (builder) => ({
     createOrder: builder.mutation<any, { master: any; details: any[] }>({
@@ -159,24 +195,24 @@ export const orderApi = createApi({
 
     // ✅ Get all orders with stockTypeId filter
     getAllOrders: builder.query<any, {
-      stockTypeId?: 11 | 12 | string  
-      status?: string
-      dateFrom?: string
-      dateTo?: string
-      page?: number
-      limit?: number
+      stockTypeId?: 11 | 12 | string;
+      status?: string;
+      dateFrom?: string;
+      dateTo?: string;
+      page?: number;
+      limit?: number;
     }>({
       query: (params = {}) => {
-        const queryParams = new URLSearchParams()
+        const queryParams = new URLSearchParams();
         
-        if (params.stockTypeId) queryParams.append('stockTypeId', params.stockTypeId.toString())
-        if (params.status && params.status !== 'all') queryParams.append('status', params.status)
-        if (params.dateFrom) queryParams.append('dateFrom', params.dateFrom)
-        if (params.dateTo) queryParams.append('dateTo', params.dateTo)
-        if (params.page) queryParams.append('page', params.page.toString())
-        if (params.limit) queryParams.append('limit', params.limit.toString())
+        if (params.stockTypeId) queryParams.append('stockTypeId', params.stockTypeId.toString());
+        if (params.status && params.status !== 'all') queryParams.append('status', params.status);
+        if (params.dateFrom) queryParams.append('dateFrom', params.dateFrom);
+        if (params.dateTo) queryParams.append('dateTo', params.dateTo);
+        if (params.page) queryParams.append('page', params.page.toString());
+        if (params.limit) queryParams.append('limit', params.limit.toString());
         
-        return `/?${queryParams}`
+        return `/?${queryParams}`;
       },
       providesTags: ['Order'],
     }),
@@ -198,7 +234,7 @@ export const orderApi = createApi({
       ],
     }),
 
-    // ✅ NEW: Update order approval status
+    // ✅ Update order approval status
     updateOrderStatus: builder.mutation<any, { 
       id: string | number; 
       status?: string;
@@ -206,7 +242,7 @@ export const orderApi = createApi({
       is_Note_generated?: number;
     }>({
       query: ({ id, ...updateData }) => ({
-        url: `/update-status/${id}`, // ✅ YOUR SPECIFIC PATH
+        url: `/update-status/${id}`,
         method: 'PUT',
         body: updateData,
       }),
@@ -216,13 +252,13 @@ export const orderApi = createApi({
       ],
     }),
 
-    // ✅ NEW: Specific mutation for approval updates (cleaner for UI)
+    // ✅ Specific mutation for approval updates
     updateOrderApproval: builder.mutation<any, { 
       id: string | number; 
       approved: number; 
     }>({
       query: ({ id, approved }) => ({
-        url: `/update-status/${id}`, // ✅ YOUR SPECIFIC PATH
+        url: `/update-status/${id}`,
         method: 'PUT',
         body: { approved },
       }),
@@ -232,13 +268,13 @@ export const orderApi = createApi({
       ],
     }),
 
-    // ✅ NEW: System update for note generation status
+    // ✅ System update for note generation status
     updateOrderNoteStatus: builder.mutation<any, { 
       id: string | number; 
       is_Note_generated: number; 
     }>({
       query: ({ id, is_Note_generated }) => ({
-        url: `/update-status/${id}`, // ✅ YOUR SPECIFIC PATH
+        url: `/update-status/${id}`,
         method: 'PUT',
         body: { is_Note_generated },
       }),
@@ -256,28 +292,15 @@ export const orderApi = createApi({
       invalidatesTags: ['Order'],
     }),
   }),
-})
+});
 
 export const {
   useCreateOrderMutation,
   useGetAllOrdersQuery,
   useGetOrderByIdQuery,
   useUpdateOrderMutation,
-  useUpdateOrderStatusMutation,     // ✅ General status updates
-  useUpdateOrderApprovalMutation,   // ✅ Specific for approval dropdown
-  useUpdateOrderNoteStatusMutation, // ✅ System updates for GRN/GDN generation
+  useUpdateOrderStatusMutation,
+  useUpdateOrderApprovalMutation,
+  useUpdateOrderNoteStatusMutation,
   useDeleteOrderMutation,
-} = orderApi
-
-
-
-
-
-
-
-
-
-
-
-
-
+} = orderApi;

@@ -9,7 +9,7 @@ module.exports = {
   test: {
     username: 'root',
     password: '@mysql123',
-    database: 'testing',
+    database: 'newschema_check',
     host: 'localhost',
     dialect: 'mysql'
   }

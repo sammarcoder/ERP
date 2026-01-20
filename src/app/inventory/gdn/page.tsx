@@ -7,7 +7,8 @@ import {
   Plus, Search, Trash2, Edit, Eye, Loader2,
   RefreshCw, AlertCircle, CheckCircle, Clock, Truck, Printer
 } from 'lucide-react'
-import { useGetAllGDNsQuery, useDeleteGDNMutation } from '@/store/test/gdnApi'
+// import { useGetAllGDNsQuery, useDeleteGDNMutation } from '@/store/test/gdnApi'
+import { useGetAllGDNsQuery, useDeleteGDNMutation } from '@/store/slice/gdnApi'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { ConfirmationModal } from '@/components/common/ConfirmationModal'
