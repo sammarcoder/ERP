@@ -265,15 +265,15 @@
 
 
 
-import { auth, signIn } from "../../auth"
-import { redirect } from "next/navigation"
+// import { auth, signIn } from "../../auth"
+// import { redirect } from "next/navigation"
 
 export default async function LoginPage() {
-  const session = await auth()
+  // const session = await auth()
   
-  if (session) {
-    redirect('/dashboard')
-  }
+  // if (session) {
+  //   redirect('/dashboard')
+  // }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -282,12 +282,12 @@ export default async function LoginPage() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             ERP System Login
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          {/* <p className="mt-2 text-center text-sm text-gray-600">
             Please sign in with your Keycloak account
-          </p>
+          </p> */}
         </div>
         
-        <div className="mt-8 space-y-6">
+        {/* <div className="mt-8 space-y-6">
           <form
             action={async () => {
               "use server"
@@ -301,7 +301,7 @@ export default async function LoginPage() {
               Sign in with Keycloak
             </button>
           </form>
-        </div>
+        </div> */}
       </div>
     </div>
   )

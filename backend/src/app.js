@@ -149,7 +149,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get('/api', (req, res) => {
-  res.json({ name: "saamr" });
+  res.json({ name: "sammar" });
 });
 
 app.use('/api', require('./routes/index.js'));
@@ -177,7 +177,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 4000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const DEFAULT_PORT = NODE_ENV === 'test' ? 4001 : 4000;
+const PORT = process.env.PORT || DEFAULT_PORT;
 
 // Replaced initDatabase with initServer
 const initServer = async () => {
@@ -187,7 +189,7 @@ const initServer = async () => {
     console.log('✅ Database connection successful. Ready to start the server.');
 
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`🚀 Server running in ${NODE_ENV} mode on http://localhost:${PORT}`);
       console.log(`📍 COA API: http://localhost:${PORT}/api/z-coa/create`);
     });
   } catch (err) {

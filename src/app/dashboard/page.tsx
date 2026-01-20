@@ -32,11 +32,11 @@
 
 
 import { auth } from "../../../auth"
-import TokenDisplay from "../token-display/page"
-import LogoutButton from "@/components/LogoutButton"
+// import TokenDisplay from "../token-display/page"
+// import LogoutButton from "@/components/LogoutButton"
 
 export default async function Dashboard() {
-  const session = await auth() // This will always exist due to middleware
+  // const session = await auth() // This will always exist due to middleware
 
   return (
     <div className="min-h-screen bg-gray-100 py-6">
@@ -48,12 +48,12 @@ export default async function Dashboard() {
             </h1>
             
             {/* User Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+            {/* <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
               <h2 className="text-lg font-semibold text-blue-900 mb-2">
                 Welcome, {session?.user.name}!
               </h2>
               <p className="text-blue-700">Email: {session?.user.email}</p>
-            </div>
+            </div> */}
 
             {/* User Roles */}
             <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
@@ -77,12 +77,12 @@ export default async function Dashboard() {
             </div>
 
             {/* Token Display Component */}
-            {session && <TokenDisplay session={session} />}
+            {/* {session && <TokenDisplay session={session} />} */}
 
             {/* Logout Button */}
-            <div className="mt-6">
+           {/* <div className="mt-6">
               <LogoutButton />
-            </div>
+            </div>*/}
           </div>
         </div>
       </div>

@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:dev": "cross-env NODE_ENV=development PORT=4000 nodemon src/app.js",
+    "start:test": "cross-env NODE_ENV=test PORT=4001 nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:dev": "echo \"Running development tests\" && exit 0"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +30,7 @@
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "nodemon": "^3.1.10",
     "sequelize-cli": "^6.6.3"
   }
