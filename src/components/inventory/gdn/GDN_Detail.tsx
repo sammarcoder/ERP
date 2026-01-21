@@ -92,6 +92,7 @@ export default function GDN_Detail({
         id: fullItem.id,
         itemName: fullItem.itemName,
         sellingPrice: parseFloat(fullItem.sellingPrice) || 0,
+        Price: orderItem ? parseFloat(orderItem.Price) || 0 : parseFloat(fullItem.sellingPrice) || 0,
         uomStructure,
         orderQty: orderItem ? {
           uom1_qty: orderItem.uom1_qty || '0',

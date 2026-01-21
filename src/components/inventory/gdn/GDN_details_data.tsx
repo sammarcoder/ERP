@@ -41,7 +41,7 @@ export default function GDN_details_data({
             itemName: item.itemName,
             uomStructure: item.uomStructure,
             orderQty: item.orderQty,
-            sellingPrice: item.sellingPrice,
+            sellingPrice: item.Price || item.sellingPrice,
             batchno: null,
             selectedBatchQty: 0,
             dispatchQty: {
@@ -51,7 +51,7 @@ export default function GDN_details_data({
               sale_unit: 1,
               Uom_Id: item.orderQty?.Uom_Id || null
             },
-            unitPrice: item.sellingPrice || 0,
+            unitPrice: item.Price || item.sellingPrice || 0,
             // Auto-populate discounts from order
             Discount_A: item.discounts?.Discount_A || 0,
             Discount_B: item.discounts?.Discount_B || 0,
@@ -99,7 +99,7 @@ export default function GDN_details_data({
         itemName: item.itemName,
         uomStructure: item.uomStructure,
         orderQty: null, // No order qty for duplicate
-        sellingPrice: item.sellingPrice,
+        sellingPrice: item.Price || item.sellingPrice,
         batchno: null,
         selectedBatchQty: 0,
         dispatchQty: {
@@ -109,7 +109,7 @@ export default function GDN_details_data({
           sale_unit: 1,
           Uom_Id: item.orderQty?.Uom_Id || null
         },
-        unitPrice: item.sellingPrice || 0,
+        unitPrice: item.Price || item.sellingPrice || 0,
         // Inherit discounts from original item for duplicate rows
         Discount_A: item.discounts?.Discount_A || 0,
         Discount_B: item.discounts?.Discount_B || 0,
@@ -189,17 +189,7 @@ export default function GDN_details_data({
                 </span>
                 <div>
                   <h3 className="font-semibold text-gray-900">{item.itemName}</h3>
-                  {/* <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <span>ID: {item.id}</span>
-                    {item.orderQty && (
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded">
-                        Order: {item.orderQty.uom1_qty} {item.uomStructure?.primary?.name || 'pcs'}
-                      </span>
-                    )}
-                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
-                      {rows.length} batch row{rows.length > 1 ? 's' : ''}
-                    </span>
-                  </div> */}
+                  
                 </div>
               </div>
 

@@ -145,7 +145,24 @@ router.get('/', async (req, res) => {
         },
         { model: ZCoa, as: 'account', attributes: ['id', 'acName', 'city', 'mobileNo'] },
 
-        { model: Order_Main, as: 'order', attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated', 'sub_city', 'sub_customer'] },
+        {
+          model: Order_Main,
+          as: 'order',
+          attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated', 'sub_city', 'sub_customer'],
+          include: [
+            {
+              model: Order_Detail, as: 'details',
+              attributes: ['ID', 'Item_ID', 'uom1_qty', 'uom2_qty', 'uom3_qty'],
+              include: [
+                {
+                  model: ZItems,
+                  as: 'item',
+                  attributes: ['id', 'itemName']
+                }
+              ]
+            }
+          ]
+        },
         { model: Ztransporter, as: 'transporter', artributes: ['id', 'name'] }
       ],
       order: [['createdAt', 'DESC']],
@@ -163,6 +180,124 @@ router.get('/', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+
+
+
+
+
+
+
+
+// GET orders with Next_Status = 'partial' for additional GDN
+router.get('/orders-for-additional-gdn', async (req, res) => {
+  try {
+    const { search } = req.query;
+
+    const where = {
+      Next_Status: 'partial',
+      approved: 1
+    };
+
+    if (search) {
+      where[Op.or] = [
+        { Number: { [Op.like]: `%${search}%` } }
+      ];
+    }
+
+    // ✅ Query Order_Main table (not Stk_Main)
+    const rows = await Order_Main.findAll({
+      where,
+      attributes: ['ID', 'Number', 'Date', 'Next_Status', 'approved', 'is_Note_generated', 'sub_city', 'sub_customer'],
+      include: [
+        {
+          model: Order_Detail,
+          as: 'details',
+          attributes: ['ID', 'Item_ID', 'uom1_qty', 'uom2_qty', 'uom3_qty'],
+          // include: [
+          //   {
+          //     model: ZItems,
+          //     as: 'item',
+          //     attributes: ['id', 'itemName', 'skuUOM', 'uom2', 'uom2_qty', 'uom3', 'uom3_qty'],
+          //     include: [
+          //       { model: Uom, as: 'uom1', attributes: ['id', 'uom'] },
+          //       { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
+          //       { model: Uom, as: 'uomThree', attributes: ['id', 'uom'] }
+          //     ]
+          //   }
+          // ]
+        },
+        {
+           model: Stk_main,
+           as: 'stockTransactions',
+           attributes: ['ID', 'Number', 'Date', 'Status','order_Main_ID'],
+           include: [
+             {
+               model: Stk_Detail,
+                as: 'details',
+                attributes: ['ID', 'Item_ID', 'uom1_qty', 'uom2_qty', 'uom3_qty'],
+                // include: [
+                //   {
+                //     model: ZItems,
+                //     as: 'item',
+                //     attributes: ['id', 'itemName']
+                //   }
+                // ]
+              }
+            ]
+        },
+        {
+          model: ZCoa,
+          as: 'account',
+          attributes: ['id', 'acName', 'city']
+        },
+        // {
+        //   model: Order_Detail,
+        //   as: 'details',
+        //   include: [
+        //     {
+        //       model: ZItems,
+        //       as: 'item',
+        //       attributes: ['id', 'itemName', 'skuUOM', 'uom2', 'uom2_qty', 'uom3', 'uom3_qty'],
+        //       include: [
+        //         { model: Uom, as: 'uom1', attributes: ['id', 'uom'] },
+        //         { model: Uom, as: 'uomTwo', attributes: ['id', 'uom'] },
+        //         { model: Uom, as: 'uomThree', attributes: ['id', 'uom'] }
+        //       ]
+        //     }
+        //   ]
+        // }
+      ],
+      order: [['Date', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      data: rows
+    });
+
+  } catch (error) {
+    console.error('❌ Error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // =====================================================
 // GET SINGLE GDN

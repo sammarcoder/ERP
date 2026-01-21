@@ -609,41 +609,93 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
   }, [carriage]);
 
   // Calculate totals
+  // const { totals, batchTotals } = useMemo(() => {
+  //   let totalGross = 0, totalNet = 0;
+  //   const batches: Record<string, { batchName: string; amount: number }> = {};
+
+  //   details.forEach(d => {
+  //     const qty = parseFloat(d.uom2_qty);
+  //     const gross = qty * (d.editedPrice || 0);
+  //     const discA = parseFloat(d.editedDiscountA) || 0;
+  //     const discB = parseFloat(d.editedDiscountB) || 0;
+  //     const discC = parseFloat(d.editedDiscountC) || 0;
+  //     const afterA = gross - (gross * discA / 100);
+  //     const afterB = afterA - (afterA * discB / 100);
+  //     const net = afterB - (afterB * discC / 100);
+
+  //     totalGross += gross;
+  //     totalNet += net;
+
+  //     const batchId = d.batchno || 'unknown';
+  //     if (!batches[batchId]) batches[batchId] = { batchName: d.batchDetails?.acName || `Batch-${batchId}`, amount: 0 };
+  //     batches[batchId].amount += net;
+  //   });
+
+  //   // ✅ Use Math.trunc to remove decimals (no rounding)
+  //   totalGross = Math.trunc(totalGross);
+  //   totalNet = Math.trunc(totalNet);
+
+  //   // Trunc batch amounts
+  //   Object.keys(batches).forEach(key => {
+  //     batches[key].amount = Math.trunc(batches[key].amount);
+  //   });
+
+  //   // ✅ If carriage ID selected, minus carriage from customer
+  //   const customerDebit = carriage.id ? totalNet - Math.trunc(carriageAmount) : totalNet;
+
+  //   return { totals: { totalGross, totalNet, customerDebit, carriageAmount: carriage.id ? Math.trunc(carriageAmount) : 0 }, batchTotals: batches };
+  // }, [details, carriage.id, carriageAmount]);
+  // Calculate totals
+
+
   const { totals, batchTotals } = useMemo(() => {
     let totalGross = 0, totalNet = 0;
     const batches: Record<string, { batchName: string; amount: number }> = {};
 
     details.forEach(d => {
-      const qty = parseFloat(d.uom2_qty);
-      const gross = qty * (d.editedPrice || 0);
+      const qty = parseFloat(d.uom2_qty) || 0;
+      const price = d.editedPrice || 0;
+      const gross = qty * price;
+
       const discA = parseFloat(d.editedDiscountA) || 0;
       const discB = parseFloat(d.editedDiscountB) || 0;
       const discC = parseFloat(d.editedDiscountC) || 0;
+
       const afterA = gross - (gross * discA / 100);
       const afterB = afterA - (afterA * discB / 100);
-      const net = afterB - (afterB * discC / 100);
+      const netRaw = afterB - (afterB * discC / 100);
 
-      totalGross += gross;
-      totalNet += net;
+      // ✅ Truncate at ROW level FIRST
+      const grossTrunc = Math.trunc(gross);
+      const netTrunc = Math.trunc(netRaw);
 
+      totalGross += grossTrunc;
+      totalNet += netTrunc;
+
+      // ✅ Sum truncated values per batch
       const batchId = d.batchno || 'unknown';
-      if (!batches[batchId]) batches[batchId] = { batchName: d.batchDetails?.acName || `Batch-${batchId}`, amount: 0 };
-      batches[batchId].amount += net;
+      if (!batches[batchId]) {
+        batches[batchId] = {
+          batchName: d.batchDetails?.acName || `Batch-${batchId}`,
+          amount: 0
+        };
+      }
+      batches[batchId].amount += netTrunc;  // ✅ Add truncated value
     });
 
-    // ✅ Use Math.trunc to remove decimals (no rounding)
-    totalGross = Math.trunc(totalGross);
-    totalNet = Math.trunc(totalNet);
+    // ✅ No need to truncate again - already truncated per row
+    const carriageAmountTrunc = Math.trunc(carriageAmount);
+    const customerDebit = carriage.id ? totalNet - carriageAmountTrunc : totalNet;
 
-    // Trunc batch amounts
-    Object.keys(batches).forEach(key => {
-      batches[key].amount = Math.trunc(batches[key].amount);
-    });
-
-    // ✅ If carriage ID selected, minus carriage from customer
-    const customerDebit = carriage.id ? totalNet - Math.trunc(carriageAmount) : totalNet;
-
-    return { totals: { totalGross, totalNet, customerDebit, carriageAmount: carriage.id ? Math.trunc(carriageAmount) : 0 }, batchTotals: batches };
+    return {
+      totals: {
+        totalGross,
+        totalNet,
+        customerDebit,
+        carriageAmount: carriage.id ? carriageAmountTrunc : 0
+      },
+      batchTotals: batches
+    };
   }, [details, carriage.id, carriageAmount]);
 
   // ✅ Validation: Only checkbox is compulsory
@@ -728,7 +780,7 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
           {/* Tab 1: Details */}
-          {activeTab === 'details' && (
+          {/* {activeTab === 'details' && (
             <table className="w-full text-sm">
               <thead className="bg-gray-100">
                 <tr>
@@ -770,25 +822,25 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-1">
                           <input type="text" inputMode="decimal" value={d.editedPrice ?? ''} onChange={e => setDetails(p => p.map((x, j) => j === i ? { ...x, editedPrice: handleNumericInput(e.target.value) } : x))} className="w-20 px-2 py-1 border rounded text-right" />
-                          <span className="text-xs text-gray-500">/{uom2Name}</span>
+                          <span className="text-xs border-green-40 text-gray-500">/{uom2Name}</span>
                         </div>
                       </td>
                       <td className="px-3 py-2 text-right">{fmtInt(Math.trunc(gross))}</td>
                       <td className="">
                         <div className="flex items-center justify-center gap-1">
-                          <input type="text" inputMode="decimal" value={d.editedDiscountA} onChange={e => { const v = e.target.value; if (v === '' || /^\d*\.?\d*$/.test(v)) setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountA: v } : x)); }} className="w-14 px-2 py-1 border rounded text-right" />
+                          <input type="text" inputMode="decimal" value={d.editedDiscountA} onChange={e => { const v = e.target.value; if (v === '' || /^\d*\.?\d*$/.test(v)) setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountA: v } : x)); }} className="w-14 px-2 py-1 border border-green-400 rounded text-right" />
                           <span className="text-xs text-gray-500">%</span>
                         </div>
                       </td>
                       <td className="">
                         <div className="flex items-center justify-center gap-1">
-                          <input type="text" inputMode="decimal" value={d.editedDiscountB} onChange={e => { const v = e.target.value; if (v === '' || /^\d*\.?\d*$/.test(v)) setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountB: v } : x)); }} className="w-14 px-2 py-1 border rounded text-right" />
+                          <input type="text" inputMode="decimal" value={d.editedDiscountB} onChange={e => { const v = e.target.value; if (v === '' || /^\d*\.?\d*$/.test(v)) setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountB: v } : x)); }} className="w-14 px-2 py-1 border border-green-400 rounded text-right" />
                           <span className="text-xs text-gray-500">%</span>
                         </div>
                       </td>
                       <td className="">
                         <div className="flex items-center justify-center gap-1">
-                          <input type="text" inputMode="decimal" value={d.editedDiscountC} onChange={e => { const v = e.target.value; if (v === '' || /^\d*\.?\d*$/.test(v)) setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountC: v } : x)); }} className="w-14 px-2 py-1 border rounded text-right" />
+                          <input type="text" inputMode="decimal" value={d.editedDiscountC} onChange={e => { const v = e.target.value; if (v === '' || /^\d*\.?\d*$/.test(v)) setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountC: v } : x)); }} className="w-14 px-2 py-1 border border-green-400 rounded text-right" />
                           <span className="text-xs text-gray-500">%</span>
                         </div>
                       </td>
@@ -801,7 +853,139 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
                 <tr><td colSpan={6} className="px-3 py-2 text-right">Totals:</td><td className="px-3 py-2 text-right">{fmtInt(totals.totalGross)}</td><td colSpan={3}></td><td className="px-3 py-2 text-right text-emerald-600">{fmtInt(totals.totalNet)}</td></tr>
               </tfoot>
             </table>
+          )} */}
+
+
+
+
+          {/* Tab 1: Details */}
+          {activeTab === 'details' && (
+            <table className="w-full text-sm">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-3 py-2 text-center">#</th>
+                  <th className="px-3 py-2 text-left">Batch</th>
+                  <th className="px-3 py-2 text-left">Item Name</th>
+                  <th className="px-3 py-2 text-right">Crt Sold</th>
+                  <th className="px-3 py-2 text-right">Qty Sold</th>
+                  <th className="px-3 py-2 text-left">Price</th>
+                  <th className="px-3 py-2 text-right">Gross Total</th>
+                  <th className="px-3 py-2 text-center">Disc A</th>
+                  <th className="px-3 py-2 text-center">Disc B</th>
+                  <th className="px-3 py-2 text-center">Disc C</th>
+                  <th className="px-3 py-2 text-right">Net Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {details.map((d, i) => {
+                  const qty = parseFloat(d.uom2_qty) || 0;
+                  const crtQty = parseFloat(d.uom3_qty) || 0;
+                  const uom1Name = d.item?.uom1?.uom || '';
+                  const uom2Name = d.item?.uomTwo?.uom || '';
+                  const uom3Name = d.item?.uomThree?.uom || '';
+                  const batchName = d.batchDetails?.acName || '-';
+
+                  // ✅ Calculate gross
+                  const gross = qty * (d.editedPrice || 0);
+
+                  // ✅ Calculate discounts
+                  const discountA = parseFloat(d.editedDiscountA) || 0;
+                  const discountB = parseFloat(d.editedDiscountB) || 0;
+                  const discountC = parseFloat(d.editedDiscountC) || 0;
+
+                  const afterA = gross - (gross * discountA / 100);
+                  const afterB = afterA - (afterA * discountB / 100);
+                  const netRaw = afterB - (afterB * discountC / 100);
+
+                  // ✅ Truncate at ROW level (same as calculation in useMemo)
+                  const grossTrunc = Math.trunc(gross);
+                  const netTrunc = Math.trunc(netRaw);
+
+                  return (
+                    <tr key={d.ID} className="border-b hover:bg-gray-50">
+                      <td className="px-3 py-2 text-center">{d.Line_Id || i + 1}</td>
+                      <td className="px-3 py-2">{batchName}</td>
+                      <td className="px-3 py-2">{d.item?.itemName || '-'}</td>
+                      <td className="px-3 py-2 text-right">{Math.trunc(crtQty)} {uom3Name}</td>
+                      <td className="px-3 py-2 text-right">{Math.trunc(qty)} {uom2Name}</td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="text"
+                            inputMode="decimal"
+                            value={d.editedPrice ?? ''}
+                            onChange={e => setDetails(p => p.map((x, j) => j === i ? { ...x, editedPrice: handleNumericInput(e.target.value) } : x))}
+                            className="w-20 px-2 py-1 border rounded text-right"
+                          />
+                          <span className="text-xs text-gray-500">/{uom2Name}</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 text-right">{fmtInt(grossTrunc)}</td>
+                      <td className="">
+                        <div className="flex items-center justify-center gap-1">
+                          <input
+                            type="text"
+                            inputMode="decimal"
+                            value={d.editedDiscountA}
+                            onChange={e => {
+                              const v = e.target.value;
+                              if (v === '' || /^\d*\.?\d*$/.test(v))
+                                setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountA: v } : x));
+                            }}
+                            className="w-14 px-2 py-1 border border-green-400 rounded text-right"
+                          />
+                          <span className="text-xs text-gray-500">%</span>
+                        </div>
+                      </td>
+                      <td className="">
+                        <div className="flex items-center justify-center gap-1">
+                          <input
+                            type="text"
+                            inputMode="decimal"
+                            value={d.editedDiscountB}
+                            onChange={e => {
+                              const v = e.target.value;
+                              if (v === '' || /^\d*\.?\d*$/.test(v))
+                                setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountB: v } : x));
+                            }}
+                            className="w-14 px-2 py-1 border border-green-400 rounded text-right"
+                          />
+                          <span className="text-xs text-gray-500">%</span>
+                        </div>
+                      </td>
+                      <td className="">
+                        <div className="flex items-center justify-center gap-1">
+                          <input
+                            type="text"
+                            inputMode="decimal"
+                            value={d.editedDiscountC}
+                            onChange={e => {
+                              const v = e.target.value;
+                              if (v === '' || /^\d*\.?\d*$/.test(v))
+                                setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountC: v } : x));
+                            }}
+                            className="w-14 px-2 py-1 border border-green-400 rounded text-right"
+                          />
+                          <span className="text-xs text-gray-500">%</span>
+                        </div>
+                      </td>
+                      <td className="px-3 text-right font-medium text-emerald-600">{fmtInt(netTrunc)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot className="bg-gray-100 font-medium">
+                <tr>
+                  <td colSpan={6} className="px-3 py-2 text-right">Totals:</td>
+                  <td className="px-3 py-2 text-right">{fmtInt(totals.totalGross)}</td>
+                  <td colSpan={3}></td>
+                  <td className="px-3 py-2 text-right text-emerald-600">{fmtInt(totals.totalNet)}</td>
+                </tr>
+              </tfoot>
+            </table>
           )}
+
+
 
           {/* Tab 2: Carriage */}
           {activeTab === 'carriage' && (
@@ -817,7 +1001,7 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
                       <Truck className="w-3 h-3" />
                       Transporter
                     </label>
-                      
+
                     <TransporterSearchableInput
                       value={transporterId || ''}
                       onChange={(id) => setTransporterId(id ? Number(id) : null)}
