@@ -127,6 +127,8 @@ export interface JournalDetail {
   idCard?: string
   bank?: string
   bankDate?: string
+  isCurrencyLocked?: boolean
+  coaTypeId?: number | string
 }
 
 export interface CoaAccount {

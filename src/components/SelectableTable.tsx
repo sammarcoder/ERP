@@ -26,7 +26,7 @@ const SelectableTable: React.FC<SelectableTableProps> = ({
   value,
   onChange,
   options = [],
-  placeholder = "Select an option",
+  placeholder = "Select",
   required = false,
   disabled = false,
   displayKey = 'label',
@@ -113,7 +113,7 @@ const SelectableTable: React.FC<SelectableTableProps> = ({
       {/* Selected Value Display with Enhanced Design */}
       <div
         className={`
-          relative w-full px-2 py-2 
+          relative w-full h-8 px-2 py-2 
           bg-white border rounded-lg 
           cursor-pointer transition-all duration-200
           flex justify-between items-center

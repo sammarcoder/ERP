@@ -27,10 +27,11 @@ import { employeeApi } from './slice/employeeApi';
 import { mouldApi } from './slice/mouldApi';
 import { mouldingApi } from './slice/mouldingApi';
 
+import { reportApi } from './slice/reports/reportApi';
 
 
 
-import { gdnApi2 } from './test/gdnApi';
+// import { gdnApi2 } from './test/gdnApi';
 
 export const store = configureStore({
   reducer: {
@@ -55,8 +56,10 @@ export const store = configureStore({
     [shiftApi.reducerPath]: shiftApi.reducer,
     [departmentApi.reducerPath]: departmentApi.reducer,
     [employeeApi.reducerPath]: employeeApi.reducer,
-     [mouldApi.reducerPath]: mouldApi.reducer,
-      [mouldingApi.reducerPath]: mouldingApi.reducer,
+    [mouldApi.reducerPath]: mouldApi.reducer,
+    [mouldingApi.reducerPath]: mouldingApi.reducer,
+
+    [reportApi.reducerPath]: reportApi.reducer,
 
 
 
@@ -86,8 +89,9 @@ export const store = configureStore({
       .concat(shiftApi.middleware)
       .concat(departmentApi.middleware)
       .concat(employeeApi.middleware)
-       .concat(mouldApi.middleware)
-       .concat(mouldingApi.middleware),
+      .concat(mouldApi.middleware)
+      .concat(mouldingApi.middleware)
+      .concat(reportApi.middleware),
 });
 
 setupListeners(store.dispatch);

@@ -61,6 +61,7 @@ router.use('/department', require('./departmentRoutes'));
 router.use('/employee', require('./employeeRoutes'));
 router.use('/mould', require('./mouldRoutes'));
 router.use('/moulding', require('./mouldingRoutes'));
+router.use('/reports', require('./reportRoutes'));
 
 
 

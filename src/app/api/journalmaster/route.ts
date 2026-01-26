@@ -1,34 +1,3 @@
-// import { NextResponse } from 'next/server';
-// import metabaseService from '@/lib/metabaseService';
-// import { convertToCleanFormat } from '@/lib/dataConverter';
-
-// export async function GET() {
-//   try {
-//     // Get raw data from Metabase
-//     const rawData = await metabaseService.getQuestionData(103);
-    
-//     // Convert to clean arrow notation format
-//     const cleanData = convertToCleanFormat(rawData);
-    
-//     return NextResponse.json({
-//       success: true,
-//       message: "Data retrieved successfully",
-//       data: cleanData
-//     });
-
-//   } catch (error: any) {
-//     return NextResponse.json({ 
-//       error: error.message 
-//     }, { status: 500 });
-//   }
-// }
-
-
-
-
-
-
-
 
 
 
