@@ -1025,7 +1025,7 @@ const VoucherDetails: React.FC<VoucherDetailsProps> = ({
               {/* Auto-balance preview */}
               {totals.difference > 0 && balancingCoaId && (
                 <tr className="bg-blue-50 border-t-2 border-blue-300">
-                  <td colSpan={7} className="px-2 py-3 text-right text-sm text-blue-700 font-medium">
+                  <td colSpan={9} className="px-2 py-3 text-right text-sm text-blue-700 font-medium">
                     Auto-balancing entry will be added:
                   </td>
                   <td className="px-2 py-3 text-right text-sm font-bold text-blue-700">

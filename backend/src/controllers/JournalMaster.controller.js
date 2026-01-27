@@ -2352,14 +2352,14 @@ const get_BF_RF = async (req, res) => {
     console.log('excludeId:', excludeId);
     console.log('========================');
 
-    let lastDate;
+    let masterWhereClause = {
+      is_partially_deleted: false
+    };
 
     // ✅ CREATE MODE: Use last JV date
     if (mode === 'create' || !mode) {
       const lastEntry = await JournalMaster.findOne({
-        where: {
-          voucherTypeId: 10
-        },
+        where: { voucherTypeId: 10 },
         order: [['id', 'DESC']]
       });
 
@@ -2367,51 +2367,43 @@ const get_BF_RF = async (req, res) => {
         return res.status(200).json({
           success: true,
           message: 'No Journal Voucher entries found',
-          upToDate: null,
-          coaId: coaId ? parseInt(coaId) : null,
+          bf: 0,
           allTotals: { debit: 0, credit: 0, difference: 0 },
           coaTotals: null,
-          bf: 0,
           count: 0,
-          coaDetailsCount: 0,
-          coaDetails: null,
           data: []
         });
       }
 
-      lastDate = lastEntry.date;
-      console.log('CREATE MODE - Last JV Date:', lastDate);
+      masterWhereClause.date = { [Op.lte]: lastEntry.date };
+      console.log('CREATE MODE - Last JV Date:', lastEntry.date);
     }
 
-    // ✅ EDIT MODE: Use provided upToDate
+    // ✅ EDIT MODE: Only include vouchers BEFORE current one
     if (mode === 'edit') {
-      if (!upToDate) {
+      if (!upToDate || !excludeId) {
         return res.status(400).json({
           success: false,
-          message: 'upToDate is required for edit mode'
+          message: 'upToDate and excludeId are required for edit mode'
         });
       }
-      lastDate = new Date(upToDate);
-      console.log('EDIT MODE - Up To Date:', lastDate);
+
+      const parsedDate = new Date(upToDate);
+      const parsedExcludeId = parseInt(excludeId);
+
+      // Date < upToDate OR (Date = upToDate AND ID < excludeId)
+      masterWhereClause[Op.or] = [
+        { date: { [Op.lt]: parsedDate } },
+        { 
+          date: parsedDate, 
+          id: { [Op.lt]: parsedExcludeId } 
+        }
+      ];
+
+      console.log('EDIT MODE - Date:', parsedDate, 'Exclude ID:', parsedExcludeId);
     }
 
-    // ✅ Build WHERE clause for JournalMaster
-    const masterWhereClause = {
-      date: {
-        [Op.lte]: lastDate
-      },
-      is_partially_deleted: false
-    };
-
-    // ✅ EDIT MODE: Exclude the voucher being edited
-    if (mode === 'edit' && excludeId) {
-      masterWhereClause.id = {
-        [Op.ne]: parseInt(excludeId)
-      };
-      console.log('Excluding voucher ID:', excludeId);
-    }
-
-    // ✅ Get ALL entries with ALL details
+    // Get entries
     const allEntries = await JournalMaster.findAll({
       where: masterWhereClause,
       attributes: ['id', 'date', 'voucherTypeId', 'voucherNo', 'status', 'isOpening'],
@@ -2423,103 +2415,72 @@ const get_BF_RF = async (req, res) => {
       order: [['date', 'ASC'], ['id', 'ASC']]
     });
 
-    // ✅ Calculate ALL totals (no filter)
+    // Calculate totals
     let allTotalDebit = 0;
     let allTotalCredit = 0;
-
-    allEntries.forEach(entry => {
-      if (entry.details && entry.details.length > 0) {
-        entry.details.forEach(detail => {
-          allTotalDebit += parseFloat(detail.amountDb) || 0;
-          allTotalCredit += parseFloat(detail.amountCr) || 0;
-        });
-      }
-    });
-
-    // ✅ Calculate COA-specific totals (if coaId provided)
     let coaTotalDebit = 0;
     let coaTotalCredit = 0;
     let coaDetails = [];
 
-    if (coaId) {
-      const parsedCoaId = parseInt(coaId);
+    const parsedCoaId = coaId ? parseInt(coaId) : null;
 
-      allEntries.forEach(entry => {
-        if (entry.details && entry.details.length > 0) {
-          entry.details.forEach(detail => {
-            if (detail.coaId === parsedCoaId) {
-              coaTotalDebit += parseFloat(detail.amountDb) || 0;
-              coaTotalCredit += parseFloat(detail.amountCr) || 0;
-              coaDetails.push({
-                voucherNo: entry.voucherNo,
-                voucherId: entry.id,
-                date: entry.date,
-                voucherTypeId: entry.voucherTypeId,
-                description: detail.description,
-                amountDb: parseFloat(detail.amountDb) || 0,
-                amountCr: parseFloat(detail.amountCr) || 0
-              });
-            }
-          });
-        }
-      });
-    }
+    allEntries.forEach(entry => {
+      if (entry.details) {
+        entry.details.forEach(detail => {
+          allTotalDebit += parseFloat(detail.amountDb) || 0;
+          allTotalCredit += parseFloat(detail.amountCr) || 0;
 
-    // ✅ Calculate BF (Brought Forward)
-    const bf = coaId ? (coaTotalDebit - coaTotalCredit) : 0;
+          if (parsedCoaId && detail.coaId === parsedCoaId) {
+            coaTotalDebit += parseFloat(detail.amountDb) || 0;
+            coaTotalCredit += parseFloat(detail.amountCr) || 0;
+            coaDetails.push({
+              voucherNo: entry.voucherNo,
+              voucherId: entry.id,
+              date: entry.date,
+              description: detail.description,
+              amountDb: parseFloat(detail.amountDb) || 0,
+              amountCr: parseFloat(detail.amountCr) || 0
+            });
+          }
+        });
+      }
+    });
 
-    console.log('=== CALCULATIONS ===');
-    console.log('Mode:', mode || 'create');
-    console.log('Up To Date:', lastDate);
-    console.log('Excluded ID:', excludeId || 'none');
-    console.log('All Total Debit:', allTotalDebit);
-    console.log('All Total Credit:', allTotalCredit);
-    console.log('COA Total Debit:', coaTotalDebit);
-    console.log('COA Total Credit:', coaTotalCredit);
+    const bf = parsedCoaId ? (  coaTotalCredit - coaTotalDebit) : 0;
+
+    console.log('=== RESULTS ===');
+    console.log('Entries Count:', allEntries.length);
     console.log('BF:', bf);
-    console.log('====================');
+    console.log('===============');
 
     res.json({
       success: true,
       mode: mode || 'create',
-      upToDate: lastDate,
+      upToDate,
       excludedId: excludeId ? parseInt(excludeId) : null,
-      coaId: coaId ? parseInt(coaId) : null,
-
-      // ✅ All details sum (no filter)
+      coaId: parsedCoaId,
       allTotals: {
         debit: Math.round(allTotalDebit * 100) / 100,
         credit: Math.round(allTotalCredit * 100) / 100,
         difference: Math.round(Math.abs(allTotalDebit - allTotalCredit) * 100) / 100
       },
-
-      // ✅ COA-specific sum (filtered)
-      coaTotals: coaId ? {
+      coaTotals: parsedCoaId ? {
         debit: Math.round(coaTotalDebit * 100) / 100,
         credit: Math.round(coaTotalCredit * 100) / 100,
         difference: Math.round(Math.abs(coaTotalDebit - coaTotalCredit) * 100) / 100
       } : null,
-
-      // ✅ BF (Brought Forward)
       bf: Math.round(bf * 100) / 100,
-
-      // ✅ Count
       count: allEntries.length,
       coaDetailsCount: coaDetails.length,
-
-      // ✅ COA-specific details
-      coaDetails: coaId ? coaDetails : null,
-
-      // ✅ Full data
+      coaDetails: parsedCoaId ? coaDetails : null,
       data: allEntries
     });
 
   } catch (error) {
-    console.error('Error fetching BF/RF entries:', error);
+    console.error('Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error fetching entries',
-      error: error.message
+      message: error.message
     });
   }
 };
