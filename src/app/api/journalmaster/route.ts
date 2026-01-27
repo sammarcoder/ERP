@@ -14,13 +14,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import metabaseService from '@/lib/metabaseService';
 import { convertToCleanFormat } from '@/lib/dataConverter';
 import DataFilter from '@/lib/filters/dataProcessor';
+import { reportsBaseQuery } from '@/lib/baseQuery';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     
     // Get raw data from Metabase
-    const rawData = await metabaseService.getQuestionData(103);
+    // const rawData = await metabaseService.getQuestionData(103);
+    const rawData = await fetch(`http://localhost:4000/api/reports/journal-master-raw`);
+    console.log('✅ Fetched raw data from Metabase');
     const cleanData = convertToCleanFormat(rawData);
     
     console.log('📊 Total records from Metabase:', cleanData.length);
@@ -55,6 +58,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
+      rawData: rawData,
       message: "Data retrieved and filtered successfully",
       data: filteredData,
       meta: {

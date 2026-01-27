@@ -281,7 +281,7 @@
 //       },
 //     }),
 
-   
+
 
 //     // ✅ POST /api/journal-master/create-complete
 //     createJournalVoucher: builder.mutation<any, CreateJournalVoucherRequest>({
@@ -293,7 +293,7 @@
 //       invalidatesTags: ['JournalVoucher'],
 //     }),
 
-   
+
 //     // ✅ DELETE /api/journal-master/delete/:id
 //     deleteJournalVoucher: builder.mutation<any, number>({
 //       query: (id) => ({
@@ -589,6 +589,111 @@ export const journalVoucherApi = createApi({
         }
       },
     }),
+
+    // Add this endpoint
+    // getBFRF: builder.query({
+    //   query: (coaId) => `/journal-master/reports/get_BF_RF${coaId ? `?coaId=${coaId}` : ''}`,
+    //   transformResponse: (response: any) => {
+    //     if (!response.success) return { bf: 0, cf: 0, data: [] }
+
+    //     const details = response.data?.flatMap((entry: any) => entry.details || []) || []
+
+    //     // Calculate BF = Sum(Debit) - Sum(Credit)
+    //     const totalDebit = details.reduce((sum: number, d: any) => sum + (parseFloat(d.amountDb) || 0), 0)
+    //     const totalCredit = details.reduce((sum: number, d: any) => sum + (parseFloat(d.amountCr) || 0), 0)
+    //     const bf = totalDebit - totalCredit
+
+    //     return {
+    //       bf: bf,
+    //       totalDebit,
+    //       totalCredit,
+    //       upToDate: response.upToDate,
+    //       count: response.count,
+    //       data: response.data
+    //     }
+    //   }
+    // }),
+    // Add this endpoint to your journalVoucherApi
+
+    // getBFRF: builder.query({
+    //   query: (coaId) => `/journal-master/reports/get_BF_RF${coaId ? `?coaId=${coaId}` : ''}`,
+    //   transformResponse: (response: any) => {
+    //     if (!response.success) {
+    //       return {
+    //         bf: 0,
+    //         allTotals: { debit: 0, credit: 0, difference: 0 },
+    //         coaTotals: null,
+    //         coaDetails: [],
+    //         upToDate: null,
+    //         count: 0,
+    //         data: []
+    //       }
+    //     }
+
+    //     return {
+    //       bf: response.bf || 0,
+    //       allTotals: response.allTotals || { debit: 0, credit: 0, difference: 0 },
+    //       coaTotals: response.coaTotals || null,
+    //       coaDetails: response.coaDetails || [],
+    //       coaDetailsCount: response.coaDetailsCount || 0,
+    //       upToDate: response.upToDate,
+    //       coaId: response.coaId,
+    //       count: response.count,
+    //       data: response.data
+    //     }
+    //   }
+    // }),
+
+
+
+
+
+    // ✅ Updated getBFRF endpoint
+getBFRF: builder.query({
+  query: ({ coaId, mode, upToDate, excludeId }) => {
+    let url = `/journal-master/reports/get_BF_RF?`;
+    const params = [];
+    
+    if (coaId) params.push(`coaId=${coaId}`);
+    if (mode) params.push(`mode=${mode}`);
+    if (upToDate) params.push(`upToDate=${upToDate}`);
+    if (excludeId) params.push(`excludeId=${excludeId}`);
+    
+    return url + params.join('&');
+  },
+  transformResponse: (response: any) => {
+    if (!response.success) {
+      return {
+        bf: 0,
+        allTotals: { debit: 0, credit: 0, difference: 0 },
+        coaTotals: null,
+        coaDetails: [],
+        upToDate: null,
+        count: 0,
+        data: []
+      }
+    }
+
+    return {
+      bf: response.bf || 0,
+      allTotals: response.allTotals || { debit: 0, credit: 0, difference: 0 },
+      coaTotals: response.coaTotals || null,
+      coaDetails: response.coaDetails || [],
+      coaDetailsCount: response.coaDetailsCount || 0,
+      upToDate: response.upToDate,
+      excludedId: response.excludedId,
+      mode: response.mode,
+      coaId: response.coaId,
+      count: response.count,
+      data: response.data
+    }
+  }
+}),
+
+
+
+
+
   }),
 });
 
@@ -603,6 +708,7 @@ export const {
   usePostUnpostVoucherMutation,
   useGetCoaAccountsQuery,
   useGetCurrenciesQuery,
+  useGetBFRFQuery
 } = journalVoucherApi;
 
 export default journalVoucherApi;

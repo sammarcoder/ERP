@@ -16,7 +16,8 @@ const {
   // vTypePettyVouchers
   deleteVoucherAndReset,
   getSalesVouchers,
-  postUnpostSalesVoucher
+  postUnpostSalesVoucher,
+  get_BF_RF
 } = require('../controllers/JournalMaster.controller');
 
 // Combined endpoints
@@ -38,6 +39,8 @@ router.post('/delete-voucher/:stockMainId', deleteVoucherAndReset);
 router.get('/sales-vouchers', getSalesVouchers);
 
 router.post('/sales-voucher-post-unpost/:id', postUnpostSalesVoucher);
+
+router.get('/reports/get_BF_RF', get_BF_RF);
 // router.get('/vtype/journal-vouchers', vTypeJournalVouchers); //  New route for Journal Vouchers
 // router.get('/vtype/petty-vouchers', vTypePettyVouchers); // New route for Petty Vouchers
 

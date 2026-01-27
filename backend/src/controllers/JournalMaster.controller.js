@@ -2118,6 +2118,414 @@ const postUnpostSalesVoucher = async (req, res) => {
 
 
 
+// const get_BF_RF = async (req, res) => {
+//   try {
+//     // Step 1: Get the last Journal Voucher entry
+//     const lastEntry = await JournalMaster.findOne({
+//       where: {
+//         voucherTypeId: 10
+//       },
+//       order: [['id', 'DESC']]
+//     });
+
+//     if (!lastEntry) {
+//       return res.status(404).json({ 
+//         success: false, 
+//         message: 'No Journal Voucher entries found' 
+//       });
+//     }
+
+//     console.log('Last JV Entry:', lastEntry.toJSON());
+
+//     // Step 2: Extract the date
+//     const lastDate = lastEntry.date;
+
+//     // Step 3: Get ALL JournalMaster entries UP TO that date (all voucher types)
+//     const allEntries = await JournalMaster.findAll({
+//       where: {
+//         date: {
+//           [Op.lte]: lastDate  // Less than or equal to last date
+//         },
+//         is_partially_deleted: false
+//       },
+//       attributes: ['id', 'date', 'voucherTypeId', 'voucherNo', 'status', 'isOpening'],
+//       include: [{
+//         model: JournalDetail,
+//         as: 'details',
+//         where: { coaId:req.query.coaId ? req.query.coaId : { [Op.ne]: null } },
+//         required: false,
+//         attributes: ['id','description', 'jmId', 'coaId', 'amountDb', 'amountCr']
+//       }],
+//       order: [['date', 'ASC'], ['id', 'ASC']]
+//     });
+
+//     console.log(`Found ${allEntries.length} entries up to date: ${lastDate}`);
+
+//     res.json({ 
+//       success: true, 
+//       upToDate: lastDate,
+//       count: allEntries.length,
+//       data: allEntries 
+//     });
+
+//   } catch (error) {
+//     console.error('Error fetching entries:', error);
+//     res.status(500).json({ 
+//       success: false, 
+//       message: 'Error fetching entries',
+//       error: error.message 
+//     });
+//   }
+
+
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// =============================================
+// GET BF/RF REPORT
+// =============================================
+
+// const get_BF_RF = async (req, res) => {
+//   try {
+//     // Step 1: Get the last Journal Voucher entry
+//     const lastEntry = await JournalMaster.findOne({
+//       where: {
+//         voucherTypeId: 10
+//       },
+//       order: [['id', 'DESC']]
+//     });
+
+//     if (!lastEntry) {
+//       return res.status(404).json({ 
+//         success: false, 
+//         message: 'No Journal Voucher entries found' 
+//       });
+//     }
+
+//     console.log('Last JV Entry:', lastEntry.toJSON());
+
+//     // Step 2: Extract the date
+//     const lastDate = lastEntry.date;
+//     const coaId = req.query.coaId;
+
+//     console.log('Last Date:', lastDate);
+//     console.log('Filtering by coaId:', coaId);
+
+//     // Step 3: Get ALL entries with ALL details (no COA filter)
+//     const allEntries = await JournalMaster.findAll({
+//       where: {
+//         date: {
+//           [Op.lte]: lastDate
+//         },
+//         is_partially_deleted: false
+//       },
+//       attributes: ['id', 'date', 'voucherTypeId', 'voucherNo', 'status', 'isOpening'],
+//       include: [{
+//         model: JournalDetail,
+//         as: 'details',
+//         attributes: ['id', 'description', 'jmId', 'coaId', 'amountDb', 'amountCr']
+//       }],
+//       order: [['date', 'ASC'], ['id', 'ASC']]
+//     });
+
+//     // Step 4: Calculate ALL totals (no filter)
+//     let allTotalDebit = 0;
+//     let allTotalCredit = 0;
+
+//     allEntries.forEach(entry => {
+//       if (entry.details && entry.details.length > 0) {
+//         entry.details.forEach(detail => {
+//           allTotalDebit += parseFloat(detail.amountDb) || 0;
+//           allTotalCredit += parseFloat(detail.amountCr) || 0;
+//         });
+//       }
+//     });
+
+//     // Step 5: Calculate COA-specific totals (if coaId provided)
+//     let coaTotalDebit = 0;
+//     let coaTotalCredit = 0;
+//     let coaDetails = [];
+
+//     if (coaId) {
+//       const parsedCoaId = parseInt(coaId);
+
+//       allEntries.forEach(entry => {
+//         if (entry.details && entry.details.length > 0) {
+//           entry.details.forEach(detail => {
+//             if (detail.coaId === parsedCoaId) {
+//               coaTotalDebit += parseFloat(detail.amountDb) || 0;
+//               coaTotalCredit += parseFloat(detail.amountCr) || 0;
+//               coaDetails.push({
+//                 voucherNo: entry.voucherNo,
+//                 date: entry.date,
+//                 voucherTypeId: entry.voucherTypeId,
+//                 description: detail.description,
+//                 amountDb: parseFloat(detail.amountDb) || 0,
+//                 amountCr: parseFloat(detail.amountCr) || 0
+//               });
+//             }
+//           });
+//         }
+//       });
+//     }
+
+//     // Step 6: Calculate BF (Brought Forward)
+//     // BF = COA Debit - COA Credit
+//     const bf = coaId ? (coaTotalDebit - coaTotalCredit) : 0;
+
+//     console.log('=== CALCULATIONS ===');
+//     console.log('All Total Debit:', allTotalDebit);
+//     console.log('All Total Credit:', allTotalCredit);
+//     console.log('COA Total Debit:', coaTotalDebit);
+//     console.log('COA Total Credit:', coaTotalCredit);
+//     console.log('BF:', bf);
+//     console.log('====================');
+
+//     res.json({ 
+//       success: true,
+//       upToDate: lastDate,
+//       coaId: coaId ? parseInt(coaId) : null,
+      
+//       // ✅ All details sum (no filter)
+//       allTotals: {
+//         debit: Math.round(allTotalDebit * 100) / 100,
+//         credit: Math.round(allTotalCredit * 100) / 100,
+//         difference: Math.round(Math.abs(allTotalDebit - allTotalCredit) * 100) / 100
+//       },
+      
+//       // ✅ COA-specific sum (filtered)
+//       coaTotals: coaId ? {
+//         debit: Math.round(coaTotalDebit * 100) / 100,
+//         credit: Math.round(coaTotalCredit * 100) / 100,
+//         difference: Math.round(Math.abs(coaTotalDebit - coaTotalCredit) * 100) / 100
+//       } : null,
+      
+//       // ✅ BF (Brought Forward) = COA Debit - COA Credit
+//       bf: Math.round(bf * 100) / 100,
+      
+//       // ✅ Count
+//       count: allEntries.length,
+//       coaDetailsCount: coaDetails.length,
+      
+//       // ✅ COA-specific details
+//       coaDetails: coaId ? coaDetails : null,
+      
+//       // ✅ Full data (optional - can remove if too large)
+//       data: allEntries 
+//     });
+
+//   } catch (error) {
+//     console.error('Error fetching entries:', error);
+//     res.status(500).json({ 
+//       success: false, 
+//       message: 'Error fetching entries',
+//       error: error.message 
+//     });
+//   }
+// };
+
+
+
+
+
+
+const get_BF_RF = async (req, res) => {
+  try {
+    const { coaId, mode, upToDate, excludeId } = req.query;
+
+    console.log('=== BF/RF API PARAMS ===');
+    console.log('coaId:', coaId);
+    console.log('mode:', mode);
+    console.log('upToDate:', upToDate);
+    console.log('excludeId:', excludeId);
+    console.log('========================');
+
+    let lastDate;
+
+    // ✅ CREATE MODE: Use last JV date
+    if (mode === 'create' || !mode) {
+      const lastEntry = await JournalMaster.findOne({
+        where: {
+          voucherTypeId: 10
+        },
+        order: [['id', 'DESC']]
+      });
+
+      if (!lastEntry) {
+        return res.status(200).json({
+          success: true,
+          message: 'No Journal Voucher entries found',
+          upToDate: null,
+          coaId: coaId ? parseInt(coaId) : null,
+          allTotals: { debit: 0, credit: 0, difference: 0 },
+          coaTotals: null,
+          bf: 0,
+          count: 0,
+          coaDetailsCount: 0,
+          coaDetails: null,
+          data: []
+        });
+      }
+
+      lastDate = lastEntry.date;
+      console.log('CREATE MODE - Last JV Date:', lastDate);
+    }
+
+    // ✅ EDIT MODE: Use provided upToDate
+    if (mode === 'edit') {
+      if (!upToDate) {
+        return res.status(400).json({
+          success: false,
+          message: 'upToDate is required for edit mode'
+        });
+      }
+      lastDate = new Date(upToDate);
+      console.log('EDIT MODE - Up To Date:', lastDate);
+    }
+
+    // ✅ Build WHERE clause for JournalMaster
+    const masterWhereClause = {
+      date: {
+        [Op.lte]: lastDate
+      },
+      is_partially_deleted: false
+    };
+
+    // ✅ EDIT MODE: Exclude the voucher being edited
+    if (mode === 'edit' && excludeId) {
+      masterWhereClause.id = {
+        [Op.ne]: parseInt(excludeId)
+      };
+      console.log('Excluding voucher ID:', excludeId);
+    }
+
+    // ✅ Get ALL entries with ALL details
+    const allEntries = await JournalMaster.findAll({
+      where: masterWhereClause,
+      attributes: ['id', 'date', 'voucherTypeId', 'voucherNo', 'status', 'isOpening'],
+      include: [{
+        model: JournalDetail,
+        as: 'details',
+        attributes: ['id', 'description', 'jmId', 'coaId', 'amountDb', 'amountCr']
+      }],
+      order: [['date', 'ASC'], ['id', 'ASC']]
+    });
+
+    // ✅ Calculate ALL totals (no filter)
+    let allTotalDebit = 0;
+    let allTotalCredit = 0;
+
+    allEntries.forEach(entry => {
+      if (entry.details && entry.details.length > 0) {
+        entry.details.forEach(detail => {
+          allTotalDebit += parseFloat(detail.amountDb) || 0;
+          allTotalCredit += parseFloat(detail.amountCr) || 0;
+        });
+      }
+    });
+
+    // ✅ Calculate COA-specific totals (if coaId provided)
+    let coaTotalDebit = 0;
+    let coaTotalCredit = 0;
+    let coaDetails = [];
+
+    if (coaId) {
+      const parsedCoaId = parseInt(coaId);
+
+      allEntries.forEach(entry => {
+        if (entry.details && entry.details.length > 0) {
+          entry.details.forEach(detail => {
+            if (detail.coaId === parsedCoaId) {
+              coaTotalDebit += parseFloat(detail.amountDb) || 0;
+              coaTotalCredit += parseFloat(detail.amountCr) || 0;
+              coaDetails.push({
+                voucherNo: entry.voucherNo,
+                voucherId: entry.id,
+                date: entry.date,
+                voucherTypeId: entry.voucherTypeId,
+                description: detail.description,
+                amountDb: parseFloat(detail.amountDb) || 0,
+                amountCr: parseFloat(detail.amountCr) || 0
+              });
+            }
+          });
+        }
+      });
+    }
+
+    // ✅ Calculate BF (Brought Forward)
+    const bf = coaId ? (coaTotalDebit - coaTotalCredit) : 0;
+
+    console.log('=== CALCULATIONS ===');
+    console.log('Mode:', mode || 'create');
+    console.log('Up To Date:', lastDate);
+    console.log('Excluded ID:', excludeId || 'none');
+    console.log('All Total Debit:', allTotalDebit);
+    console.log('All Total Credit:', allTotalCredit);
+    console.log('COA Total Debit:', coaTotalDebit);
+    console.log('COA Total Credit:', coaTotalCredit);
+    console.log('BF:', bf);
+    console.log('====================');
+
+    res.json({
+      success: true,
+      mode: mode || 'create',
+      upToDate: lastDate,
+      excludedId: excludeId ? parseInt(excludeId) : null,
+      coaId: coaId ? parseInt(coaId) : null,
+
+      // ✅ All details sum (no filter)
+      allTotals: {
+        debit: Math.round(allTotalDebit * 100) / 100,
+        credit: Math.round(allTotalCredit * 100) / 100,
+        difference: Math.round(Math.abs(allTotalDebit - allTotalCredit) * 100) / 100
+      },
+
+      // ✅ COA-specific sum (filtered)
+      coaTotals: coaId ? {
+        debit: Math.round(coaTotalDebit * 100) / 100,
+        credit: Math.round(coaTotalCredit * 100) / 100,
+        difference: Math.round(Math.abs(coaTotalDebit - coaTotalCredit) * 100) / 100
+      } : null,
+
+      // ✅ BF (Brought Forward)
+      bf: Math.round(bf * 100) / 100,
+
+      // ✅ Count
+      count: allEntries.length,
+      coaDetailsCount: coaDetails.length,
+
+      // ✅ COA-specific details
+      coaDetails: coaId ? coaDetails : null,
+
+      // ✅ Full data
+      data: allEntries
+    });
+
+  } catch (error) {
+    console.error('Error fetching BF/RF entries:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching entries',
+      error: error.message
+    });
+  }
+};
+
+
+
 
 
 module.exports = {
@@ -2136,5 +2544,6 @@ module.exports = {
   getPettyCashVouchers, // ✅ NEW
   deleteVoucherAndReset, // ✅ NEW
   getSalesVouchers,
-  postUnpostSalesVoucher
+  postUnpostSalesVoucher,
+  get_BF_RF
 };

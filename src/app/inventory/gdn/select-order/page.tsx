@@ -203,7 +203,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Loader2, Truck, ShoppingCart, ArrowRight, CheckCircle } from 'lucide-react'
+import { Search, Loader2, Truck, ShoppingCart, ArrowRight, CheckCircle, AlertTriangle } from 'lucide-react'
 import { useGetAllOrdersQuery } from '@/store/slice/orderApi'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -217,7 +217,10 @@ export default function SelectOrderForGDN() {
     stockTypeId: 12,
   })
 
+  // Debug: log API response for inspection
+  console.log('useGetAllOrdersQuery response:', data, 'isLoading:', isLoading)
   const orders = data?.data || []
+  console.log('derived orders array:', orders)
 
   // ✅ Only show approved orders without GDN
   const filteredOrders = orders.filter((order: any) => {
@@ -236,6 +239,7 @@ export default function SelectOrderForGDN() {
     if (!dateStr) return '-'
     return new Date(dateStr).toLocaleDateString('en-GB')
   }
+
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -310,6 +314,7 @@ export default function SelectOrderForGDN() {
                     variant="success"
                     size="sm"
                     icon={<ArrowRight className="w-4 h-4" />}
+                    
                   >
                     Create GDN
                   </Button>

@@ -238,3 +238,4 @@ export const departmentBaseQuery = createDynamicBaseQuery('/department');
 export const employeeBaseQuery = createDynamicBaseQuery('/employee');
 export const mouldBaseQuery = createDynamicBaseQuery('/mould');
 export const mouldingBaseQuery = createDynamicBaseQuery('/moulding');
+export const reportsBaseQuery = createDynamicBaseQuery('/reports');
