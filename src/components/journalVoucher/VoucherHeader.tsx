@@ -257,7 +257,7 @@
 //             <h3 className="font-semibold text-blue-900">Link to Journal Voucher</h3>
 //             <span className="text-red-500">*</span>
 //           </div>
-          
+
 //           <JournalSearchableInput
 //             value={linkedJournalId || ''}
 //             onChange={onLinkedJournalChange}
@@ -266,7 +266,7 @@
 //             required
 //             clearable
 //           />
-          
+
 //           {!linkedJournalId && !errors.linkedJournalId && (
 //             <p className="mt-2 text-sm text-blue-600">
 //               <AlertCircle className="w-4 h-4 inline mr-1" />
@@ -688,6 +688,7 @@ import React from 'react'
 import { CoaSearchableInput } from '@/components/common/coa/CoaSearchableInput'
 import { JournalSearchableInput } from '@/components/common/journal/JournalSearchableInput'
 import { Calendar, FileText, Hash } from 'lucide-react'
+import { Input } from '@/components/ui/Input'
 
 // =============================================
 // TYPES
@@ -786,18 +787,18 @@ const VoucherHeader: React.FC<VoucherHeaderProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Voucher Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mt-3">
             <Hash className="w-4 h-4 inline mr-1" />
             Voucher No <span className="text-red-500">*</span>
           </label>
-          <input
+          <Input
             type="text"
             value={formData.voucherNo}
             onChange={(e) => onFormDataChange('voucherNo', e.target.value)}
             placeholder={`${config.prefix}XXX`}
-            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#509ee3] ${
-              errors.voucherNo ? 'border-red-500' : 'border-gray-300'
-            }`}
+
+            size="md"
+            required
           />
           {errors.voucherNo && (
             <p className="mt-1 text-sm text-red-500">{errors.voucherNo}</p>
@@ -805,7 +806,7 @@ const VoucherHeader: React.FC<VoucherHeaderProps> = ({
         </div>
 
         {/* Date */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             <Calendar className="w-4 h-4 inline mr-1" />
             Date <span className="text-red-500">*</span>
@@ -814,20 +815,38 @@ const VoucherHeader: React.FC<VoucherHeaderProps> = ({
             type="date"
             value={formData.date}
             onChange={(e) => onFormDataChange('date', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#509ee3] ${
-              errors.date ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#509ee3] ${errors.date ? 'border-red-500' : 'border-gray-300'
+              }`}
           />
           {errors.date && (
             <p className="mt-1 text-sm text-red-500">{errors.date}</p>
           )}
+        </div> */}
+        <div className='mt-2'>
+          <Input
+            type="date"
+            label={`Date *`}
+            // value={value.date}
+            value={formData.date}
+            // onChange={(e) => {
+            //   console.log('📅 Date changed:', e.target.value)
+            //   updateField('date', e.target.value)
+            // }}
+            onChange={(e) => onFormDataChange('date', e.target.value)}
+            error={errors.date}
+            icon={<Calendar className="w-4 h-4" />}
+            variant="default"
+            size="md"
+            required
+          />
         </div>
+
 
         {/* Balancing COA */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          {/* <label className="block text-sm font-medium text-gray-700 mb-2">
             {config.balanceLabel} <span className="text-red-500">*</span>
-          </label>
+          </label> */}
           <CoaSearchableInput
             orderType={voucherType}
             value={formData.coaId || ''}
@@ -873,11 +892,11 @@ const VoucherHeader: React.FC<VoucherHeaderProps> = ({
       {/* ✅ All Totals + COA Totals + BF & CF Display */}
       {(voucherType === 'journal' || voucherType === 'pettycash') && formData.coaId && (
         <div className="mt-6 pt-6 border-t border-gray-200">
-          
+
           {/* Row 1: All Totals + COA Totals */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             
-            {/* All Vouchers Total */}
+            
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">
@@ -912,7 +931,7 @@ const VoucherHeader: React.FC<VoucherHeaderProps> = ({
               )}
             </div>
 
-            {/* COA-Specific Total */}
+         
             <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-medium text-purple-600 uppercase tracking-wide">
@@ -948,7 +967,7 @@ const VoucherHeader: React.FC<VoucherHeaderProps> = ({
                 <p className="text-gray-400 text-sm">No data for this COA</p>
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* Row 2: BF & CF */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

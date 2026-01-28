@@ -26,7 +26,7 @@ const SelectableTable: React.FC<SelectableTableProps> = ({
   value,
   onChange,
   options = [],
-  placeholder = "Select",
+  placeholder = "",
   required = false,
   disabled = false,
   displayKey = 'label',
@@ -103,12 +103,12 @@ const SelectableTable: React.FC<SelectableTableProps> = ({
 
   return (
     <div className="relative">
-      {label && (
+      {/* {label && (
         <label className="block text-[14px] font-semibold text-gray-700 mb-2">
           {label} 
-          {/* {required && <span className="text-red-500 ml-1">*</span>} */}
+          {required && <span className="text-red-500 ml-1">*</span>}
         </label>
-      )}
+      )} */}
       
       {/* Selected Value Display with Enhanced Design */}
       <div
@@ -156,7 +156,7 @@ const SelectableTable: React.FC<SelectableTableProps> = ({
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-white flex items-center">
                   <FileText className="w-6 h-6 mr-2" />
-                  Select {label || 'Option'}
+                  {label || 'Option'}
                 </h3>
                 <button
                   onClick={() => setIsOpen(false)}

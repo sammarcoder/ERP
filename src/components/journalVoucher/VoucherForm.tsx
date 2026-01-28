@@ -4349,6 +4349,24 @@ interface VoucherFormProps {
 // EMPTY DETAIL TEMPLATE
 // =============================================
 
+// const createEmptyDetail = (lineId: number): JournalDetail => ({
+//   lineId,
+//   coaId: 0,
+//   description: '',
+//   recieptNo: '',
+//   currencyId: null,
+//   rate: 0,
+//   ownDb: 0,
+//   ownCr: 0,
+//   amountDb: 0,
+//   amountCr: 0,
+//   idCard: '',
+//   bank: '',
+//   bankDate: null,
+//   status: true
+// })
+
+
 const createEmptyDetail = (lineId: number): JournalDetail => ({
   lineId,
   coaId: 0,
@@ -4363,8 +4381,9 @@ const createEmptyDetail = (lineId: number): JournalDetail => ({
   idCard: '',
   bank: '',
   bankDate: null,
-  status: true
+  status: false  // ✅ Changed from true to false
 })
+
 
 // =============================================
 // COMPONENT
@@ -4529,13 +4548,23 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
 
     let cfValue = bfValue
 
+    // if (totals.difference > 0 && formData.coaId) {
+    //   if (totals.debitTotal > totals.creditTotal) {
+    //     cfValue = bfValue - totals.difference
+    //   } else {
+    //     cfValue = bfValue + totals.difference
+    //   }
+    // }
+
+
     if (totals.difference > 0 && formData.coaId) {
       if (totals.debitTotal > totals.creditTotal) {
-        cfValue = bfValue + totals.difference
-      } else {
         cfValue = bfValue - totals.difference
+      } else {
+        cfValue = bfValue + totals.difference
       }
     }
+
 
     console.log('📊 BF/CF calculated:', {
       mode,
@@ -4710,6 +4739,46 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
     })
   }, [journalDetails.length])
 
+
+
+  // Handle cloning a row
+
+  // const handleCloneRow = useCallback((index: number) => {
+  //   console.log('📋 Cloning row:', index)
+  //   setJournalDetails(prev => {
+  //     const rowToClone = prev[index]
+
+  //     let newReceiptNo = rowToClone.recieptNo || ''
+  //     if (newReceiptNo) {
+  //       newReceiptNo = newReceiptNo + 'R'
+  //     }
+
+  //     const clonedRow: JournalDetail = {
+  //       ...rowToClone,
+  //       lineId: prev.length + 1,
+  //       recieptNo: newReceiptNo,
+  //       amountDb: rowToClone.amountCr || 0,
+  //       amountCr: rowToClone.amountDb || 0,
+  //       ownDb: rowToClone.ownCr || 0,
+  //       ownCr: rowToClone.ownDb || 0,
+  //       amountDb_raw: undefined,
+  //       amountCr_raw: undefined,
+  //       ownDb_raw: undefined,
+  //       ownCr_raw: undefined,
+  //     }
+
+  //     const newDetails = [...prev]
+  //     newDetails.splice(index + 1, 0, clonedRow)
+
+  //     return newDetails.map((detail, i) => ({ ...detail, lineId: i + 1 }))
+  //   })
+  // }, [])
+
+  // =============================================
+  // VALIDATION
+  // =============================================
+
+
   const handleCloneRow = useCallback((index: number) => {
     console.log('📋 Cloning row:', index)
     setJournalDetails(prev => {
@@ -4723,15 +4792,23 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
       const clonedRow: JournalDetail = {
         ...rowToClone,
         lineId: prev.length + 1,
+        coaId: 0,                          // ✅ Don't copy account
+        coaTypeId: undefined,              // ✅ Clear coaTypeId
+        isCurrencyLocked: false,           // ✅ Reset currency lock
+        currencyId: null,                  // ✅ Clear currency
         recieptNo: newReceiptNo,
+        // Reverse Debit and Credit
         amountDb: rowToClone.amountCr || 0,
         amountCr: rowToClone.amountDb || 0,
         ownDb: rowToClone.ownCr || 0,
         ownCr: rowToClone.ownDb || 0,
+        // Clear raw values
         amountDb_raw: undefined,
         amountCr_raw: undefined,
         ownDb_raw: undefined,
         ownCr_raw: undefined,
+        rate_raw: undefined,
+        status: false                      // ✅ Unchecked by default
       }
 
       const newDetails = [...prev]
@@ -4741,9 +4818,6 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
     })
   }, [])
 
-  // =============================================
-  // VALIDATION
-  // =============================================
 
   const validateForm = useCallback(() => {
     console.log('🔍 Validating form...')

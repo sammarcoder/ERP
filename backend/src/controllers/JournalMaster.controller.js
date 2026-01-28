@@ -2446,7 +2446,8 @@ const get_BF_RF = async (req, res) => {
       }
     });
 
-    const bf = parsedCoaId ? (  coaTotalCredit - coaTotalDebit) : 0;
+    // const bf = parsedCoaId ? (  coaTotalCredit - coaTotalDebit) : 0;
+    const bf = parsedCoaId ? (   coaTotalDebit - coaTotalCredit ) : 0;
 
     console.log('=== RESULTS ===');
     console.log('Entries Count:', allEntries.length);
