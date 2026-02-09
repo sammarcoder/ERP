@@ -608,46 +608,6 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
     return (labourCrt * bookedCrt) + (freightCrt * bookedCrt) + biltyExpense + otherExpense;
   }, [carriage]);
 
-  // Calculate totals
-  // const { totals, batchTotals } = useMemo(() => {
-  //   let totalGross = 0, totalNet = 0;
-  //   const batches: Record<string, { batchName: string; amount: number }> = {};
-
-  //   details.forEach(d => {
-  //     const qty = parseFloat(d.uom2_qty);
-  //     const gross = qty * (d.editedPrice || 0);
-  //     const discA = parseFloat(d.editedDiscountA) || 0;
-  //     const discB = parseFloat(d.editedDiscountB) || 0;
-  //     const discC = parseFloat(d.editedDiscountC) || 0;
-  //     const afterA = gross - (gross * discA / 100);
-  //     const afterB = afterA - (afterA * discB / 100);
-  //     const net = afterB - (afterB * discC / 100);
-
-  //     totalGross += gross;
-  //     totalNet += net;
-
-  //     const batchId = d.batchno || 'unknown';
-  //     if (!batches[batchId]) batches[batchId] = { batchName: d.batchDetails?.acName || `Batch-${batchId}`, amount: 0 };
-  //     batches[batchId].amount += net;
-  //   });
-
-  //   // ✅ Use Math.trunc to remove decimals (no rounding)
-  //   totalGross = Math.trunc(totalGross);
-  //   totalNet = Math.trunc(totalNet);
-
-  //   // Trunc batch amounts
-  //   Object.keys(batches).forEach(key => {
-  //     batches[key].amount = Math.trunc(batches[key].amount);
-  //   });
-
-  //   // ✅ If carriage ID selected, minus carriage from customer
-  //   const customerDebit = carriage.id ? totalNet - Math.trunc(carriageAmount) : totalNet;
-
-  //   return { totals: { totalGross, totalNet, customerDebit, carriageAmount: carriage.id ? Math.trunc(carriageAmount) : 0 }, batchTotals: batches };
-  // }, [details, carriage.id, carriageAmount]);
-  // Calculate totals
-
-
   const { totals, batchTotals } = useMemo(() => {
     let totalGross = 0, totalNet = 0;
     const batches: Record<string, { batchName: string; amount: number }> = {};
@@ -779,85 +739,7 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
 
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
-          {/* Tab 1: Details */}
-          {/* {activeTab === 'details' && (
-            <table className="w-full text-sm">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-3 py-2 text-center">#</th>
-                  <th className="px-3 py-2 text-left">Batch</th>
-                  <th className="px-3 py-2 text-left">Item Name</th>
-                  <th className="px-3 py-2 text-right">Crt Sold</th>
-                  <th className="px-3 py-2 text-right">Qty Sold</th>
-                  <th className="px-3 py-2 text-left">Price</th>
-                  <th className="px-3 py-2 text-right">Gross Total</th>
-                  <th className="px-3 py-2 text-center">Disc A</th>
-                  <th className="px-3 py-2 text-center">Disc B</th>
-                  <th className="px-3 py-2 text-center">Disc C</th>
-                  <th className="px-3 py-2 text-right">Net Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {details.map((d, i) => {
-                  const qty = d.uom2_qty;
-                  const crtQty = d.uom3_qty;
-                  const uom1Name = d.item?.uom1?.uom || '';
-                  const uom2Name = d.item?.uomTwo?.uom;
-                  const uom3Name = d.item?.uomThree?.uom || '';
-                  const batchName = d.batchDetails?.acName || '-';
-                  const gross = qty * (d.editedPrice || 0);
-                  const discountA = parseFloat(d.editedDiscountA) || 0;
-                  const discountB = parseFloat(d.editedDiscountB) || 0;
-                  const discountC = parseFloat(d.editedDiscountC) || 0;
-                  const afterA = gross - (gross * discountA / 100);
-                  const afterB = afterA - (afterA * discountB / 100);
-                  const net = afterB - (afterB * discountC / 100);
-                  return (
-                    <tr key={d.ID} className="border-b hover:bg-gray-50">
-                      <td className="px-3 py-2 text-center">{d.Line_Id || i + 1}</td>
-                      <td className="px-3 py-2">{batchName}</td>
-                      <td className="px-3 py-2">{d.item?.itemName || '-'}</td>
-                      <td className="px-3 py-2 text-right">{Math.trunc(crtQty)} {uom3Name}</td>
-                      <td className="px-3 py-2 text-right">{Math.trunc(qty)} {uom2Name}</td>
-                      <td className="px-3 py-2">
-                        <div className="flex items-center gap-1">
-                          <input type="text" inputMode="decimal" value={d.editedPrice ?? ''} onChange={e => setDetails(p => p.map((x, j) => j === i ? { ...x, editedPrice: handleNumericInput(e.target.value) } : x))} className="w-20 px-2 py-1 border rounded text-right" />
-                          <span className="text-xs border-green-40 text-gray-500">/{uom2Name}</span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-2 text-right">{fmtInt(Math.trunc(gross))}</td>
-                      <td className="">
-                        <div className="flex items-center justify-center gap-1">
-                          <input type="text" inputMode="decimal" value={d.editedDiscountA} onChange={e => { const v = e.target.value; if (v === '' || /^\d*\.?\d*$/.test(v)) setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountA: v } : x)); }} className="w-14 px-2 py-1 border border-green-400 rounded text-right" />
-                          <span className="text-xs text-gray-500">%</span>
-                        </div>
-                      </td>
-                      <td className="">
-                        <div className="flex items-center justify-center gap-1">
-                          <input type="text" inputMode="decimal" value={d.editedDiscountB} onChange={e => { const v = e.target.value; if (v === '' || /^\d*\.?\d*$/.test(v)) setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountB: v } : x)); }} className="w-14 px-2 py-1 border border-green-400 rounded text-right" />
-                          <span className="text-xs text-gray-500">%</span>
-                        </div>
-                      </td>
-                      <td className="">
-                        <div className="flex items-center justify-center gap-1">
-                          <input type="text" inputMode="decimal" value={d.editedDiscountC} onChange={e => { const v = e.target.value; if (v === '' || /^\d*\.?\d*$/.test(v)) setDetails(p => p.map((x, j) => j === i ? { ...x, editedDiscountC: v } : x)); }} className="w-14 px-2 py-1 border border-green-400 rounded text-right" />
-                          <span className="text-xs text-gray-500">%</span>
-                        </div>
-                      </td>
-                      <td className="px-3 text-right font-medium text-emerald-600">{fmtInt(Math.trunc(net))}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot className="bg-gray-100 font-medium">
-                <tr><td colSpan={6} className="px-3 py-2 text-right">Totals:</td><td className="px-3 py-2 text-right">{fmtInt(totals.totalGross)}</td><td colSpan={3}></td><td className="px-3 py-2 text-right text-emerald-600">{fmtInt(totals.totalNet)}</td></tr>
-              </tfoot>
-            </table>
-          )} */}
-
-
-
-
+        
           {/* Tab 1: Details */}
           {activeTab === 'details' && (
             <table className="w-full text-sm">
@@ -914,7 +796,7 @@ export default function SalesVoucher({ gdnId, mode, onClose, onSuccess }: SalesV
                             type="text"
                             inputMode="decimal"
                             value={d.editedPrice ?? ''}
-                            onChange={e => setDetails(p => p.map((x, j) => j === i ? { ...x, editedPrice: handleNumericInput(e.target.value) } : x))}
+                            onChange={e => setDetails(p => p.map((x, j) => j === i ? { ...x, editedPrice: e.target.value } : x))}
                             className="w-20 px-2 py-1 border rounded text-right"
                           />
                           <span className="text-xs text-gray-500">/{uom2Name}</span>

@@ -394,6 +394,40 @@ const ZCoaGetByCoaTypesSupplier = async (req, res) => {
 
 
 
+const ZCoaGetByCoaTypesLc = async (req, res) => {
+    try {
+        const zCoaList = await ZCoa.findAll({
+            where: {
+                coaTypeId: {
+                    [db.Sequelize.Op.in]: [2]
+                }
+            },
+            include: [
+                { model: db.ZControlHead2, required: false },
+                { model: db.ZCOAType, required: false }
+            ]
+        });
+
+        if (!zCoaList || zCoaList.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No Chart of Accounts found for the specified COA types"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: zCoaList,
+            count: zCoaList.length
+        });
+    } catch (error) {
+        console.error("Error fetching ZCoa by COA types:", error.message);
+        res.status(500).json({
+            success: false,
+            err: error.message
+        });
+    }
+};
 
 
 

@@ -731,7 +731,7 @@ export const CoaSearchableInput: React.FC<CoaSearchableInputProps> = ({
     } else if (orderType === 'pettycash') {
       return ['pettycash'] as const  // ✅ Only pettycash filter
     }
-    return ['all', 'customer', 'supplier'] as const
+    return ['all'] as const
   }
 
   const availableFilters = getAvailableFilters()
@@ -1039,3 +1039,55 @@ export const CoaSearchableInput: React.FC<CoaSearchableInputProps> = ({
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

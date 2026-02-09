@@ -109,41 +109,7 @@ const createCompleteJournal = async (req, res) => {
     });
   }
 
-  // =============================================
-  // 5. CHECK DUPLICATE RECEIPT NUMBERS (Across ALL vouchers)
-  // =============================================
-
-  // try {
-  //   const receiptNumbers = details
-  //     .filter(d => d.recieptNo && d.recieptNo.trim() !== '')
-  //     .map(d => d.recieptNo.trim());
-
-  //   if (receiptNumbers.length > 0) {
-  //     const existingReceipts = await JournalDetail.findAll({
-  //       where: {
-  //         recieptNo: { [Op.in]: receiptNumbers }
-  //       },
-  //       attributes: ['recieptNo']
-  //     });
-
-  //     if (existingReceipts.length > 0) {
-  //       const duplicates = [...new Set(existingReceipts.map(r => r.recieptNo))];
-  //       return res.status(409).json({
-  //         success: false,
-  //         message: `Receipt number(s) already exist in database: ${duplicates.join(', ')}`,
-  //         errorCode: 'DUPLICATE_RECEIPT_NO'
-  //       });
-  //     }
-  //   }
-  // } catch (receiptCheckError) {
-  //   console.error('Error checking receipt numbers:', receiptCheckError);
-  //   return res.status(500).json({
-  //     success: false,
-  //     message: 'Error checking receipt numbers',
-  //     error: receiptCheckError.message
-  //   });
-  // }
-
+ 
 
   // ✅ Check for duplicate receipts with voucher info
   try {
@@ -211,6 +177,7 @@ const createCompleteJournal = async (req, res) => {
     // Prepare master data with defaults
     const masterWithDefaults = {
       date: master.date,
+      coaId: master.coaId || null,
       voucherNo: master.voucherNo,
       voucherTypeId: master.voucherTypeId,
       balacingId: master.balacingId || null,
@@ -676,6 +643,11 @@ const getAllJournals = async (req, res) => {
         {
           model: db.JournalDetail,
           as: 'details'
+        },
+        {
+          model: db.ZCoa,
+          as: 'coa',
+          attributes: ['id', 'acName']
         }
       ]
     });
@@ -743,224 +715,6 @@ const getJournalById = async (req, res) => {
     });
   }
 };
-
-/**
- * Update a complete journal entry with transaction support
-//  */
-// const updateCompleteJournal = async (req, res) => {
-//   const { id } = req.params;
-//   const { master, details } = req.body;
-
-//   // Validate master data
-//   if (!master.date || !master.voucherNo || !master.voucherTypeId) {
-//     return res.status(400).json({ 
-//       success: false, 
-//       message: 'Missing required master fields' 
-//     });
-//   }
-
-//   // Validate details data
-//   if (!Array.isArray(details) || details.length === 0) {
-//     return res.status(400).json({
-//       success: false,
-//       message: 'Journal details are required and must be an array'
-//     });
-//   }
-
-//   // Start a transaction
-//   const transaction = await sequelize.transaction();
-
-//   try {
-//     // First find the journal master to update
-//     const journalMaster = await JournalMaster.findByPk(id);
-
-//     if (!journalMaster) {
-//       await transaction.rollback();
-//       return res.status(404).json({
-//         success: false,
-//         message: 'Journal entry not found'
-//       });
-//     }
-
-//     // Update the journal master
-//     await journalMaster.update(master, { transaction });
-
-//     // Delete existing details to replace with new ones
-//     await JournalDetail.destroy({
-//       where: { jmId: id },
-//       transaction
-//     });
-
-//     // Create new details with the master ID
-//     const detailsWithMasterId = details.map((detail, index) => ({
-//       ...detail,
-//       jmId: id,
-//       lineId: index + 1
-//     }));
-
-//     const newJournalDetails = await JournalDetail.bulkCreate(
-//       detailsWithMasterId,
-//       {
-//         transaction,
-//         validate: true
-//       }
-//     );
-
-//     // Commit the transaction
-//     await transaction.commit();
-
-//     // Return the updated journal
-//     return res.status(200).json({
-//       success: true,
-//       message: 'Journal entry updated successfully',
-//       data: {
-//         master: journalMaster,
-//         details: newJournalDetails
-//       }
-//     });
-//   } catch (error) {
-//     // Rollback the transaction on error
-//     await transaction.rollback();
-//     console.error('Error updating journal entry:', error);
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Failed to update journal entry',
-//       error: error.message
-//     });
-//   }
-// };
-
-
-
-
-// const updateCompleteJournal = async (req, res) => {
-//   const { id } = req.params;
-//   const { master, details } = req.body;
-
-//   // Validate master data
-//   if (!master.date || !master.voucherNo || !master.voucherTypeId) {
-//     return res.status(400).json({ 
-//       success: false, 
-//       message: 'Missing required master fields' 
-//     });
-//   }
-
-//   // Validate details data
-//   if (!Array.isArray(details) || details.length === 0) {
-//     return res.status(400).json({
-//       success: false,
-//       message: 'Journal details are required and must be an array'
-//     });
-//   }
-
-//   // ✅ NEW: Check if voucherNo already exists for OTHER records (exclude current)
-//   try {
-//     const existingVoucher = await JournalMaster.findOne({
-//       where: { 
-//         voucherNo: master.voucherNo,
-//         id: { [Op.ne]: id }  // ✅ Exclude current record
-//       }
-//     });
-
-//     if (existingVoucher) {
-//       return res.status(409).json({
-//         success: false,
-//         message: `Voucher number '${master.voucherNo}' already exists`,
-//         errorCode: 'DUPLICATE_VOUCHER_NO'
-//       });
-//     }
-//   } catch (checkError) {
-//     console.error('Error checking voucher number:', checkError);
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Error checking voucher number',
-//       error: checkError.message
-//     });
-//   }
-
-//   // Start a transaction
-//   const transaction = await sequelize.transaction();
-
-//   try {
-//     // First find the journal master to update
-//     const journalMaster = await JournalMaster.findByPk(id);
-
-//     if (!journalMaster) {
-//       await transaction.rollback();
-//       return res.status(404).json({
-//         success: false,
-//         message: 'Journal entry not found'
-//       });
-//     }
-
-//     // ✅ Include isOpening in update
-//     const masterWithDefaults = {
-//       ...master,
-//       isOpening: master.isOpening !== undefined ? master.isOpening : journalMaster.isOpening
-//     };
-
-//     // Update the journal master
-//     await journalMaster.update(masterWithDefaults, { transaction });
-
-//     // Delete existing details to replace with new ones
-//     await JournalDetail.destroy({
-//       where: { jmId: id },
-//       transaction
-//     });
-
-//     // Create new details with the master ID
-//     const detailsWithMasterId = details.map((detail, index) => ({
-//       ...detail,
-//       jmId: id,
-//       lineId: index + 1,
-//       bankDate: detail.bankDate || null,
-//       idCard: detail.idCard || null,
-//       bank: detail.bank || null
-//     }));
-
-//     const newJournalDetails = await JournalDetail.bulkCreate(
-//       detailsWithMasterId,
-//       {
-//         transaction,
-//         validate: true
-//       }
-//     );
-
-//     // Commit the transaction
-//     await transaction.commit();
-
-//     // Return the updated journal
-//     return res.status(200).json({
-//       success: true,
-//       message: 'Journal entry updated successfully',
-//       data: {
-//         master: journalMaster,
-//         details: newJournalDetails
-//       }
-//     });
-//   } catch (error) {
-//     // Rollback the transaction on error
-//     await transaction.rollback();
-//     console.error('Error updating journal entry:', error);
-
-//     // ✅ Handle Sequelize unique constraint error
-//     if (error.name === 'SequelizeUniqueConstraintError') {
-//       return res.status(409).json({
-//         success: false,
-//         message: `Voucher number '${master.voucherNo}' already exists`,
-//         errorCode: 'DUPLICATE_VOUCHER_NO'
-//       });
-//     }
-
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Failed to update journal entry',
-//       error: error.message
-//     });
-//   }
-// };
-
-
 
 
 
@@ -1445,11 +1199,97 @@ const checkJournalStatus = async (req, res) => {
 
 
 // ✅ NEW: Post/Unpost voucher functionality
+// const postUnpostVoucher = async (req, res) => {
+//   const { id } = req.params;
+
+//   // Start a transaction
+//   const transaction = await sequelize.transaction();
+
+//   try {
+//     // Find the journal master
+//     const journalMaster = await JournalMaster.findByPk(id, {
+//       include: [{
+//         model: JournalDetail,
+//         as: 'details'
+//       }],
+//       transaction
+//     });
+
+//     if (!journalMaster) {
+//       await transaction.rollback();
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Voucher not found'
+//       });
+//     }
+
+//     // Toggle status
+//     const newStatus = !journalMaster.status;
+
+//     // Update journal master status
+//     await journalMaster.update({ status: newStatus }, { transaction });
+
+//     // If posting (newStatus = true), update all detail statuses to true
+//     if (newStatus === true) {
+//       await JournalDetail.update(
+//         { status: true },
+//         {
+//           where: { jmId: id },
+//           transaction
+//         }
+//       );
+//     }
+//     // If unposting (newStatus = false), keep detail statuses as they are
+//     // This allows individual detail control when needed
+
+//     // Commit the transaction
+//     await transaction.commit();
+
+//     // Fetch updated data with details
+//     const updatedVoucher = await JournalMaster.findByPk(id, {
+//       include: [{
+//         model: JournalDetail,
+//         as: 'details',
+//         include: [{
+//           model: ZCoa,
+//           as: 'coa',
+//           attributes: ['id', 'acName', 'acCode']
+//         }]
+//       }, {
+//         model: ZvoucherType,
+//         as: 'voucherType',
+//         attributes: ['id', 'vType']
+//       }]
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: `Voucher ${newStatus ? 'posted' : 'unposted'} successfully`,
+//       data: updatedVoucher
+//     });
+
+//   } catch (error) {
+//     // Rollback the transaction on error
+//     await transaction.rollback();
+//     console.error('Error posting/unposting voucher:', error);
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Failed to post/unpost voucher',
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
+
 const postUnpostVoucher = async (req, res) => {
   const { id } = req.params;
 
-  // Start a transaction
   const transaction = await sequelize.transaction();
+  let committed = false;
 
   try {
     // Find the journal master
@@ -1485,13 +1325,12 @@ const postUnpostVoucher = async (req, res) => {
         }
       );
     }
-    // If unposting (newStatus = false), keep detail statuses as they are
-    // This allows individual detail control when needed
 
     // Commit the transaction
     await transaction.commit();
+    committed = true;
 
-    // Fetch updated data with details
+    // ✅ FIXED: Removed acCode from attributes
     const updatedVoucher = await JournalMaster.findByPk(id, {
       include: [{
         model: JournalDetail,
@@ -1499,7 +1338,7 @@ const postUnpostVoucher = async (req, res) => {
         include: [{
           model: ZCoa,
           as: 'coa',
-          attributes: ['id', 'acName', 'acCode']
+          attributes: ['id', 'acName']  // ✅ Removed 'acCode'
         }]
       }, {
         model: ZvoucherType,
@@ -1515,8 +1354,14 @@ const postUnpostVoucher = async (req, res) => {
     });
 
   } catch (error) {
-    // Rollback the transaction on error
-    await transaction.rollback();
+    if (!committed) {
+      try {
+        await transaction.rollback();
+      } catch (rollbackError) {
+        console.error('Rollback error (ignored):', rollbackError.message);
+      }
+    }
+    
     console.error('Error posting/unposting voucher:', error);
     return res.status(500).json({
       success: false,
@@ -1525,6 +1370,11 @@ const postUnpostVoucher = async (req, res) => {
     });
   }
 };
+
+
+
+
+
 
 // ✅ NEW: Get vouchers by type (Journal = 10)
 const getJournalVouchers = async (req, res) => {
@@ -2490,6 +2340,82 @@ const get_BF_RF = async (req, res) => {
 
 
 
+
+
+
+
+
+const checkCoaUsageForLc = async (req, res) => {
+  try {
+    const { coaId, excludeId } = req.query;
+
+    if (!coaId) {
+      return res.status(400).json({
+        success: false,
+        message: 'coaId is required'
+      });
+    }
+
+    const whereClause = {
+      coaId: parseInt(coaId),
+      voucherTypeId: 13  // LC Voucher type
+    };
+
+    // Exclude current voucher in edit mode
+    if (excludeId) {
+      whereClause.id = { [Op.ne]: parseInt(excludeId) };
+    }
+
+    const existingVoucher = await JournalMaster.findOne({
+      where: whereClause,
+      attributes: ['id', 'voucherNo', 'date']
+    });
+
+    if (existingVoucher) {
+      return res.json({
+        success: true,
+        isUsed: true,
+        message: `This COA is already used in ${existingVoucher.voucherNo}`,
+        existingVoucher: {
+          id: existingVoucher.id,
+          voucherNo: existingVoucher.voucherNo,
+          date: existingVoucher.date
+        }
+      });
+    }
+
+    res.json({
+      success: true,
+      isUsed: false,
+      message: 'COA is available'
+    });
+
+  } catch (error) {
+    console.error('Error checking COA usage:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error checking COA usage',
+      error: error.message
+    });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
   createCompleteJournal,
   getAllJournals,
@@ -2507,5 +2433,6 @@ module.exports = {
   deleteVoucherAndReset, // ✅ NEW
   getSalesVouchers,
   postUnpostSalesVoucher,
-  get_BF_RF
+  get_BF_RF,
+  checkCoaUsageForLc
 };

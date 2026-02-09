@@ -24,6 +24,14 @@ const dispatchController = require('./dispatch.js')
 const gdnRoutes = require('./gdn.js')
 
 const salesVoucherRoutes = require('./salesVoucher.routes.js')
+const zlcvRoutes = require('./zlcv.routes.js');
+
+
+const masterTypeRoutes = require('./ZMasterType.routes');
+const lcMainRoutes = require('./LcMain.routes');
+
+
+
 
 router.use("/auth", authRoutes);
 router.use("/z-control", zRoutes);
@@ -66,6 +74,16 @@ router.use('/reports', require('./reportRoutes'));
 
 
 router.use('/sales-voucher', salesVoucherRoutes);
+
+router.use('/zlcv', zlcvRoutes);
+
+router.use('/master-types', masterTypeRoutes);
+
+
+
+
+
+router.use('/lc-main', lcMainRoutes);
 
 
 module.exports = router

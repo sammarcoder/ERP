@@ -257,6 +257,11 @@ ZItems.init(
             allowNull: true
         },
 
+        incomeTaxWithheld: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: true
+        },
+
         // Supplier Foreign Key
         supplier: {
             type: DataTypes.INTEGER,

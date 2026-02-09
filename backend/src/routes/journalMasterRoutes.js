@@ -9,7 +9,7 @@ const {
   deleteCompleteJournal,
   postVoucherToJournal,
   checkJournalStatus,
-    postUnpostVoucher, // ✅ NEW
+  postUnpostVoucher, // ✅ NEW
   getJournalVouchers, // ✅ NEW
   getPettyCashVouchers, // ✅ NEW
   // vTypeJournalVouchers,
@@ -17,7 +17,8 @@ const {
   deleteVoucherAndReset,
   getSalesVouchers,
   postUnpostSalesVoucher,
-  get_BF_RF
+  get_BF_RF,
+  checkCoaUsageForLc
 } = require('../controllers/JournalMaster.controller');
 
 // Combined endpoints
@@ -41,6 +42,7 @@ router.get('/sales-vouchers', getSalesVouchers);
 router.post('/sales-voucher-post-unpost/:id', postUnpostSalesVoucher);
 
 router.get('/reports/get_BF_RF', get_BF_RF);
+router.get('/check-coa-lc', checkCoaUsageForLc);
 // router.get('/vtype/journal-vouchers', vTypeJournalVouchers); //  New route for Journal Vouchers
 // router.get('/vtype/petty-vouchers', vTypePettyVouchers); // New route for Petty Vouchers
 

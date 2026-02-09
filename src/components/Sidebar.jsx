@@ -49,7 +49,8 @@ const Sidebar = () => {
                 { id: 'machines', title: 'Machines', path: '/machines' },
                 { id: 'shifts', title: 'Shifts', path: '/shifts' },
                 { id: 'moulds', title: 'Moulds', path: '/moulds' },
-                { id: 'moulding', title: 'Moulding', path: '/moulding' },
+                { id: 'masterTypes', title: 'Master Types', path: '/master-types' },
+                { id: 'lcMain', title: 'Lc Main', path: '/lc-main' },
                 // { id: 'sales-voucher', title: 'Sales Voucher', path: '/vouchers/sales' },
                 // { id: 'transfer-voucher', title: 'Transfer Voucher', path: '/vouchers/transfer' }
             ]
@@ -66,7 +67,9 @@ const Sidebar = () => {
                 { id: 'purchase-voucher', title: 'Purchase Voucher', path: '/vouchers/purchase' },
                 { id: 'lc-voucher', title: 'LC Voucher', path: '/vouchers/lc' },
                 { id: 'sales-voucher', title: 'Sales Voucher', path: '/vouchers/sales' },
-                { id: 'transfer-voucher', title: 'Transfer Voucher', path: '/vouchers/transfer' }
+                { id: 'transfer-voucher', title: 'Transfer Voucher', path: '/vouchers/transfer' },
+                { id: 'zlcv', title: 'Z LCV', path: '/vouchers/lcv' },
+
             ]
         },
         {
@@ -103,8 +106,8 @@ const Sidebar = () => {
             subItems: [
                 { id: 'coa', title: 'COA', path: '/coa' },
                 // { id: 'purchase-order-def', title: 'Purchase Order', path: '/definition-ac/purchase-order' },
-                 { id: 'currency', title: 'Currency', path: '/currency' },
-                 { id: 'control head 2', title: 'control head 2', path: '/control-headTwo' },
+                { id: 'currency', title: 'Currency', path: '/currency' },
+                { id: 'control head 2', title: 'control head 2', path: '/control-headTwo' },
             ]
         },
         {
@@ -150,7 +153,8 @@ const Sidebar = () => {
                         { id: 'purchase-voucher-report', title: 'Purchase Voucher Report', path: '/reports/voucher/purchase' },
                         { id: 'lc-voucher-report', title: 'LC Voucher Report', path: '/reports/voucher/lc' },
                         { id: 'sales-voucher-report', title: 'Sales Voucher Report', path: '/reports/voucher/sales' },
-                        { id: 'transfer-voucher-report', title: 'Transfer Voucher Report', path: '/reports/voucher/transfer' }
+                        { id: 'transfer-voucher-report', title: 'Transfer Voucher Report', path: '/reports/voucher/transfer' },
+
                     ]
                 },
                 {
@@ -158,7 +162,9 @@ const Sidebar = () => {
                     title: 'Inventory Reports',
                     path: null,
                     subItems: [
-                        { id: 'stock-position', title: 'Stock Position', path: '/reports/inventory/stock-position' }
+                        { id: 'stock-position', title: 'Stock Position', path: '/reports/inventory/stock-position' },
+                        { id: 'stock-report', title: 'stock Report', path: '/reports/stock-report' },
+                        { id: 'items-order', title: 'gdn Report', path: '/reports/item-order-dispatch' }
                     ]
                 },
                 {
@@ -281,9 +287,9 @@ const Sidebar = () => {
                 {/* Menu Items */}
                 <nav className="overflow-y-auto h-[calc(100%-64px)] py-4 dark:text-gray-200">
                     {menuItems.map((item) => (
-                        <MenuItem 
-                            key={item.id} 
-                            item={item} 
+                        <MenuItem
+                            key={item.id}
+                            item={item}
                             isVisible={isOpen || isHovered}
                         />
                     ))}

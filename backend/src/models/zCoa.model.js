@@ -173,7 +173,7 @@ const ZCoa = sequelize.define('ZCoa', {
     },
     str: {
         type: DataTypes.INTEGER,
-        allowNull:true
+        allowNull: true
     }
 });
 
@@ -236,7 +236,25 @@ ZCoa.associate = function (models) {
             onUpdate: 'CASCADE'
         });
     }
-    
+
+    if (models && models.Zlcv) {
+        ZCoa.hasMany(models.Zlcv, {
+            foreignKey: 'coaId',
+            as: 'zlcvEntries',
+            onDelete: 'RESTRICT',
+            onUpdate: 'CASCADE'
+        });
+    }
+    if (models && models.ZCoa) {
+        ZCoa.hasMany(models.JournalMaster, {
+            foreignKey: 'coaId',
+            as: 'journalMasters',
+            onDelete: 'RESTRICT',
+            onUpdate: 'CASCADE'
+        });
+    }
+
+
 };
 
 module.exports = ZCoa;

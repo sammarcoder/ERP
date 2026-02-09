@@ -45,10 +45,15 @@ const JournalMaster = sequelize.define('JournalMaster', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
-    }
+    },
+    coaId: {
+        type: DataTypes.INTEGER,
+        allowNull:true,
+        isUnique: true,
+    },
 },
     {
-        tableName: 'JournalMaster', // 👈 match your existing migration table name
+        tableName: 'JournalMaster', 
         freezeTableName: true,
     }
 );
@@ -80,6 +85,11 @@ JournalMaster.associate = function (models) {
     JournalMaster.hasMany(models.JournalMaster, {
         foreignKey: 'linkedJournalId',
         as: 'linkedPettyCash'
+    });
+
+    JournalMaster.belongsTo(models.ZCoa, {
+        foreignKey: 'coaId',
+        as: 'coa'
     });
 };
 

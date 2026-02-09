@@ -649,46 +649,46 @@ export const journalVoucherApi = createApi({
 
 
     // ✅ Updated getBFRF endpoint
-getBFRF: builder.query({
-  query: ({ coaId, mode, upToDate, excludeId }) => {
-    let url = `/journal-master/reports/get_BF_RF?`;
-    const params = [];
-    
-    if (coaId) params.push(`coaId=${coaId}`);
-    if (mode) params.push(`mode=${mode}`);
-    if (upToDate) params.push(`upToDate=${upToDate}`);
-    if (excludeId) params.push(`excludeId=${excludeId}`);
-    
-    return url + params.join('&');
-  },
-  transformResponse: (response: any) => {
-    if (!response.success) {
-      return {
-        bf: 0,
-        allTotals: { debit: 0, credit: 0, difference: 0 },
-        coaTotals: null,
-        coaDetails: [],
-        upToDate: null,
-        count: 0,
-        data: []
-      }
-    }
+    getBFRF: builder.query({
+      query: ({ coaId, mode, upToDate, excludeId }) => {
+        let url = `/journal-master/reports/get_BF_RF?`;
+        const params = [];
 
-    return {
-      bf: response.bf || 0,
-      allTotals: response.allTotals || { debit: 0, credit: 0, difference: 0 },
-      coaTotals: response.coaTotals || null,
-      coaDetails: response.coaDetails || [],
-      coaDetailsCount: response.coaDetailsCount || 0,
-      upToDate: response.upToDate,
-      excludedId: response.excludedId,
-      mode: response.mode,
-      coaId: response.coaId,
-      count: response.count,
-      data: response.data
-    }
-  }
-}),
+        if (coaId) params.push(`coaId=${coaId}`);
+        if (mode) params.push(`mode=${mode}`);
+        if (upToDate) params.push(`upToDate=${upToDate}`);
+        if (excludeId) params.push(`excludeId=${excludeId}`);
+
+        return url + params.join('&');
+      },
+      transformResponse: (response: any) => {
+        if (!response.success) {
+          return {
+            bf: 0,
+            allTotals: { debit: 0, credit: 0, difference: 0 },
+            coaTotals: null,
+            coaDetails: [],
+            upToDate: null,
+            count: 0,
+            data: []
+          }
+        }
+
+        return {
+          bf: response.bf || 0,
+          allTotals: response.allTotals || { debit: 0, credit: 0, difference: 0 },
+          coaTotals: response.coaTotals || null,
+          coaDetails: response.coaDetails || [],
+          coaDetailsCount: response.coaDetailsCount || 0,
+          upToDate: response.upToDate,
+          excludedId: response.excludedId,
+          mode: response.mode,
+          coaId: response.coaId,
+          count: response.count,
+          data: response.data
+        }
+      }
+    }),
 
 
 

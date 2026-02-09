@@ -28,9 +28,10 @@ import { mouldApi } from './slice/mouldApi';
 import { mouldingApi } from './slice/mouldingApi';
 
 import { reportApi } from './slice/reports/reportApi';
-
-
-
+import { zlcvApi } from './slice/zlcvSlice';
+import { lcVoucherApi } from './slice/lcVoucherSlice';
+import { masterTypeApi } from './slice/masterTypeSlice';
+import { lcMainApi } from './slice/lcMainSlice';
 // import { gdnApi2 } from './test/gdnApi';
 
 export const store = configureStore({
@@ -60,7 +61,10 @@ export const store = configureStore({
     [mouldingApi.reducerPath]: mouldingApi.reducer,
 
     [reportApi.reducerPath]: reportApi.reducer,
-
+    [zlcvApi.reducerPath]: zlcvApi.reducer,
+    [lcVoucherApi.reducerPath]: lcVoucherApi.reducer,
+    [masterTypeApi.reducerPath]: masterTypeApi.reducer,
+    [lcMainApi.reducerPath]: lcMainApi.reducer,
 
 
   },
@@ -91,7 +95,11 @@ export const store = configureStore({
       .concat(employeeApi.middleware)
       .concat(mouldApi.middleware)
       .concat(mouldingApi.middleware)
-      .concat(reportApi.middleware),
+      .concat(reportApi.middleware)
+      .concat(zlcvApi.middleware)
+      .concat(lcVoucherApi.middleware)
+      .concat(masterTypeApi.middleware) 
+      .concat(lcMainApi.middleware), 
 });
 
 setupListeners(store.dispatch);
