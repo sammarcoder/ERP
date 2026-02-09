@@ -682,12 +682,12 @@ router.get('/', async (req, res) => {
     res.json({
       success: true,
       data: grns,
-      pagination: {
-        total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / parseInt(limit))
-      }
+      // pagination: {
+      //   total: count,
+      //   page: parseInt(page),
+      //   limit: parseInt(limit),
+      //   totalPages: Math.ceil(count / parseInt(limit))
+      // }
     });
   } catch (error) {
     console.error('❌ Error fetching GRNs:', error);
