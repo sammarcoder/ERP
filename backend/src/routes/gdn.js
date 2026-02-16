@@ -36,8 +36,6 @@ const generateGDNNumber = async () => {
 };
 
 
-
-
 // =====================================================
 // HELPER: Check Stock Availability
 // =====================================================
@@ -182,13 +180,6 @@ router.get('/', async (req, res) => {
 });
 
 
-
-
-
-
-
-
-
 // GET orders with Next_Status = 'partial' for additional GDN
 router.get('/orders-for-additional-gdn', async (req, res) => {
   try {
@@ -266,23 +257,6 @@ router.get('/orders-for-additional-gdn', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // =====================================================
 // GET SINGLE GDN
@@ -499,19 +473,6 @@ router.put('/:id', async (req, res) => {
 
     // Replace details
     await Stk_Detail.destroy({ where: { STK_Main_ID: id }, transaction });
-
-    // const updatedDetails = stockDetails.map((detail, idx) => ({
-    //   ...detail,
-    //   STK_Main_ID: parseInt(id),
-    //   Line_Id: idx + 1,
-    //   Stock_out_UOM: detail.Stock_In_UOM,
-    //   Stock_out_UOM_Qty: detail.uom1_qty,
-    //   Stock_out_SKU_UOM: detail.Stock_In_SKU_UOM,
-    //   Stock_out_SKU_UOM_Qty: detail.uom2_qty,
-    //   Stock_out_UOM3_Qty: detail.uom3_qty
-    // }));
-
-
     const updatedDetails = stockDetails.map((detail, idx) => ({
       STK_Main_ID: parseInt(id),
       Line_Id: idx + 1,
@@ -533,19 +494,14 @@ router.put('/:id', async (req, res) => {
       Discount_B: parseFloat(detail.Discount_B) || 0,
       Discount_C: parseFloat(detail.Discount_C) || 0
     }));
-
-
     await Stk_Detail.bulkCreate(updatedDetails, { transaction });
-
     // Recalculate order status
     if (existing.Order_Main_ID) {
       const newStatus = await calculateOrderStatus(existing.Order_Main_ID, stockDetails);
       await Order_Main.update({ Next_Status: newStatus }, { where: { ID: existing.Order_Main_ID }, transaction });
     }
-
     await transaction.commit();
     res.json({ success: true, message: 'GDN updated' });
-
   } catch (error) {
     await transaction.rollback();
     res.status(500).json({ success: false, error: error.message });

@@ -106,3 +106,6 @@ export const zlcvBaseQuery = createDynamicBaseQuery('/zlcv');
 export const lcVoucherBaseQuery = createDynamicBaseQuery('');
 export const masterTypeBaseQuery = createDynamicBaseQuery('/master-types');
 export const lcMainBaseQuery = createDynamicBaseQuery('/lc-main');
+export const recipeBaseQuery = createDynamicBaseQuery('/recipe');
+export const ginBaseQuery = createDynamicBaseQuery('/gin');
+export const mgrnBaseQuery = createDynamicBaseQuery('/mgrn');

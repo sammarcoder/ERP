@@ -15,12 +15,6 @@ interface Props {
   showRemoveButton?: boolean
 }
 
-// const getApiBaseUrl = () => {
-//   if (typeof window !== 'undefined') {
-//     return `http://${window.location.hostname}:4000/api`
-//   }
-//   return 'http://localhost:4000/api'
-// }
 
 export default function GDN_Item_Row({
   row,
@@ -52,111 +46,6 @@ export default function GDN_Item_Row({
     if (row.Discount_C !== undefined) setDiscountC(row.Discount_C || 0)
   }, [row.Discount_A, row.Discount_B, row.Discount_C])
 
-  // ═══════════════════════════════════════════════════════════════
-  // FETCH BATCHES USING NATIVE FETCH
-  // ═══════════════════════════════════════════════════════════════
-  // useEffect(() => {
-  //   const fetchBatches = async () => {
-  //     if (!row.Item_ID) return
-
-  //     setIsLoadingBatches(true)
-  //     setBatchError(null)
-
-  //     try {
-  //       const baseUrl = getApiBaseUrl()
-  //       let url: string
-
-  //       if (mode === 'edit' && dispatchId) {
-  //         url = `${baseUrl}/dispatch/available-batches-edit/${row.Item_ID}/${dispatchId}`
-  //       } else {
-  //         url = `${baseUrl}/dispatch/available-batches/${row.Item_ID}`
-  //       }
-
-  //       console.log(`📡 Fetching batches for Item ${row.Item_ID}:`, url)
-
-  //       const response = await fetch(url)
-
-  //       if (!response.ok) {
-  //         throw new Error(`HTTP ${response.status}`)
-  //       }
-
-  //       const result = await response.json()
-
-  //       if (result.success && Array.isArray(result.data)) {
-  //         console.log(`✅ Found ${result.data.length} batch(es) for Item ${row.Item_ID}`)
-  //         setAvailableBatches(result.data)
-  //       } else {
-  //         setAvailableBatches([])
-  //       }
-
-  //     } catch (error: any) {
-  //       console.error('❌ Batch fetch error:', error)
-  //       setBatchError(error.message)
-  //       setAvailableBatches([])
-  //     } finally {
-  //       setIsLoadingBatches(false)
-  //     }
-  //   }
-
-  //   fetchBatches()
-  // }, [row.Item_ID, mode, dispatchId])
-
-
-  // ✅ Refresh available qty - keeps entered data, only updates batches
-  // const handleRefreshBatches = useCallback(async () => {
-  //   if (!row.Item_ID) return
-
-  //   setIsLoadingBatches(true)
-  //   setBatchError(null)
-
-  //   try {
-  //     const baseUrl = getApiBaseUrl()
-  //     let url: string
-
-  //     if (mode === 'edit' && dispatchId) {
-  //       url = `${baseUrl}/dispatch/available-batches-edit/${row.Item_ID}/${dispatchId}`
-  //     } else {
-  //       url = `${baseUrl}/dispatch/available-batches/${row.Item_ID}`
-  //     }
-
-  //     console.log(`🔄 Refreshing batches for Item ${row.Item_ID}`)
-
-  //     const response = await fetch(url)
-
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP ${response.status}`)
-  //     }
-
-  //     const result = await response.json()
-
-  //     if (result.success && Array.isArray(result.data)) {
-  //       console.log(`✅ Refreshed: ${result.data.length} batch(es) for Item ${row.Item_ID}`)
-  //       setAvailableBatches(result.data)
-
-  //       // ✅ Update selected batch qty if batch is already selected
-  //       if (selectedBatch) {
-  //         const updatedBatch = result.data.find((b: any) => b.batchno === selectedBatch)
-  //         if (updatedBatch) {
-  //           setBatchQty(updatedBatch.available_qty_uom1 || 0)
-  //         }
-  //       }
-  //     } else {
-  //       setAvailableBatches([])
-  //     }
-
-  //   } catch (error: any) {
-  //     console.error('❌ Refresh error:', error)
-  //     setBatchError(error.message)
-  //   } finally {
-  //     setIsLoadingBatches(false)
-  //   }
-  // }, [row.Item_ID, mode, dispatchId, selectedBatch])
-
-
-
-
-
-// Import at the top of your component file
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -259,17 +148,6 @@ const handleRefreshBatches = useCallback(async () => {
     setIsLoadingBatches(false);
   }
 }, [row.Item_ID, mode, dispatchId, selectedBatch]);
-
-
-
-
-
-
-
-
-
-
-
 
   // Handle batch selection
   const handleBatchSelect = useCallback((batchno: number) => {
@@ -417,9 +295,7 @@ const handleRefreshBatches = useCallback(async () => {
                         <span className="font-bold">#{batch.batchName}</span>
                         {isSelected && <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />}
                       </div>
-                      {/* <span className="text-xs text-green-600 font-semibold mt-0.5">
-                        {batch.available_qty_uom1?.toLocaleString()} avl
-                      </span> */}
+                      
                     </div>
                   </button>
                 )
@@ -455,45 +331,7 @@ const handleRefreshBatches = useCallback(async () => {
           )}
         </div>
 
-        {/* Discount Fields */}
-        {/* <div className="col-span-1 flex gap-1">
-          <div className="flex-1">
-            <label className="text-[10px] text-gray-500 block mb-0.5">Disc A%</label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              max="100"
-              value={discountA}
-              onChange={(e) => handleDiscountChange('A', e.target.value)}
-              className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="text-[10px] text-gray-500 block mb-0.5">Disc B%</label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              max="100"
-              value={discountB}
-              onChange={(e) => handleDiscountChange('B', e.target.value)}
-              className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="text-[10px] text-gray-500 block mb-0.5">Disc C%</label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              max="100"
-              value={discountC}
-              onChange={(e) => handleDiscountChange('C', e.target.value)}
-              className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
-            />
-          </div>
-        </div> */}
+       
 
         {/* Remove Button */}
         <div className="col-span-1 flex items-center justify-center pt-6">
@@ -511,3 +349,65 @@ const handleRefreshBatches = useCallback(async () => {
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//  {/* Discount Fields */}
+//         {/* <div className="col-span-1 flex gap-1">
+//           <div className="flex-1">
+//             <label className="text-[10px] text-gray-500 block mb-0.5">Disc A%</label>
+//             <input
+//               type="number"
+//               step="0.01"
+//               min="0"
+//               max="100"
+//               value={discountA}
+//               onChange={(e) => handleDiscountChange('A', e.target.value)}
+//               className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+//             />
+//           </div>
+//           <div className="flex-1">
+//             <label className="text-[10px] text-gray-500 block mb-0.5">Disc B%</label>
+//             <input
+//               type="number"
+//               step="0.01"
+//               min="0"
+//               max="100"
+//               value={discountB}
+//               onChange={(e) => handleDiscountChange('B', e.target.value)}
+//               className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+//             />
+//           </div>
+//           <div className="flex-1">
+//             <label className="text-[10px] text-gray-500 block mb-0.5">Disc C%</label>
+//             <input
+//               type="number"
+//               step="0.01"
+//               min="0"
+//               max="100"
+//               value={discountC}
+//               onChange={(e) => handleDiscountChange('C', e.target.value)}
+//               className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+//             />
+//           </div>
+//         </div> */}

@@ -290,21 +290,7 @@ export const MultiSelectItemTable: React.FC<MultiSelectItemTableProps> = ({
                         />
                       )}
                     </td>
-                    {/* <td className="px-4 py-3">
-                      {isAlreadyAdded ? (
-                        <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
-                          Already Added
-                        </span>
-                      ) : isSelected ? (
-                        <span className={`text-xs ${isPurchase ? 'bg-green-100 text-green-700' : 'bg-[#509ee3] text-white'} px-2 py-1 rounded-full`}>
-                          Selected
-                        </span>
-                      ) : (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                          Available
-                        </span>
-                      )}
-                    </td> */}
+                  
                     <td className="px-4 py-3 text-sm">{item.id}</td>
                     <td className="px-4 py-3 text-sm font-medium">{item.itemName}</td>
                     <td className="px-4 py-3 text-sm">
@@ -327,7 +313,7 @@ export const MultiSelectItemTable: React.FC<MultiSelectItemTableProps> = ({
                     <td className="px-4 py-3 text-sm">
                       {isPurchase ? (item.purchasePricePKR || '-') : (item.sellingPrice || '-')}
                     </td>
-                    {/* <td className="px-4 py-3 text-sm">{item.barCode || '-'}</td> */}
+                    
                   </tr>
                 )
               })}

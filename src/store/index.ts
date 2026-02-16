@@ -32,6 +32,11 @@ import { zlcvApi } from './slice/zlcvSlice';
 import { lcVoucherApi } from './slice/lcVoucherSlice';
 import { masterTypeApi } from './slice/masterTypeSlice';
 import { lcMainApi } from './slice/lcMainSlice';
+import { recipeApi } from './slice/recipeSlice';
+import { ginApi } from './slice/ginSlice';
+import { mgrnApi } from './slice/mgrnSlice';
+import { batchReportApi } from './slice/batchReportSlice';
+
 // import { gdnApi2 } from './test/gdnApi';
 
 export const store = configureStore({
@@ -65,6 +70,10 @@ export const store = configureStore({
     [lcVoucherApi.reducerPath]: lcVoucherApi.reducer,
     [masterTypeApi.reducerPath]: masterTypeApi.reducer,
     [lcMainApi.reducerPath]: lcMainApi.reducer,
+    [recipeApi.reducerPath]: recipeApi.reducer,
+    [ginApi.reducerPath]: ginApi.reducer,
+    [mgrnApi.reducerPath]: mgrnApi.reducer,
+    [batchReportApi.reducerPath]: batchReportApi.reducer,
 
 
   },
@@ -99,7 +108,11 @@ export const store = configureStore({
       .concat(zlcvApi.middleware)
       .concat(lcVoucherApi.middleware)
       .concat(masterTypeApi.middleware) 
-      .concat(lcMainApi.middleware), 
+      .concat(lcMainApi.middleware)
+      .concat(recipeApi.middleware) 
+      .concat(ginApi.middleware)
+      .concat(mgrnApi.middleware)
+      .concat(batchReportApi.middleware),
 });
 
 setupListeners(store.dispatch);

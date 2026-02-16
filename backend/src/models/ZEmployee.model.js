@@ -1,6 +1,7 @@
 const sequelize = require('../../config/database');
 const { DataTypes } = require('sequelize');
 const ZDepartment = require('./ZDepartment.model');
+const ZGinEmployee = require('./ZGinEmployee.model');
 
 const ZEmployee = sequelize.define('ZEmployee', {
     employeeName: {
@@ -33,7 +34,21 @@ const ZEmployee = sequelize.define('ZEmployee', {
 });
 
 // Define relationship
-ZDepartment.hasMany(ZEmployee, { foreignKey: 'departmentId', as: 'employees' });
-ZEmployee.belongsTo(ZDepartment, { foreignKey: 'departmentId', as: 'department' });
+ZDepartment.hasMany(ZEmployee, {
+    foreignKey: 'departmentId',
+    as: 'employees'
+});
+ZEmployee.belongsTo(ZDepartment, {
+    foreignKey: 'departmentId',
+    as: 'department'
+});
+ZEmployee.hasMany(ZGinEmployee,{
+    foreignKey:'employee_id',
+    as:'empl'
+
+}
+
+)
+
 
 module.exports = ZEmployee;

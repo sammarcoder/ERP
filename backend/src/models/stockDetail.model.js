@@ -50,7 +50,7 @@ const Stk_Detail = sequelize.define('Stk_Detail', {
 
   // Sale Unit
   Sale_Unit: { type: DataTypes.STRING() },
-  sale_Uom :{ type: DataTypes.INTEGER() },
+  sale_Uom: { type: DataTypes.INTEGER() },
   uom1_qty: { type: DataTypes.DECIMAL(10, 3) },
   uom2_qty: { type: DataTypes.DECIMAL(10, 3) },
   uom3_qty: { type: DataTypes.DECIMAL(10, 3) },
@@ -71,7 +71,12 @@ const Stk_Detail = sequelize.define('Stk_Detail', {
     allowNull: true,
     defaultValue: 0
   },
- 
+
+  gin_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+
 }, {
   tableName: 'Stk_Detail',
   timestamps: true
@@ -120,6 +125,12 @@ Stk_Detail.associate = function (models) {
     foreignKey: 'batchno',
     as: 'batchDetails'
   });
+
+  Stk_Detail.belongsTo(models.ZGinMain,{
+    foreignKey:'gin_id',
+    as:'ginMain'
+  })
+ 
 };
 
 module.exports = Stk_Detail;

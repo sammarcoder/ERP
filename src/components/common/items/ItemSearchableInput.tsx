@@ -96,7 +96,7 @@ export const ItemSearchableInput: React.FC<ItemSearchableInputProps> = ({
         <div
           onClick={handleInputClick}
           className={`
-            flex items-center justify-between w-full rounded-lg border px-4 py-2.5 text-sm cursor-pointer
+            flex items-center justify-between max-w-62 rounded-lg border px-4 py-1.5 text-sm cursor-pointer
             ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white hover:border-gray-400'}
             ${error ? 'border-red-500' : 'border-gray-300'}
             ${isOpen ? 'ring-1 ring-[#509ee3] border-[#509ee3]' : ''}

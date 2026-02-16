@@ -9,6 +9,110 @@ const sequelize = db.sequelize;
 
 
 // controllers/dispatchController.js - COMPLETE API WITH CREATE AND EDIT
+// const getAvailableBatchesForEdit = async (req, res) => {
+//   try {
+//     const itemId = req.params.itemId;
+//     const dispatchId = req.params.dispatchId;
+
+//     console.log(`🔍 EDIT MODE: Item_ID: ${itemId}, Dispatch_ID: ${dispatchId}`);
+
+//     if (!itemId || !dispatchId) {
+//       return res.status(400).json({
+//         success: false,
+//         error: 'Item ID and Dispatch ID are required for edit mode'
+//       });
+//     }
+
+//     // FIXED: SQL for edit mode - excludes current dispatch
+//     const batches = await sequelize.query(`
+//       SELECT 
+//         sd.batchno,
+//         sd.Item_ID,
+//         zi.itemName,
+//         zc.acName as batchName,
+
+//         -- Total received from GRN
+//         SUM(CASE 
+//           WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+//           ELSE 0 
+//         END) as total_received_uom1,
+
+//         -- Other dispatches (excluding current dispatch)
+//         SUM(CASE 
+//           WHEN sm.Stock_Type_ID = 12 AND sm.ID != :dispatchId 
+//           THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+//           ELSE 0 
+//         END) as total_other_dispatched_uom1,
+
+//         -- Current dispatch being edited
+//         SUM(CASE 
+//           WHEN sm.Stock_Type_ID = 12 AND sm.ID = :dispatchId 
+//           THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+//           ELSE 0 
+//         END) as current_dispatch_uom1,
+
+//         -- Available = Received - Other Dispatches (excludes current)
+//         (SUM(CASE 
+//           WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+//           ELSE 0 
+//         END) - 
+//         SUM(CASE 
+//           WHEN sm.Stock_Type_ID = 12 AND sm.ID != :dispatchId 
+//           THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+//           ELSE 0 
+//         END)) as available_qty_uom1
+
+//       FROM stk_detail sd
+//       INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+//       INNER JOIN zitems zi ON sd.Item_ID = zi.id
+//       LEFT JOIN zcoas zc ON sd.batchno = zc.id
+//       WHERE sd.Item_ID = :itemId 
+//         AND sd.batchno IS NOT NULL 
+//         AND sd.batchno != ''
+//       GROUP BY sd.batchno, sd.Item_ID, zi.itemName, zc.acName
+//       ORDER BY sd.batchno ASC
+//     `, {
+//       replacements: { itemId, dispatchId },
+//       type: sequelize.QueryTypes.SELECT
+//     });
+
+//     const processedBatches = batches.map(batch => ({
+//       batchno: batch.batchno,
+//       batchName: batch.batchName || batch.batchno,
+//       item_id: batch.Item_ID,
+//       item_name: batch.itemName,
+//       total_received_uom1: parseFloat(batch.total_received_uom1) || 0,
+//       total_other_dispatched_uom1: parseFloat(batch.total_other_dispatched_uom1) || 0,
+//       current_dispatch_uom1: parseFloat(batch.current_dispatch_uom1) || 0,
+//       available_qty_uom1: parseFloat(batch.available_qty_uom1) || 0,
+//       edit_mode: true
+//     }));
+
+//     console.log(`✅ EDIT MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
+
+//     res.json({
+//       success: true,
+//       data: processedBatches,
+//       mode: 'edit'
+//     });
+
+//   } catch (error) {
+//     console.error(`❌ EDIT API ERROR:`, error);
+//     res.status(500).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
+
 const getAvailableBatchesForEdit = async (req, res) => {
   try {
     const itemId = req.params.itemId;
@@ -23,7 +127,6 @@ const getAvailableBatchesForEdit = async (req, res) => {
       });
     }
 
-    // FIXED: SQL for edit mode - excludes current dispatch
     const batches = await sequelize.query(`
       SELECT 
         sd.batchno,
@@ -31,36 +134,98 @@ const getAvailableBatchesForEdit = async (req, res) => {
         zi.itemName,
         zc.acName as batchName,
         
-        -- Total received from GRN
+        -- UOM1: Total received from GRN (11, 13)
         SUM(CASE 
-          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
           ELSE 0 
         END) as total_received_uom1,
         
-        -- Other dispatches (excluding current dispatch)
+        -- UOM1: Other dispatches (excluding current)
         SUM(CASE 
-          WHEN sm.Stock_Type_ID = 12 AND sm.ID != :dispatchId 
+          WHEN sm.Stock_Type_ID IN (12, 14) AND sm.ID != :dispatchId 
           THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
           ELSE 0 
         END) as total_other_dispatched_uom1,
         
-        -- Current dispatch being edited
+        -- UOM1: Current dispatch being edited
         SUM(CASE 
-          WHEN sm.Stock_Type_ID = 12 AND sm.ID = :dispatchId 
+          WHEN sm.Stock_Type_ID IN (12, 14) AND sm.ID = :dispatchId 
           THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
           ELSE 0 
         END) as current_dispatch_uom1,
         
-        -- Available = Received - Other Dispatches (excludes current)
+        -- UOM1: Available = Received - Other Dispatches
         (SUM(CASE 
-          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
           ELSE 0 
         END) - 
         SUM(CASE 
-          WHEN sm.Stock_Type_ID = 12 AND sm.ID != :dispatchId 
+          WHEN sm.Stock_Type_ID IN (12, 14) AND sm.ID != :dispatchId 
           THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
           ELSE 0 
-        END)) as available_qty_uom1
+        END)) as available_qty_uom1,
+
+        -- UOM2: Total received from GRN (11, 13)
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_SKU_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_received_uom2,
+        
+        -- UOM2: Other dispatches (excluding current)
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) AND sm.ID != :dispatchId 
+          THEN COALESCE(sd.Stock_out_SKU_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_other_dispatched_uom2,
+        
+        -- UOM2: Current dispatch being edited
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) AND sm.ID = :dispatchId 
+          THEN COALESCE(sd.Stock_out_SKU_UOM_Qty, 0) 
+          ELSE 0 
+        END) as current_dispatch_uom2,
+        
+        -- UOM2: Available = Received - Other Dispatches
+        (SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_SKU_UOM_Qty, 0) 
+          ELSE 0 
+        END) - 
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) AND sm.ID != :dispatchId 
+          THEN COALESCE(sd.Stock_out_SKU_UOM_Qty, 0) 
+          ELSE 0 
+        END)) as available_qty_uom2,
+
+        -- UOM3: Total received from GRN (11, 13)
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_UOM3_Qty, 0) 
+          ELSE 0 
+        END) as total_received_uom3,
+        
+        -- UOM3: Other dispatches (excluding current)
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) AND sm.ID != :dispatchId 
+          THEN COALESCE(sd.Stock_out_UOM3_Qty, 0) 
+          ELSE 0 
+        END) as total_other_dispatched_uom3,
+        
+        -- UOM3: Current dispatch being edited
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) AND sm.ID = :dispatchId 
+          THEN COALESCE(sd.Stock_out_UOM3_Qty, 0) 
+          ELSE 0 
+        END) as current_dispatch_uom3,
+        
+        -- UOM3: Available = Received - Other Dispatches
+        (SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_UOM3_Qty, 0) 
+          ELSE 0 
+        END) - 
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) AND sm.ID != :dispatchId 
+          THEN COALESCE(sd.Stock_out_UOM3_Qty, 0) 
+          ELSE 0 
+        END)) as available_qty_uom3
         
       FROM stk_detail sd
       INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
@@ -81,10 +246,21 @@ const getAvailableBatchesForEdit = async (req, res) => {
       batchName: batch.batchName || batch.batchno,
       item_id: batch.Item_ID,
       item_name: batch.itemName,
+      // UOM1 (existing - backward compatible)
       total_received_uom1: parseFloat(batch.total_received_uom1) || 0,
       total_other_dispatched_uom1: parseFloat(batch.total_other_dispatched_uom1) || 0,
       current_dispatch_uom1: parseFloat(batch.current_dispatch_uom1) || 0,
       available_qty_uom1: parseFloat(batch.available_qty_uom1) || 0,
+      // UOM2 (new)
+      total_received_uom2: parseFloat(batch.total_received_uom2) || 0,
+      total_other_dispatched_uom2: parseFloat(batch.total_other_dispatched_uom2) || 0,
+      current_dispatch_uom2: parseFloat(batch.current_dispatch_uom2) || 0,
+      available_qty_uom2: parseFloat(batch.available_qty_uom2) || 0,
+      // UOM3 (new)
+      total_received_uom3: parseFloat(batch.total_received_uom3) || 0,
+      total_other_dispatched_uom3: parseFloat(batch.total_other_dispatched_uom3) || 0,
+      current_dispatch_uom3: parseFloat(batch.current_dispatch_uom3) || 0,
+      available_qty_uom3: parseFloat(batch.available_qty_uom3) || 0,
       edit_mode: true
     }));
 
@@ -105,7 +281,112 @@ const getAvailableBatchesForEdit = async (req, res) => {
   }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 // EXISTING: Keep your current function for create/fromOrder (modify HAVING clause)
+// const getAvailableBatchesForItem = async (req, res) => {
+//   try {
+//     const itemId = req.params.itemId;
+
+//     console.log(`🔍 CREATE/FROM_ORDER MODE: Item_ID: ${itemId}`);
+
+//     if (!itemId) {
+//       return res.status(400).json({
+//         success: false,
+//         error: 'Item ID is required'
+//       });
+//     }
+
+//     // FIXED: Remove HAVING clause to show ALL batches (let frontend decide)
+//     // ADDED: LEFT JOIN with zcoa to get batchName (acName)
+//     const availableBatches = await sequelize.query(`
+//       SELECT 
+//         sd.batchno,
+//         sd.Item_ID,
+//         zi.itemName,
+//         zc.acName as batchName,
+
+//         SUM(CASE 
+//           WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+//           ELSE 0 
+//         END) as total_received_uom1,
+
+//         SUM(CASE 
+//           WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+//           ELSE 0 
+//         END) as total_dispatched_uom1,
+
+//         (SUM(CASE 
+//           WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+//           ELSE 0 
+//         END) - 
+//         SUM(CASE 
+//           WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+//           ELSE 0 
+//         END)) as available_qty_uom1
+
+//       FROM stk_detail sd
+//       INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
+//       INNER JOIN zitems zi ON sd.Item_ID = zi.id
+//       LEFT JOIN zcoas zc ON sd.batchno = zc.id
+//       WHERE sd.Item_ID = :itemId 
+//         AND sd.batchno IS NOT NULL 
+//         AND sd.batchno != ''
+//       GROUP BY sd.batchno, sd.Item_ID, zi.itemName, zc.acName
+//       -- FIXED: No HAVING clause - show all batches
+//       ORDER BY sd.batchno ASC
+//     `, {
+//       replacements: { itemId },
+//       type: sequelize.QueryTypes.SELECT
+//     });
+
+//     const processedBatches = availableBatches.map(batch => ({
+//       batchno: batch.batchno,
+//       batchName: batch.batchName || batch.batchno, // Fallback to batchno if no name found
+//       item_id: batch.Item_ID,
+//       item_name: batch.itemName,
+//       total_received_uom1: parseFloat(batch.total_received_uom1) || 0,
+//       total_dispatched_uom1: parseFloat(batch.total_dispatched_uom1) || 0,
+//       available_qty_uom1: parseFloat(batch.available_qty_uom1) || 0,
+//       edit_mode: false
+//     }));
+
+//     // console.log(`✅ CREATE MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
+//     console.log(`Batches:`, processedBatches);
+
+//     res.json({
+//       success: true,
+//       data: processedBatches,
+//       mode: 'create'
+//     });
+
+//   } catch (error) {
+//     console.error(`❌ CREATE API ERROR:`, error);
+//     res.status(500).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
 const getAvailableBatchesForItem = async (req, res) => {
   try {
     const itemId = req.params.itemId;
@@ -119,8 +400,6 @@ const getAvailableBatchesForItem = async (req, res) => {
       });
     }
 
-    // FIXED: Remove HAVING clause to show ALL batches (let frontend decide)
-    // ADDED: LEFT JOIN with zcoa to get batchName (acName)
     const availableBatches = await sequelize.query(`
       SELECT 
         sd.batchno,
@@ -128,24 +407,65 @@ const getAvailableBatchesForItem = async (req, res) => {
         zi.itemName,
         zc.acName as batchName,
         
+        -- UOM1: Stock_In_UOM_Qty / Stock_out_UOM_Qty
         SUM(CASE 
-          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
           ELSE 0 
         END) as total_received_uom1,
         
         SUM(CASE 
-          WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          WHEN sm.Stock_Type_ID IN (12, 14) THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
           ELSE 0 
         END) as total_dispatched_uom1,
         
         (SUM(CASE 
-          WHEN sm.Stock_Type_ID = 11 THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_UOM_Qty, 0) 
           ELSE 0 
         END) - 
         SUM(CASE 
-          WHEN sm.Stock_Type_ID = 12 THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
+          WHEN sm.Stock_Type_ID IN (12, 14) THEN COALESCE(sd.Stock_out_UOM_Qty, 0) 
           ELSE 0 
-        END)) as available_qty_uom1
+        END)) as available_qty_uom1,
+
+        -- UOM2: Stock_In_SKU_UOM_Qty / Stock_out_SKU_UOM_Qty
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_SKU_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_received_uom2,
+        
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) THEN COALESCE(sd.Stock_out_SKU_UOM_Qty, 0) 
+          ELSE 0 
+        END) as total_dispatched_uom2,
+        
+        (SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_SKU_UOM_Qty, 0) 
+          ELSE 0 
+        END) - 
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) THEN COALESCE(sd.Stock_out_SKU_UOM_Qty, 0) 
+          ELSE 0 
+        END)) as available_qty_uom2,
+
+        -- UOM3: Stock_In_UOM3_Qty / Stock_out_UOM3_Qty
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_UOM3_Qty, 0) 
+          ELSE 0 
+        END) as total_received_uom3,
+        
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) THEN COALESCE(sd.Stock_out_UOM3_Qty, 0) 
+          ELSE 0 
+        END) as total_dispatched_uom3,
+        
+        (SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (11, 13) THEN COALESCE(sd.Stock_In_UOM3_Qty, 0) 
+          ELSE 0 
+        END) - 
+        SUM(CASE 
+          WHEN sm.Stock_Type_ID IN (12, 14) THEN COALESCE(sd.Stock_out_UOM3_Qty, 0) 
+          ELSE 0 
+        END)) as available_qty_uom3
         
       FROM stk_detail sd
       INNER JOIN stk_main sm ON sd.STK_Main_ID = sm.ID
@@ -155,7 +475,6 @@ const getAvailableBatchesForItem = async (req, res) => {
         AND sd.batchno IS NOT NULL 
         AND sd.batchno != ''
       GROUP BY sd.batchno, sd.Item_ID, zi.itemName, zc.acName
-      -- FIXED: No HAVING clause - show all batches
       ORDER BY sd.batchno ASC
     `, {
       replacements: { itemId },
@@ -164,17 +483,25 @@ const getAvailableBatchesForItem = async (req, res) => {
 
     const processedBatches = availableBatches.map(batch => ({
       batchno: batch.batchno,
-      batchName: batch.batchName || batch.batchno, // Fallback to batchno if no name found
+      batchName: batch.batchName || batch.batchno,
       item_id: batch.Item_ID,
       item_name: batch.itemName,
+      // UOM1 (existing - backward compatible)
       total_received_uom1: parseFloat(batch.total_received_uom1) || 0,
       total_dispatched_uom1: parseFloat(batch.total_dispatched_uom1) || 0,
       available_qty_uom1: parseFloat(batch.available_qty_uom1) || 0,
+      // UOM2 (new)
+      total_received_uom2: parseFloat(batch.total_received_uom2) || 0,
+      total_dispatched_uom2: parseFloat(batch.total_dispatched_uom2) || 0,
+      available_qty_uom2: parseFloat(batch.available_qty_uom2) || 0,
+      // UOM3 (new)
+      total_received_uom3: parseFloat(batch.total_received_uom3) || 0,
+      total_dispatched_uom3: parseFloat(batch.total_dispatched_uom3) || 0,
+      available_qty_uom3: parseFloat(batch.available_qty_uom3) || 0,
       edit_mode: false
     }));
 
-    // console.log(`✅ CREATE MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
-    console.log(  `Batches:`, processedBatches);
+    console.log(`✅ CREATE MODE: ${processedBatches.length} batches for Item_ID ${itemId}`);
 
     res.json({
       success: true,
@@ -190,6 +517,25 @@ const getAvailableBatchesForItem = async (req, res) => {
     });
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const createDispatch = async (req, res) => {
   const { stockMain, stockDetails, updateOrderStatus, selectedOrderStatus } = req.body;
@@ -254,7 +600,7 @@ const createDispatch = async (req, res) => {
       });
 
       const availableStock = batchCheck[0]?.available || 0;
-      
+
       // ✅ FIXED: Calculate requested quantity based on sale_unit
       let requestedQty = 0;
       if (detail.sale_unit === 1) {
@@ -303,21 +649,21 @@ const createDispatch = async (req, res) => {
         Item_ID: detail.Item_ID,
         batchno: detail.batchno,
         Uom_Id: detail.Uom_Id || 0,
-        
+
         // ✅ FIXED: Map quantities properly
         uom1_qty: parseFloat(detail.uom1_qty) || 0,
         uom2_qty: parseFloat(detail.uom2_qty) || 0,
         uom3_qty: parseFloat(detail.uom3_qty) || 0,
         sale_unit: detail.sale_unit || 1,
-        
+
         // ✅ Set stock out quantity
         Stock_out_UOM_Qty: stockOutQty,
         Stock_out_SKU_UOM_Qty: 0,
-        
+
         // Set Stock_In quantities to 0 for dispatch
         Stock_In_UOM_Qty: 0,
         Stock_In_SKU_UOM_Qty: 0,
-        
+
         Stock_Price: parseFloat(detail.Stock_Price) || 0,
         Discount_A: parseFloat(detail.Discount_A) || 0,
         Discount_B: parseFloat(detail.Discount_B) || 0,
@@ -336,7 +682,7 @@ const createDispatch = async (req, res) => {
     // ✅ NEW: Update source order status if Order_Main_ID exists
     if (stockMain.Order_Main_ID) {
       console.log(`🔄 Updating source order ${stockMain.Order_Main_ID}...`);
-      
+
       try {
         const orderUpdateData = {
           is_Note_generated: true, // ✅ CRITICAL: Set to true when dispatch is created
@@ -469,7 +815,8 @@ const getAllDispatches = async (req, res) => {
         {
           model: Stk_Detail, as: 'details',
           include: [
-            { model: ZItems, as: 'item', attributes: ['id', 'itemName', 'sellingPrice'],
+            {
+              model: ZItems, as: 'item', attributes: ['id', 'itemName', 'sellingPrice'],
               include: [
                 { model: Uom, as: 'uom1', attributes: ['uom'] },
                 { model: Uom, as: 'uomTwo', attributes: ['uom'] },
@@ -508,7 +855,8 @@ const getDispatchById = async (req, res) => {
       include: [
         {
           model: Stk_Detail, as: 'details',
-          include: [{ model: ZItems, as: 'item',
+          include: [{
+            model: ZItems, as: 'item',
             include: [
               { model: Uom, as: 'uom1' },
               { model: Uom, as: 'uomTwo' },
@@ -584,8 +932,10 @@ const updateDispatch = async (req, res) => {
 
     const updatedDispatch = await Stk_main.findByPk(id, {
       include: [
-        { model: Stk_Detail, as: 'details',
-          include: [{ model: ZItems, as: 'item',
+        {
+          model: Stk_Detail, as: 'details',
+          include: [{
+            model: ZItems, as: 'item',
             include: [
               { model: Uom, as: 'uom1', attributes: ['uom'] },
               { model: Uom, as: 'uomTwo', attributes: ['uom'] },

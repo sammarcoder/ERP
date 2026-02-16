@@ -1,4 +1,3 @@
-
 // models/Stk_main.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/database');
@@ -35,13 +34,10 @@ const Stk_main = sequelize.define('Stk_main', {
         defaultValue: 'UnPost'
     },
     Purchase_Type: {
-        type: DataTypes.ENUM('Local', 'Foreign', 'Mfg', 'Local selling'),
+        type: DataTypes.STRING,
+        // type: DataTypes.ENUM('Local', 'Foreign', 'Mfg', 'Local selling'),
         // comment: 'Local/Foreign/Mfg/ Local selling'
     },
-    // Purchase_Batchno: {
-    //     type: DataTypes.INTEGER,
-    //     comment: 'Foreign key to ZCOA for batch reference'
-    // },
     Status_Account_Entry: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -113,7 +109,7 @@ const Stk_main = sequelize.define('Stk_main', {
         // ✅ ADD THIS: Reset order status when stock record is deleted
         afterDestroy: async (stkRecord, options) => {
             try {
-                const { Order_Main } = require('./Order_main');
+                const { Order_Main } = require('./ordeMain.model');
                 const orderId = stkRecord.Order_Main_ID;
 
                 // Check if there are any other stock records for this order

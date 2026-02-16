@@ -29,6 +29,12 @@ const zlcvRoutes = require('./zlcv.routes.js');
 
 const masterTypeRoutes = require('./ZMasterType.routes');
 const lcMainRoutes = require('./LcMain.routes');
+const recipeRoutes = require('./ZRecipe.routes');
+const zGinRouter = require('./ZGin.routes');
+const zMgrnRoutes = require('./ZMgrn.routes');
+// In app.js or routes/index.js
+
+const batchReportRoutes = require('./BatchReport.routes');
 
 
 
@@ -84,6 +90,11 @@ router.use('/master-types', masterTypeRoutes);
 
 
 router.use('/lc-main', lcMainRoutes);
+
+router.use('/recipe', recipeRoutes);
+router.use('/gin', zGinRouter);
+router.use('/mgrn', zMgrnRoutes);
+router.use('/batch-report', batchReportRoutes);
 
 
 module.exports = router

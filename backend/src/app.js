@@ -141,6 +141,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const sequelize = require('../config/database');
+const ZGinEmployee = require('../src/models/ZGinEmployee.model.js');
 
 const app = express();
 
@@ -148,9 +149,23 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(cors());
 
-app.get('/api', (req, res) => {
-  res.json({ name: "sammar" });
-});
+app.get('/api',async (req, res) => {
+
+
+ try {
+  const gemp = await ZGinEmployee.findAll()
+  res.json({data:gemp})
+
+ }catch(err){
+res.json({error:err.message
+ })}
+
+
+})
+
+
+  // res.json({ name: "sammar" });
+
 
 app.use('/api', require('./routes/index.js'));
 
